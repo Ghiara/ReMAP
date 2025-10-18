@@ -26,11 +26,11 @@ from tigr.agent_module import Agent
 from tigr.training_algorithm import TrainingAlgorithm
 # from tigr.task_inference.true_gmm_inference import DecoupledEncoder
 # from tigr.trainer.true_gmm_trainer import AugmentedTrainer
-from tigr.task_inference.dpmm_bnp import BNPModel
-from tigr.task_inference.dpmm_inference import DecoupledEncoder
-from tigr.trainer.dpmm_trainer import AugmentedTrainer
-# from tigr.task_inference.stick_break_inference import DecoupledEncoder
-# from tigr.trainer.stick_break_trainer import AugmentedTrainer
+# from tigr.task_inference.dpmm_bnp import BNPModel
+# from tigr.task_inference.dpmm_inference import DecoupledEncoder
+# from tigr.trainer.dpmm_trainer import AugmentedTrainer
+from tigr.task_inference.stick_break_inference import DecoupledEncoder
+from tigr.trainer.stick_break_trainer import AugmentedTrainer
 
 from torch.utils.tensorboard import SummaryWriter
 import vis_utils.tb_logging as TB
@@ -106,16 +106,19 @@ def experiment(variant):
     else:
         raise NotImplementedError
 
-    bnp_model = BNPModel(
-        save_dir=variant['dpmm_params']['save_dir'],
-        start_epoch=variant['dpmm_params']['start_epoch'],
-        gamma0=variant['dpmm_params']['gamma0'],
-        num_lap=variant['dpmm_params']['num_lap'],
-        fit_interval=variant['dpmm_params']['fit_interval'],
-        kl_method=variant['dpmm_params']['kl_method'],
-        birth_kwargs=variant['dpmm_params']['birth_kwargs'],
-        merge_kwargs=variant['dpmm_params']['merge_kwargs']
+    if variant['inference_option'] == "dpmm":
+        bnp_model = BNPModel(
+            save_dir=variant['dpmm_params']['save_dir'],
+            start_epoch=variant['dpmm_params']['start_epoch'],
+            gamma0=variant['dpmm_params']['gamma0'],
+            num_lap=variant['dpmm_params']['num_lap'],
+            fit_interval=variant['dpmm_params']['fit_interval'],
+            kl_method=variant['dpmm_params']['kl_method'],
+            birth_kwargs=variant['dpmm_params']['birth_kwargs'],
+            merge_kwargs=variant['dpmm_params']['merge_kwargs']
     )
+    else:
+        bnp_model = None 
 
     encoder = DecoupledEncoder(
         shared_dim,
@@ -457,4 +460,13 @@ def main(config=None, name='', ti_option='', gpu=None, use_mp=None, num_workers=
 
 
 if __name__ == "__main__":
+    import torch
+    print("CUDA available:", torch.cuda.is_available())
+    print("Current device:", torch.cuda.current_device() if torch.cuda.is_available() else "CPU only")
+    print("Device name:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "No GPU")
+
+ 
+       
+ 
+
     click_main()

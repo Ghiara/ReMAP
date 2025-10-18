@@ -122,11 +122,9 @@ def load_and_plot(csv_files, column_name, plot_name, rows_range=(0,2400)):
     # Call the save_plot function with all the extracted data
     save_plot(loss_histories, names, plot_name, path=f'{os.getcwd()}/experiment_plots', figure_size=(20, 10), fill=True, rolling_window=50, fill_scaling_factor=1.0)
 csv_file_paths = dict(
-    paths = ['/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_02_15_23_09_default_true_gmm/cheetah_retrain_beta_0.1/progress.csv',
-             '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_11_10_26_00_default_true_gmm/progress.csv',
-             '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_12_09_17_42_default_true_gmm/cheetah_retrain_beta_0.1/progress.csv',],
-    names = ['No random', 'var_0.1','var0.2']
+    paths = ['/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2025_09_22_13_09_15_default_true_gmm_seed_47/progress.csv',],
+    names = ['No random']
 )
-column_name = 'Reward History'
+column_name = 'train_eval_avg_reward_deterministic'
 plot_name = 'Randomness comparisson'
 load_and_plot(csv_file_paths, column_name, plot_name)

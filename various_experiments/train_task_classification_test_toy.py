@@ -463,7 +463,9 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, transfer_function, m
             # _,_, logits = decoder(ptu.from_numpy(simple_obs_before), simple_action, 0, mu.squeeze())
             _simple_obs,r,_,_ = simple_env.step(simple_action.detach().cpu().numpy())
             image = simple_env.render()
-            imageio.imwrite('{os.getcwd()}/toy.pdf', image)
+            # imageio.imwrite('{os.getcwd()}/toy.pdf', image)
+            import os
+            imageio.imwrite(f"{os.getcwd()}/toy.pdf", image)
             # simple_obs = torch.zeros_like(torch.tensor(task)).to(DEVICE)
 
             x_pos_curr.append(simple_env.sim.data.qpos[0])

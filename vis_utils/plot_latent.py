@@ -15,7 +15,7 @@ PLOT_LIST = []
 MARKERS = ['.', '^', 's', 'p', '*', 'X', 'h', 'd', '+', 'P']
 
 
-def main(path, run_name=None, show_='last', save=True, use_tsne=True, DIM_RED=2, hardcoded=f'{os.getcwd()}/output/toy1d-multi-task/2024_07_11_15_51_58_default_true_gmm/walker_full_30_06'):
+def main(path, run_name=None, show_='last', save=True, use_tsne=True, DIM_RED=2, hardcoded=f'{os.getcwd()}/output/toy1d-multi-task/2025_09_22_13_09_15_default_true_gmm'):
    
     data_dir = os.path.join(path, 'tensorboard')
     # data_dir = '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_07_11_15_51_58_default_true_gmm'
@@ -179,7 +179,7 @@ def main(path, run_name=None, show_='last', save=True, use_tsne=True, DIM_RED=2,
         else:
             ax = plt.gca()
             # ax.set_aspect('auto')
-            ax.set_title(f'Walker 4-Task')
+            ax.set_title(f'Toy 4-Task')
 
         legend_elements = []
         colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -292,6 +292,8 @@ def main(path, run_name=None, show_='last', save=True, use_tsne=True, DIM_RED=2,
 
         if save:
             plt.savefig(os.path.join(fig_folder, f'encodings.pdf'), format='pdf', dpi=100, bbox_inches='tight')
+            plt.savefig(os.path.join(fig_folder, f'encodings.png'), format='png', dpi=100, bbox_inches='tight')
+
         else:
             plt.show()
 
@@ -478,18 +480,18 @@ if __name__ == '__main__':
     # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_09_13_11_12_default_true_gmm'
     # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_10_08_03_29_default_true_gmm'
     # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_10_08_03_29_default_true_gmm',
-    '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_11_10_26_00_default_true_gmm',     # different random, var=0.1
-    '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_11_11_49_42_default_true_gmm',     # no random, 10 steps
-    '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_12_09_17_42_default_true_gmm',     # 32 steps, random var=0.2
-    '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_12_20_31_24_default_true_gmm',     # var = 0.05
-    '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_13_00_07_13_default_true_gmm',     # next is var 0.1, steps 10
-    '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_14_20_58_59_default_true_gmm',     # var 0.1, multi
-    '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_14_20_55_42_default_true_gmm',     # var 0.1, step 10
-    '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_16_12_22_59_default_true_gmm',     # keep training var0.1 step 32, without random ??
-    '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_16_15_34_37_default_true_gmm',     # keep training var0.1 step 32, with var 0.1 ??
-    '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_21_11_05_23_default_true_gmm',     # var 0.05
-    '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_21_11_06_00_default_true_gmm',     # var 0.02
-    '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_23_12_40_04_default_true_gmm',     # var 0.05
+    # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_11_10_26_00_default_true_gmm',     # different random, var=0.1
+    # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_11_11_49_42_default_true_gmm',     # no random, 10 steps
+    # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_12_09_17_42_default_true_gmm',     # 32 steps, random var=0.2
+    # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_12_20_31_24_default_true_gmm',     # var = 0.05
+    # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_13_00_07_13_default_true_gmm',     # next is var 0.1, steps 10
+    # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_14_20_58_59_default_true_gmm',     # var 0.1, multi
+    # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_14_20_55_42_default_true_gmm',     # var 0.1, step 10
+    # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_16_12_22_59_default_true_gmm',     # keep training var0.1 step 32, without random ??
+    # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_16_15_34_37_default_true_gmm',     # keep training var0.1 step 32, with var 0.1 ??
+    # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_21_11_05_23_default_true_gmm',     # var 0.05
+    # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_21_11_06_00_default_true_gmm',     # var 0.02
+    '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2025_09_22_13_09_15_default_true_gmm',     # var 0.05
 
 
         ]

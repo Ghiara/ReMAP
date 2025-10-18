@@ -48,7 +48,7 @@ toy_config = dict(
         use_data_normalization=False,  # normalize data from experience
         sampling_mode=[None, 'linear'][0], # can be one of None, 'linear'
         use_fixed_seeding=True,  # seeding, make comparison more robust
-        seed=0,  # seeding, make comparison more robust
+        seed=42,  # seeding, make comparison more robust
 
         encoding_mode=['transitionSharedY', 'trajectory'][0],  # encoding mode, will be set automatically if wrong is chosen
         encoder_type=['gru', 'mlp', 'conv', 'transformer'][0],
@@ -66,7 +66,7 @@ toy_config = dict(
         max_replay_buffer_size=10000000,  # write as integer!
 
         permute_samples=False,  # if order of samples from previous timesteps should be permuted (avoid learning by heart)
-        num_train_epochs=1000,  # number of overall training epochs
+        num_train_epochs=2000,  # number of overall training epochs
 
         num_training_steps_policy=512,  # number of policy training steps per training epoch
         num_training_steps_reconstruction=128,  # number of reconstruction training steps per training epoch

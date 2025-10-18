@@ -195,10 +195,11 @@ def _rollout_with_encoder(
             # task = np.zeros(..)
             # task[env.base_task] = task[0]
             task = np.zeros_like(env.task)
-            if simple_action<0:
-                env.base_task = env.config['tasks']['goal_back']
-            else:
-                env.base_task = env.config['tasks']['goal_front']
+            # if simple_action<0:
+            #     env.base_task = env.config['tasks']['goal_back']
+            # else:
+            #test only for goal left
+            env.base_task = env.config['tasks']['goal_left']
         task[env.base_task] = simple_obs[0]
             # task = np.array([task[0],0])
 

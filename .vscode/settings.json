@@ -1,0 +1,44 @@
+{
+//   "editor.formatOnSave": false,
+//   "editor.formatOnType": false,
+//   "editor.formatOnPaste": false,
+
+//   "editor.detectIndentation": false,
+  // "editor.insertSpaces": true,
+  // "editor.tabSize": 4,
+
+  "files.eol": "auto",
+  // "files.trimTrailingWhitespace": false,
+  // "files.insertFinalNewline": false,
+
+  // "editor.codeActionsOnSave": {
+  //   "source.fixAll": false,
+  //   "source.organizeImports": false
+  // },
+
+
+  // settings for saving without formatting python files
+  "[python]": {
+    "editor.defaultFormatter": null,
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "never"
+    }
+  },
+
+
+      "python.analysis.extraPaths": [
+        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization",
+        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL/submodules/meta-environments-main",
+        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/meta_rand_envs",
+        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL/submodules/MRL-analysis-tools-main",
+        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/rand_param_envs",
+        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL/submodules/rlkit",
+        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/SAC",
+        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL",
+        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL/submodules/symmetrizer",
+        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/MRL-Inference-Reutilization/submodules",
+        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/tigr"
+
+    ]
+}

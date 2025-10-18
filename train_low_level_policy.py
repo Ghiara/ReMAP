@@ -1,4 +1,5 @@
-
+import os
+print(">>> DISPLAY =", os.environ.get("DISPLAY"))
 from agent import SAC
 import json
 from torch.utils.tensorboard import SummaryWriter
@@ -6,7 +7,7 @@ import numpy as np
 from sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
 from sac_envs.hopper_multi import HopperMulti
 from sac_envs.walker_multi import WalkerMulti
-from sac_envs.ant_multi import AntMulti
+from sac_envs.ant_multi_old import AntMulti
 import torch
 import cv2
 from typing import List, Any, Dict, Callable
@@ -34,7 +35,7 @@ from mrl_analysis.utility.data_smoothing import smooth_plot, smooth_fill_between
 from vis_utils.vis_logging import log_all, _frames_to_gif
 
 saved_dict = False
-record_video_every = 50
+record_video_every = 20000
 
 
 def train(env, agent, epochs, experiment_name, save_after_episodes, policy_update_steps, batch_size=config['batch_size'], path=os.path.join(os.getcwd(), 'output/low_level_policy')):
@@ -65,7 +66,8 @@ def train(env, agent, epochs, experiment_name, save_after_episodes, policy_updat
 
     for episode in range(1, epochs + 1):
         print("\033[1m" + f"Episode: {episode}" + "\033[0m")
-
+        # If using ant_multi env, set the epoch for the env
+        env.set_epoch(episode)
         '''
         Initialize list for logging
         '''
@@ -149,7 +151,13 @@ def train(env, agent, epochs, experiment_name, save_after_episodes, policy_updat
                 '''
                 action = agent.choose_action(state, task)
                 next_state, reward, done, _, info = env.step(action)
+                curr_state = env.get_body_com("torso")[0]
                 # reward = reward.clip(-5, 2)
+                #debug
+                # print("DEBUG next_state shape:", np.shape(next_state))
+                # print("DEBUG next_state sample:", next_state[:5])  
+                # print("DEBUG torso pos:", env.get_body_com("torso"))
+
 
                 '''
                 Train after every step with random sample from buffer
@@ -163,13 +171,13 @@ def train(env, agent, epochs, experiment_name, save_after_episodes, policy_updat
                 '''
                 Save the position for plotting trajectories
                 '''
-                if env.base_task == env.config.get('tasks',{}).get('goal_front'):
+                if env.base_task == env.config.get('tasks',{}).get('goal_left'):
                     curr_state = env.sim.data.qpos[0]
-                elif env.base_task == env.config.get('tasks',{}).get('goal_back'):
+                elif env.base_task == env.config.get('tasks',{}).get('goal_right'):
                     curr_state = env.sim.data.qpos[0]
-                elif env.base_task == env.config.get('tasks',{}).get('forward_vel'):
+                elif env.base_task == env.config.get('tasks',{}).get('velocity_left'):
                     curr_state = env.sim.data.qvel[0]
-                elif env.base_task == env.config.get('tasks',{}).get('backward_vel'):
+                elif env.base_task == env.config.get('tasks',{}).get('velocity_right'):
                     curr_state = env.sim.data.qvel[0]
                 elif env.base_task == env.config.get('tasks',{}).get('stand_front'):
                     curr_state = env.sim.data.qpos[2]
@@ -249,17 +257,26 @@ def load_config(env_name):
         from experiments_configs.hopper_multi import config
     elif env_name == "walker2d":
         from experiments_configs.walker_multi import config
+    elif env_name == "ant":
+        from experiments_configs.ant_multi import config
     else:
         raise ValueError(f"Unsupported environment: {env_name}")
     return config
 
 if __name__ == "__main__":
 
+    import torch
+    print("CUDA available:", torch.cuda.is_available())
+    print("Current device:", torch.cuda.current_device() if torch.cuda.is_available() else "CPU only")
+    print("Device name:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "No GPU")
+
+
+
     parser = argparse.ArgumentParser(description="Load environment config.")
     parser.add_argument(
         "--env",
         type=str,
-        choices=["cheetah", "hopper", "walker2d"],
+        choices=["cheetah", "hopper", "walker2d", "ant"],
         default="cheetah",
         help="Specify the environment to load config for. Default is 'cheetah'."
     )
@@ -278,12 +295,12 @@ if __name__ == "__main__":
     elif config['env'] == 'walker_multi':
         env = WalkerMulti(config)
     elif config['env'] == 'ant_multi':
-        env = AntMulti()
+        env = AntMulti(config)#needs to add config for ant_multi env
     else:
         print('Invalid argument for environment name... Instantiating hopper env instead')
-        env = HopperGoal()
+        #env = HopperGoal()
 
-    env.render_mode = 'rgb_array'
+    env.render_mode = None
 
     n_states = env.observation_space.shape[0]
     n_actions = env.action_space.shape[0]

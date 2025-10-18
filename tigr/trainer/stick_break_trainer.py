@@ -84,7 +84,7 @@ class AugmentedTrainer(BaseTrainer):
 
         # Calculate standard losses
         # Put in decoder to get likelihood
-        state_estimate, reward_estimate = self.decoder(states, actions, decoder_state_target,
+        state_estimate, reward_estimate, _ = self.decoder(states, actions, decoder_state_target,
                                                        latent_variables.unsqueeze(1).repeat(1, states.shape[1], 1))
         mixture_state_loss = torch.mean((decoder_state_target - state_estimate) ** 2, dim=[-2, -1])
         mixture_reward_loss = torch.mean((rewards - reward_estimate) ** 2, dim=[-2, -1])

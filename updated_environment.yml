@@ -1,4 +1,4 @@
-name: inference-reutilization
+name: bo-infer
 channels:
   - defaults
   - conda-forge

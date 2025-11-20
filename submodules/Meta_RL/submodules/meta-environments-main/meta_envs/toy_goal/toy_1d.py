@@ -503,54 +503,135 @@ class Toy1dContinuous(Toy1dDynamic):
         return self.state, reward, done, False, env_info
 
 
+
+#add the new toy velocity env as legacy support
+class Toy1dVelocity(ToyEnv):
+    """
+    Toy 1D environment for positive-direction velocity tracking.
+    ------------------------------------------------------------
+    - Observation: current velocity (1D)
+    - Action: acceleration (1D)
+    - Task goal: target velocity (only positive values)
+    - Reward: -|current_velocity - goal_velocity|
+    """
+
+    def __init__(
+        self,
+        n_train_tasks: int,
+        n_eval_tasks: int,
+        task_generation_mode: str = 'random',
+        change_steps: int = 100,
+        change_prob: float = 1.0,
+        max_action: float = 0.1,
+        max_vel: float = 1.0,
+        *args,
+        **kwargs,
+    ) -> None:
+        self.max_action = max_action
+        self.max_vel = max_vel
+        self.min_vel = 0.0   # ✅ 限制只在正方向运动
+
+        # === 定义空间 ===
+        self.observation_space = gym.spaces.Box(
+            low=np.array([self.min_vel], dtype=np.float32),
+            high=np.array([self.max_vel], dtype=np.float32),
+        )
+        self.action_space = gym.spaces.Box(
+            low=-self.max_action, high=self.max_action, shape=(1,), dtype=np.float32
+        )
+
+        # === 初始化状态 ===
+        self.state = np.array([0.0], dtype=np.float32)
+
+        # === 定义任务（仅正方向目标速度）===
+        train_tasks, eval_tasks = self._init_tasks(
+            n_train_tasks, n_eval_tasks, mode=task_generation_mode
+        )
+        super().__init__(
+            train_tasks,
+            eval_tasks,
+            change_steps=change_steps,
+            change_prob=change_prob,
+            *args,
+            **kwargs,
+        )
+
+        self.task_type = 'velocity'
+        self._last_action = 0.0
+        self._last_clipped_action = 0.0
+        self._steps_since_task_update = 0
+
+    def _init_tasks(
+        self,
+        n_train_tasks: int,
+        n_eval_tasks: int,
+        mode: str = 'random',
+    ) -> Tuple[List[Task], List[Task]]:
+        """Sample training/eval tasks with only positive goal velocities."""
+        if mode == 'random':
+            train_goals = np.random.uniform(0.0, self.max_vel, size=n_train_tasks)
+            eval_goals = np.random.uniform(0.0, self.max_vel, size=n_eval_tasks)
+        elif mode == 'fixed':
+            train_goals = np.linspace(0.0, self.max_vel, n_train_tasks)
+            eval_goals = np.linspace(0.0, self.max_vel, n_eval_tasks)
+        else:
+            raise ValueError(f"Unknown mode '{mode}' for task_generation_mode")
+
+        train_tasks = [{'id': i, 'goal_velocity': np.array([v])} for i, v in enumerate(train_goals)]
+        eval_tasks = [{'id': i + len(train_goals), 'goal_velocity': np.array([v])} for i, v in enumerate(eval_goals)]
+        return train_tasks, eval_tasks
+
+    def reset(self) -> Tuple[np.ndarray, Dict[str, Any]]:
+        """Reset environment to zero velocity."""
+        self.state = np.array([0.0], dtype=np.float32)
+        self._steps_since_task_update = 0
+        return self.state.copy(), {'true_task': self._task}
+
+    def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, bool, Dict[str, Any]]:
+        """Integrate simple 1D velocity dynamics."""
+        self._try_task_update()
+
+        # 动作限幅
+        acceleration = np.clip(action, -self.max_action, self.max_action).astype(np.float32)
+        assert self.action_space.contains(acceleration), "Action out of range!"
+
+        # 更新速度（无位置）
+        self._last_action = float(action)
+        self._last_clipped_action = float(acceleration)
+
+        # v' = v + a * dt
+        self.state += acceleration * DELTA_T
+        self.state = np.clip(self.state, self.min_vel, self.max_vel)
+
+        # 奖励计算
+        current_vel = float(self.state[0])
+        goal_vel = float(self._task['goal_velocity'])
+        vel_error = abs(current_vel - goal_vel)
+        reward = -vel_error
+
+        info = {
+            'true_task': self._task,
+            'velocity': current_vel,
+            'goal_velocity': goal_vel,
+            'vel_error': vel_error,
+            'reward': reward,
+        }
+
+        self._steps_since_task_update += 1
+        done = False
+        return self.state.copy(), reward, done, False, info
+
+    @property
+    def observation(self):
+        """Return velocity only."""
+        return self.state
+
+
+    def _draw_env(self):
+        """Dummy draw method to satisfy abstract base class."""
+        # 我们的velocity tracking环境不需要图形渲染，这里留空即可
+        pass
+
+
 Toy1dDiscretized = Toy1dContinuous  # Legacy support
 
-
-# class Toy1dRand(Toy1D):
-#     def __init__(
-#             self,
-#             n_train_tasks: int,
-#             n_eval_tasks: int,
-#             task_generation_mode: str = 'random',
-#             one_sided_tasks: bool = False,
-#             task_scale: float = 1.0,
-#             change_steps: int = 100,
-#             change_prob: float = 1.0,
-#             min_pos: float = -1.0,
-#             max_pos: float = 1.0,
-#             max_action: float = 0.1,
-#             max_multiplier: float = 2.0,
-#             min_multiplier: float = 0.5,
-#             *args,
-#             **kwargs,
-#             ) -> None:
-#         super().__init__(
-#             n_train_tasks, n_eval_tasks, task_generation_mode, 
-#             change_steps=change_steps, change_prob=change_prob, 
-#             min_pos=min_pos, max_pos=max_pos, max_action=max_action, 
-#             *args, **kwargs
-#         )
-#         self.max_multiplier = max_multiplier
-#         self.min_multiplier = min_multiplier
-
-#         def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Dict[str, Any]]:
-#             self._try_task_update()
-
-#             clipped_action = action.clip(-self.max_action, self.max_action)
-#             assert self.action_space.contains(clipped_action.astype(np.float32)), "Clipped action is not in action space!"
-
-#             self._last_state = self.state
-#             self.state = (self.state + clipped_action).clip(self.min_pos, self.max_pos)
-#             assert self.observation_space.contains(self.state.astype(np.float32)), "State is not in state space!"
-#             reward = - float(np.abs(self.state - self._task['goal']))
-#             done = False
-#             env_info = {
-#                 'true_task': self._task
-#             }
-
-#             self._steps_since_task_update += 1
-
-#             self._last_action = action.item()
-#             self._last_clipped_action = clipped_action.item()
-
-#             return self.state, reward, done, False, env_info

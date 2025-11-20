@@ -2,10 +2,14 @@ from typing import Tuple
 import numpy as np
 
 from meta_envs.toy_goal import Toy1D, Toy1dContinuous, Toy2D
+from meta_envs.toy_goal.toy_1d import Toy1dVelocity
+
 from meta_envs.wrappers import NoisyEnv, DomainRandomizer
 from meta_envs.mujoco.cheetah import HalfCheetahGoal, HalfCheetahVel
 from meta_envs.mujoco.ant import AntGoal, AntVel
 from meta_envs.toy_goal.toy_goal_legacy import ToyGoalEnv
+
+
 
 
 def toy1d() -> Tuple[Toy1D, Toy1D]:
@@ -15,13 +19,32 @@ def toy1d() -> Tuple[Toy1D, Toy1D]:
         "n_eval_tasks": 25,
         "change_steps": 1000,
         "task_generation_mode": 'random',
-        "max_action": 0.01,
-        "min_pos": .1,
+        "max_action": 1,
+        "min_pos": -10.0,
         "max_pos": 10.0,
     }
     expl_env = Toy1D(*env_args, **env_kwargs)
     eval_env = Toy1D(*env_args, **env_kwargs)
     return expl_env, eval_env
+
+
+
+def toy1d_vel() -> Tuple[Toy1dVelocity, Toy1dVelocity]:
+    env_args = []
+    env_kwargs = {
+        "n_train_tasks": 100,
+        "n_eval_tasks": 25,
+        "change_steps": 1000,
+        "task_generation_mode": 'random',
+        "max_action": 1.0,
+        # "min_pos": -30.0,
+        # "max_pos": 30.0,
+        "max_vel": 3.0,
+    }
+    expl_env = Toy1dVelocity(*env_args, **env_kwargs)
+    eval_env = Toy1dVelocity(*env_args, **env_kwargs)
+    return expl_env, eval_env
+
 
 def toy1d_rand() -> Tuple[Toy1D, Toy1D]:
     env_args = []

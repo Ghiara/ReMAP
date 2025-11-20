@@ -46,6 +46,44 @@ def map_cheetah_to_toy1d(
     actions = next_observations - observations
     return observations, actions, rewards, next_observations, terminals
 
+
+
+def map_cheetah_to_toy1d_velocity(
+    observations: torch.Tensor, 
+    actions: torch.Tensor, 
+    rewards: torch.Tensor, 
+    next_observations: torch.Tensor, 
+    terminals: torch.Tensor
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """
+    Maps transitions from the cheetah environment
+    to the discrete, one-dimensional velocity environment.
+    """
+    observations = observations[...,8:9]
+    next_observations = next_observations[...,8:9]
+    actions = next_observations - observations
+    return observations, actions, rewards, next_observations, terminals
+
+
+
+def map_ant_to_toy1d_velocity(
+    observations: torch.Tensor, 
+    actions: torch.Tensor, 
+    rewards: torch.Tensor, 
+    next_observations: torch.Tensor, 
+    terminals: torch.Tensor
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """
+    Maps transitions from the ant environment
+    to the discrete, one-dimensional velocity environment.
+    """
+    observations = observations[...,15:16]
+    next_observations = next_observations[...,15:16]
+    actions = next_observations - observations
+    return observations, actions, rewards, next_observations, terminals
+
+
+
 def map_cheetah_to_limited_toy1d(
     observations: torch.Tensor, 
     actions: torch.Tensor, 

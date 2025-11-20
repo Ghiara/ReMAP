@@ -122,9 +122,9 @@ def load_and_plot(csv_files, column_name, plot_name, rows_range=(0,2400)):
     # Call the save_plot function with all the extracted data
     save_plot(loss_histories, names, plot_name, path=f'{os.getcwd()}/experiment_plots', figure_size=(20, 10), fill=True, rolling_window=50, fill_scaling_factor=1.0)
 csv_file_paths = dict(
-    paths = ['/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2025_09_22_13_09_15_default_true_gmm_seed_47/progress.csv',],
+    paths = ['/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL/data/experiments_thesis/step1_biggerNN_velocity_-4_4_v2_right_directions/_2025-11-08_23-55-50/progress.csv',],
     names = ['No random']
 )
-column_name = 'train_eval_avg_reward_deterministic'
-plot_name = 'Randomness comparisson'
+column_name = 'eval/Average Returns'
+plot_name = 'toy_goal_1d_velocity_right_experiment_comparison'
 load_and_plot(csv_file_paths, column_name, plot_name)

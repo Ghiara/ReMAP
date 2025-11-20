@@ -67,7 +67,7 @@ def train(env, agent, epochs, experiment_name, save_after_episodes, policy_updat
     for episode in range(1, epochs + 1):
         print("\033[1m" + f"Episode: {episode}" + "\033[0m")
         # If using ant_multi env, set the epoch for the env
-        env.set_epoch(episode)
+        # env.set_epoch(episode)
         '''
         Initialize list for logging
         '''

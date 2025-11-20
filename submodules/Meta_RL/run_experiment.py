@@ -19,11 +19,11 @@ import pytz
 from smrl.experiment.experiment_setup import setup_experiment
 from configs.base_configuration import config
 # from configs.base_configuration_bigger_envs import config
-from configs.environment_factory import toy1d_rand, toy1d
+from configs.environment_factory import toy1d_rand, toy1d, toy1d_vel
 
 
 # Environment
-config['environment_factory'] = toy1d
+config['environment_factory'] = toy1d_vel
 
 
 # GPU available?
@@ -39,8 +39,8 @@ if os.environ["MULTITHREADING"] == "True":
 
 # Setup experiment, modify logging parameters
 # experiment_name = f"{config['environment_factory'].__name__}_{config['description']['name']}"
-experiment_name = "experiments_thesis/step1_biggerNN_-10_10/"
-config['algorithm_kwargs']['num_epochs'] = 5_000
+experiment_name = "experiments_thesis/step1_biggerNN_velocity__vel4_v3_right_directions/"
+config['algorithm_kwargs']['num_epochs'] = 3_000
 current_time = datetime.now().astimezone(pytz.timezone('Europe/Berlin'))
 logger_kwargs = {
     'log_dir': f"./data/{experiment_name}_{current_time.strftime('%Y-%m-%d_%H-%M-%S')}",

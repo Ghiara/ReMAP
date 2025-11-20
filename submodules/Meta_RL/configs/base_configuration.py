@@ -16,6 +16,7 @@ config = OrderedDict(
         'variant': 'Base configuration',
     },
 
+    #Only for velocity tracking training use dim =2
     observation_dim = 1,
     action_dim = 1,
     latent_dim = 1,

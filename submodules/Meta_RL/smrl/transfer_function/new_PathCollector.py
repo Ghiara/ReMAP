@@ -73,14 +73,18 @@ class TrajectoryGeneratorWithTransferFunction():
             - 'rew_dist': Distribution over encoder-predicted rewards (only if decoder provided)
             - 'std_dist': Distribution over encoder-predicted next states (only if decoder provided)
         """
-
+        #only use the simple env, encoder, transfer function for rollout
+        #how to bridge the HL to LL, happens in the rollout_with_encoder function
         rollout_fn = rollout_with_encoder(self.simple_env, self.encoder, self.transfer_function, context_size=self.encoder.context_size)
+        #choose the type of path collector
         path_collector_type = MdpPathCollector
         if 'MULTITHREADING' in os.environ.keys() and os.environ['MULTITHREADING'] == "True":
             path_collector_type = MultithreadedPathCollector
         path_collector = path_collector_type(self.env, self.policy, rollout_fn)
         
         print("Collecting trajectories...")
+        #rollout in the real env with the HL policy
+        #use the path collector of type multithreadpathcollector to collect trajectories
         trajectories = path_collector.collect_new_paths(max_path_length, n_trajectories)
 
         print("Adding additional information...")

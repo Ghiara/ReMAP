@@ -18,8 +18,20 @@ class HalfCheetahMixtureEnv(HalfCheetahEnv, utils.EzPickle):
             )
         self.reached_goal = 0
         self.config = config
+        self.reward_params = config.get('reward_params', {})
         self.task = self.sample_task()
-
+        self.r_w_track      = self.reward_params.get('w_track', 1.0)
+        self.r_w_energy     = self.reward_params.get('w_energy', 1e-3)
+        self.r_w_smooth_vel = self.reward_params.get('w_smooth_vel', 0.1)
+        self.r_w_smooth_act = self.reward_params.get('w_smooth_act', 1e-3)
+        self.r_w_pitch      = self.reward_params.get('w_pitch', 0.5)
+        self.r_alpha        = self.reward_params.get('vx_filter_alpha', 0.8)
+        self.r_scale        = self.reward_params.get('reward_scale', 3.0)
+        
+        # === 新增：用于平滑 reward 的临时量 ===
+        self._vx_filt = None          # 低通滤波后的 vx
+        self._prev_vx_filt = None     # 上一步滤波 vx
+        self._prev_action = None      # 上一步动作 (用于Δa惩罚)
 # class HalfCheetahMixtureEnv(HalfCheetahEnv, utils.EzPickle):
 #     def __init__(self, healthy_scale = 1, render_mode: str = 'rgb_array', *args, **kwargs):
 #         super().__init__(render_mode=render_mode,*args, **kwargs)
@@ -120,20 +132,78 @@ class HalfCheetahMixtureEnv(HalfCheetahEnv, utils.EzPickle):
         #     reward_ctrl = -0.5 * 1e-1 * np.sum(np.square(action))
         #     reward = reward_ctrl * 1.0 + reward_run
 
-        elif self.base_task in [self.config.get('tasks',{}).get('forward_vel'), self.config.get('tasks',{}).get('backward_vel')]: # velocity
-            forward_vel = xvelafter[0]
-            if not norm:
-                norm = 1
+        #old velocity task reward function construction
+        # elif self.base_task in [self.config.get('tasks',{}).get('forward_vel'), self.config.get('tasks',{}).get('backward_vel')]: # velocity
+        #     forward_vel = xvelafter[0]
+        #     if not norm:
+        #         norm = 1
+        #     else:
+        #         norm = np.abs(self.task[self.base_task])
+        #     reward_run = -1.0 * np.abs(forward_vel - self.task[self.base_task]) / norm
+        #     # reward_ctrl = -0.5 * 1e-1 * np.sum(np.square(action))
+        #     reward_ctrl = 0
+        #     reward = reward_ctrl * 1.0 + reward_run
+
+        elif self.base_task in [self.config['tasks']['forward_vel'],
+                                self.config['tasks']['backward_vel']]:
+
+            v_target = float(self.task[self.base_task])
+
+            # --- 低通滤波 vx ---
+            vx_raw = float(xvelafter[0])
+            if self._vx_filt is None:
+                self._vx_filt = vx_raw
             else:
-                norm = np.abs(self.task[self.base_task])
-            reward_run = -1.0 * np.abs(forward_vel - self.task[self.base_task]) / norm
-            # reward_ctrl = -0.5 * 1e-1 * np.sum(np.square(action))
-            reward_ctrl = 0
-            reward = reward_ctrl * 1.0 + reward_run
-            # if np.abs(forward_vel - self.task[3]) < 0.1:
-            #     self.reached_goal += 1
-            #     if self.reached_goal == 20:
-            #         reward+=1
+                alpha = self.r_alpha
+                self._vx_filt = alpha * self._vx_filt + (1 - alpha) * vx_raw
+            vx_filt = float(self._vx_filt)
+
+            # --- norm ---
+            v_norm = max(abs(v_target), 1e-3)
+
+            # ① tracking
+            track_term = - abs(vx_filt - v_target) / v_norm
+
+            # ② energy
+            energy_term = - float(np.sum(np.square(action)))
+
+            # ③ smooth velocity
+            if self._prev_vx_filt is None:
+                dv = 0.0
+            else:
+                dv = abs(vx_filt - float(self._prev_vx_filt))
+            smooth_vel_term = - dv
+
+            # ④ smooth action
+            if self._prev_action is None:
+                da2 = 0.0
+            else:
+                da2 = float(np.sum(np.square(action - self._prev_action)))
+            smooth_act_term = - da2
+
+            # ⑤ pitch
+            pitch = float(xposafter[2])
+            pitch_term = - abs(pitch)
+
+            # --- 加权和 + scale ---
+            reward = (
+                self.r_w_track      * track_term +
+                self.r_w_energy     * energy_term +
+                self.r_w_smooth_vel * smooth_vel_term +
+                self.r_w_smooth_act * smooth_act_term +
+                self.r_w_pitch      * pitch_term
+            )
+
+            reward = self.r_scale * reward
+            reward = float(np.clip(reward, -10.0, 0.0))
+
+            reward_run = track_term
+            reward_ctrl = reward - track_term  # 仅用于 info
+
+            self._prev_vx_filt = vx_filt
+            self._prev_action = np.array(action, copy=True)
+
+
         else:
             raise RuntimeError("base task not recognized")
 
@@ -213,6 +283,10 @@ class HalfCheetahMixtureEnv(HalfCheetahEnv, utils.EzPickle):
         obs = super().reset()
         # new_obs = np.append(self.get_body_com("torso")[0], obs[0])
         new_obs = self._get_obs()
+        # === 新增：重置平滑状态 ===
+        self._vx_filt = float(self.sim.data.qvel[0])
+        self._prev_vx_filt = None
+        self._prev_action = None
         return new_obs, {}
     
     def random_reset(self, x_pos_range=[-10,10], x_vel_range=[-0.1,0.1]):
@@ -228,6 +302,12 @@ class HalfCheetahMixtureEnv(HalfCheetahEnv, utils.EzPickle):
         self.set_state(qpos, qvel)
 
         new_obs = self._get_obs()
+
+        # === 新增：重置平滑状态 ===
+        self._vx_filt = float(self.sim.data.qvel[0])
+        self._prev_vx_filt = None
+        self._prev_action = None
+        
         return new_obs, {}
     
     def sample_task(self, test=False, task=None):

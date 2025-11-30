@@ -19,12 +19,12 @@ config = dict(
     max_goal = [0.2, 10],
     max_jump = [1.5, 3.],
     max_rot = [pi / 6., pi / 2.],
-    max_vel = [1.0, 2.5],
+    max_vel = [0.0, 2.5],
     max_rot_vel = [2. * pi, 4. * pi],
 
     env = 'half_cheetah_multi',
     # experiment_name = 'Walker_deeper_really_change_task',
-    experiment_name = 'new_cheetah_training_server1_diff_taskid',
+    experiment_name = 'new_cheetah_training_config9_comboC',
     task_dim = 5,
 
     hidden_layers_actor = [300,300,300,300],
@@ -32,6 +32,19 @@ config = dict(
 
     save_after_episodes = 5,
     plot_every = 10,
+
+
+    reward_params = dict(
+        w_track = 1.0,
+        w_energy = 1e-3,
+        w_smooth_vel = 0.25,
+        w_smooth_act = 2e-3,
+        w_pitch = 0.5,
+        vx_filter_alpha = 0.90,
+        reward_scale = 3.0,
+    )
+    ,
+
 
     tasks = dict(
                 forward_vel=2, backward_vel=3,

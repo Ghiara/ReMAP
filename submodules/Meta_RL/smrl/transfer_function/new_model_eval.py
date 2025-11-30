@@ -50,6 +50,7 @@ from smrl.vae.encoder_decorators.io_modification import InputOutputDecorator
 from meta_envs.toy_goal.toy_1d import Toy1D, Toy1dVelocity
 from specific.encoder_transfer import map_cheetah_to_toy1d, map_ant_to_toy1d_velocity, map_cheetah_to_toy1d_velocity
 from sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
+from sac_envs.half_cheetah_single_vels import CheetahVelocityEnv
 from sac_envs.walker_multi import WalkerMulti
 from sac_envs.hopper_multi import HopperMulti
 from sac_envs.ant_multi_old import AntMulti
@@ -555,13 +556,13 @@ def load_model(encoder, config):
     '''
     complex_agent_config = dict(
         experiments_repo = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy/',
-        experiment_name = 'new_cheetah_training_server1_diff_taskid',
-        epoch = 300,
+        experiment_name = 'cheetah_velocity_single_low_level(forward_vel)',
+        epoch = 400,
     )
     with open(os.path.join(complex_agent_config['experiments_repo'],complex_agent_config['experiment_name'], 'config.json'), "r") as file:
         env_config = json.load(file)
 
-    complex_agent_config['environment'] = HalfCheetahMixtureEnv(env_config)
+    complex_agent_config['environment'] = CheetahVelocityEnv(env_config)
     # env of the complex agent
     env = complex_agent_config['environment']
 
@@ -596,7 +597,7 @@ if __name__ == "__main__":
             config = json.load(file)
         model_evaluation(
             path, #path to the inference model
-            save_dir='./evaluation/experiments_thesis/transfer_cheetah_velocity_stride5_v1_infer_velright_scale_down_lowlevel_vel_test/',
+            save_dir='./evaluation/experiments_thesis/transfer_cheetah_single_velocity_stride5_v1_infer_velright_scale_down_lowlevel_vel_test/',
             config=config,
             # save_dir = './data/delete',
             create_video=True,

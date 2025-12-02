@@ -24,7 +24,7 @@ config = dict(
 
     env = 'half_cheetah_multi',
     # experiment_name = 'Walker_deeper_really_change_task',
-    experiment_name = 'new_cheetah_training_config9_comboC',
+    experiment_name = 'new_cheetah_training_iter2_C3',
     task_dim = 5,
 
     hidden_layers_actor = [300,300,300,300],
@@ -33,12 +33,12 @@ config = dict(
     save_after_episodes = 5,
     plot_every = 10,
 
-
+    #here to modify reward function (velocity tracking )weights
     reward_params = dict(
         w_track = 1.0,
         w_energy = 1e-3,
-        w_smooth_vel = 0.25,
-        w_smooth_act = 2e-3,
+        w_smooth_vel = 0.35,
+        w_smooth_act = 6e-3,
         w_pitch = 0.5,
         vx_filter_alpha = 0.90,
         reward_scale = 3.0,

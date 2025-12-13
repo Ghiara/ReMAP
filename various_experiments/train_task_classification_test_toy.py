@@ -1,3 +1,12 @@
+# THis is a toy experiment to test the task classification performance of the encoder-decoder structure on 1D point mass environment, not relevant to the inference module reuse
+
+
+# if encountered issue with found no module named tigr, 
+# run: export PYTHONPATH=$PYTHONPATH:/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization
+#then run the script with command in root directory: python various_experiments/train_task_classification_test_toy.py
+
+
+
 from tigr.task_inference.dpmm_inference import DecoupledEncoder
 # from configs.toy_config import toy_config
 import numpy as np
@@ -578,19 +587,11 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, transfer_function, m
 
 if __name__ == "__main__":
     # from experiments_configs.half_cheetah_multi_env import config as env_config
+    #inference path here will be never used, just a verfication of the toy agent
 
-    inference_path = '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_16_15_34_37_default_true_gmm'
+    inference_path = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2025_12_07_15_06_43_default_true_gmm_timesteps_64'
     paths = [
-        '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_16_12_22_59_default_true_gmm',
-        '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_16_15_34_37_default_true_gmm',
-        '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_02_15_23_09_default_true_gmm',
-        '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_11_10_26_00_default_true_gmm',
-        '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_11_11_49_42_default_true_gmm',
-        '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_12_09_17_42_default_true_gmm',
-        '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_12_20_31_24_default_true_gmm',
-        '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_14_20_55_42_default_true_gmm',
-        '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_16_12_23_15_default_true_gmm',
-        '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_16_15_34_37_default_true_gmm',
+        '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2025_12_07_15_06_43_default_true_gmm_timesteps_64',
         # {'name': 'inference_path_3', 'path': '/path/to/inference_path_3'},
     ]
     tasks = [
@@ -612,9 +613,9 @@ if __name__ == "__main__":
     for inference_path in paths:
 
             complex_agent_config = dict(
-                experiments_repo = '/home/ubuntu/juan/Meta-RL/experiments_transfer_function/',
-                experiment_name = 'new_cheetah_training/half_cheetah_back_pos_vel',
-                epoch = 100,
+                experiments_repo = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy/',
+                experiment_name = 'new_cheetah_training_server1_diff_taskid',
+                epoch = 300,
             )
 
             with open(complex_agent_config['experiments_repo'] + complex_agent_config['experiment_name'] + '/config.json', 'r') as file:

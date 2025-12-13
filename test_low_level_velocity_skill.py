@@ -11,8 +11,8 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ==== 这些常量记得改成你自己的 ====
 LOW_LEVEL_EXPERIMENTS_REPO = "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy/"
-LOW_LEVEL_EXPERIMENT_NAME  = "new_cheetah_training_config17_comboB"
-LOW_LEVEL_EPOCH            = 200
+LOW_LEVEL_EXPERIMENT_NAME  = "new_cheetah_training_server1_diff_taskid"
+LOW_LEVEL_EPOCH            = 300
 # ===================================
 
 

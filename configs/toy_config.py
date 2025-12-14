@@ -58,7 +58,7 @@ toy_config = dict(
         batch_size_policy=256,  # batch size trainer
         batch_size_reconstruction=4096,  # batch size trainer
 
-        time_steps=96,  # timesteps before current to be considered for determine current task
+        time_steps=48,  # timesteps before current to be considered for determine current task
         latent_size=4,  # dimension of the latent context vector z
 
         sac_context_type='sample',  # 'sample' if using posterior samples, 'params' if using posterior prams

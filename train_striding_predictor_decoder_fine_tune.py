@@ -217,8 +217,8 @@ def get_decoder(path, action_dim, obs_dim, reward_dim, latent_dim, output_action
         param.requires_grad = True
 
     # ===== 3. 解冻倒数第二层 fc2 =====
-    for p in decoder.task_decoder.fc2.parameters():
-        p.requires_grad = True
+    # for p in decoder.task_decoder.fc2.parameters():
+    #     p.requires_grad = True
 
     decoder.to(DEVICE)
     return decoder
@@ -433,7 +433,6 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
         #         count+=1
         #         if count>150:
         #             return 'Failed to sample task. Attempted 150 times.'
-
         #new balanced sampling method
         if tasks:
             # 你自己传了 tasks 列表就按它来（每个元素类似 {'base_task':..., 'specification':...}）
@@ -503,6 +502,7 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             # map the complex observation to simple observation, not in toy env
             #simple_obs_before: as input to the simple agent to get the simple action
             #simple_obs_before: as input to the decoder to get the task prediction
+            #simple_obs_before: [pos_x, vel_x]
             simple_obs_before = general_obs_map(env)
 
             # Save latent vars
@@ -553,7 +553,13 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             #use the simple_env to step with the simple action to get the simple observation after the simple step
             #_simple_obs: the next simple observation after stepping with simple action
             #_simple_obs: [pos_x, vel_x]  simple_obs after stepping the high level simple action in the toy env
-            _simple_obs,_,_,_ = simple_env.step(simple_action.detach().cpu().numpy())
+            
+            
+            # comment out for changing the subgoal generation method
+            #_simple_obs,_,_,_ = simple_env.step(simple_action.detach().cpu().numpy())
+            
+            
+            
             #construct the simple_obs multi-task one-hot vector
             #simple_obs: [goal_front, goal_back, forward_vel, backward_vel]
             # EXAMPLE: simple_obs: tensor([0, 0, 2.5, 0]) means the subgoal is to run forward with velocity 2.5
@@ -605,16 +611,20 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
 
                 # Analysis the perfect subgoal(real state) for the coming low level policy execution
                 #real current state---use real state
-                cur_x = float(env.sim.data.qpos[0])
-                cur_v = float(env.sim.data.qvel[0])
-                step_frac = float(torch.clamp(simple_action.squeeze(), 0.0, 1.0))
+                base_task_pred = int(true_task_idx)
+                cur_x = float(simple_obs_before[0])
+                cur_v = float(simple_obs_before[1])
+                goal_val = true_goal_value
+                raw = float(simple_action.squeeze())      # [-1, 1]
+                alpha = 0.5 * (raw + 1.0)                 # [0, 1]
+
+                #TODO: test for the new subgoal generation method discarding the _simple_obs
 
                 if true_task_idx in [idx_GF, idx_GB]:
                     # 位置任务-- use mu to generate the simple_action
-                    if true_task_idx == idx_GF:
-                        simple_obs[idx_GF] = _simple_obs[0].item()
-                    else:
-                        simple_obs[idx_GB] = _simple_obs[0].item()
+                    # position task: contractive subgoal
+                    x_subgoal = cur_x + alpha * (goal_val - cur_x)
+                    simple_obs[true_task_idx] = x_subgoal
 
                     # use real state
                     # x_goal = true_goal_value           # env.task[true_task_idx]，上一节已经算过
@@ -625,12 +635,10 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
                     # action_normalize = max(abs(x_goal - cur_x), 1e-3)     
 
                 elif true_task_idx in [idx_FV, idx_BV]:
-                    # 速度任务--use mu to generate the simple_action
-                    v_next = float(np.clip(_simple_obs[1].item(), -3, 3))
-                    if true_task_idx == idx_FV:
-                        simple_obs[idx_FV] = v_next
-                    else:
-                        simple_obs[idx_BV] = v_next
+                    # velocity task: contractive subgoal
+                    v_subgoal = cur_v + alpha * (goal_val - cur_v)
+                    v_subgoal = float(np.clip(v_subgoal, -3.0, 3.0))
+                    simple_obs[true_task_idx] = v_subgoal
                     
                     #use self defined simple action
                     # v_goal = true_goal_value
@@ -638,22 +646,27 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
                     # v_subgoal = float(np.clip(v_subgoal, -3, 3))
                     # simple_obs[true_task_idx] = v_subgoal
 
-                # 执行任务 = 真值任务
-                base_task_pred = int(true_task_idx)
+
 
             # ===== Decoder 模式（train_stride & decoder_eval）=====
             else:
-                # decoder 决定任务类型  simple_action not decide the task type
+                # decoder decides the task,  simple_action not decide the task type
                 base_task_pred = int(task_prediction.item())
-                # simple_action 只用于生成该任务下的 subgoal 数值
+                cur_x = float(simple_obs_before[0])
+                cur_v = float(simple_obs_before[1])
+                goal_val = true_goal_value
+                raw = float(simple_action.squeeze())      # [-1, 1]
+                alpha = 0.5 * (raw + 1.0)                 # [0, 1]
                 if base_task_pred in [idx_GF, idx_GB]:
-                    # 位置任务
-                    simple_obs[base_task_pred] = _simple_obs[0].item()
+                    # position task: contractive subgoal
+                    x_subgoal = cur_x + alpha * (goal_val - cur_x)
+                    simple_obs[base_task_pred] = x_subgoal
 
                 elif base_task_pred in [idx_FV, idx_BV]:
-                    # 速度任务
-                    v_next = float(np.clip(_simple_obs[1].item(), -3, 3))
-                    simple_obs[base_task_pred] = v_next
+                    # velocity task: contractive subgoal
+                    v_subgoal = cur_v + alpha * (goal_val - cur_v)
+                    v_subgoal = float(np.clip(v_subgoal, -3.0, 3.0))
+                    simple_obs[base_task_pred] = v_subgoal
 
             #get the the base task prediction from the simple_obs one-hot vector
             #DEBUG: why not use task_prediction directly?
@@ -667,8 +680,14 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             #????? NOrmailize here only for position task?  DEBUG!!!!
             #for mu this action_normalize uncomment, for real state test comment out
             #if USE_DECODER:
-            if simple_obs_before[0] != 0:
-                action_normalize = simple_obs_before[0].item() - simple_obs[0].item()
+            # if simple_obs_before[0] != 0:
+            #     action_normalize = simple_obs_before[0].item() - simple_obs[0].item()
+            
+            if base_task_pred in [idx_GF, idx_GB]:
+                action_normalize = abs(goal_val - cur_x) + 1e-3
+            elif base_task_pred in [idx_FV, idx_BV]:
+                action_normalize = abs(goal_val - cur_v) + 1e-3
+
             #set the maximal steps for the step predictor
             max_steps = 20
             #calculate sim steps from step predictor, decide how many low level steps to simulate to reach the desired subgoal
@@ -1240,13 +1259,13 @@ if __name__ == "__main__":
 
 
     # optimizer for decoder finetune for last layer
-    # optimizer = optim.Adam(decoder.parameters(), lr=3e-4)
+    optimizer = optim.Adam(decoder.parameters(), lr=3e-4)
     # the below optimizer finetune the last 2 layers of the decoder
-    optimizer = optim.Adam(
-        filter(lambda p: p.requires_grad, decoder.parameters()),
-        lr=1e-4,
-        weight_decay=1e-5
-    )
+    # optimizer = optim.Adam(
+    #     filter(lambda p: p.requires_grad, decoder.parameters()),
+    #     lr=1e-4,
+    #     weight_decay=1e-5
+    # )
 
 
     ## ROLLOUT ###
@@ -1268,10 +1287,10 @@ if __name__ == "__main__":
         {'base_task':'goal_front', 'specification':0.9},
         {'base_task':'backward_vel', 'specification':0.9},#3
         {'base_task':'backward_vel', 'specification':0.5},
-        {'base_task':'backward_vel', 'specification':0.1},
+        {'base_task':'backward_vel', 'specification':0.3},
         # {'base_task':'backward_vel', 'specification':1.0},
         # {'base_task':'forward_vel', 'specification':1.0},
-        {'base_task':'forward_vel', 'specification':0.1},#2
+        {'base_task':'forward_vel', 'specification':0.3},#2
         {'base_task':'forward_vel', 'specification':0.5},
         {'base_task':'forward_vel', 'specification':0.9},
                 ]

@@ -18,8 +18,8 @@ transfer_config = dict(
 
 
     inference_path = dict(
-        name = '2025_12_07_15_01_42_default_true_gmm_timesteps_48',
-        path = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2025_12_07_15_01_42_default_true_gmm_timesteps_48'
+        name = '2025_12_07_14_51_31_default_true_gmm_timesteps_32',
+        path = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2025_12_07_14_51_31_default_true_gmm_timesteps_32'
     ),
 
     

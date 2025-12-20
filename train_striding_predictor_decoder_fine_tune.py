@@ -418,6 +418,7 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
         done = 0
         episode_reward = 0
         loss = []
+        v_subgoal_prev = None
         value_loss, q_loss, policy_loss = [], [], []
         # old sampling method    
         # if tasks:
@@ -615,6 +616,9 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
                 cur_x = float(simple_obs_before[0])
                 cur_v = float(simple_obs_before[1])
                 goal_val = true_goal_value
+                # v_subgoal_prev = float(simple_obs_before[1])   # 或者直接用 0.0 也行，看你希望的初始值
+                if v_subgoal_prev is None:
+                    v_subgoal_prev = cur_v
                 raw = float(simple_action.squeeze())      # [-1, 1]
                 alpha = 0.5 * (raw + 1.0)                 # [0, 1]
 
@@ -636,9 +640,16 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
 
                 elif true_task_idx in [idx_FV, idx_BV]:
                     # velocity task: contractive subgoal
-                    v_subgoal = cur_v + alpha * (goal_val - cur_v)
+                    # v_subgoal = cur_v + alpha * (goal_val - cur_v)
+                    # v_subgoal = float(np.clip(v_subgoal, -3.0, 3.0))
+                    # simple_obs[true_task_idx] = v_subgoal
+
+
+                    v_subgoal = v_subgoal_prev + alpha * (goal_val - v_subgoal_prev)
                     v_subgoal = float(np.clip(v_subgoal, -3.0, 3.0))
-                    simple_obs[true_task_idx] = v_subgoal
+
+                    simple_obs[base_task_pred] = v_subgoal
+                    v_subgoal_prev = v_subgoal
                     
                     #use self defined simple action
                     # v_goal = true_goal_value
@@ -1296,8 +1307,8 @@ if __name__ == "__main__":
                 ]
     rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor,
                                     transfer_function, memory, variant, obs_dim, action_dim, 
-                                    max_path_len, n_tasks=1, inner_loop_steps=10, save_video_path=os.path.join(inference_path, "DECODER_EVAL"), experiment_name=complex_agent['experiment_name'],
-                                    current_inference_path_name=current_inference_path_name, tasks=tasks, mode = "decoder_eval")
+                                    max_path_len, n_tasks=1, inner_loop_steps=10, save_video_path=os.path.join(inference_path, "ORACLE_EVAL"), experiment_name=complex_agent['experiment_name'],
+                                    current_inference_path_name=current_inference_path_name, tasks=tasks, mode = "oracle_eval")
 
 
     '''

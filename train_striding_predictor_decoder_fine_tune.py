@@ -40,7 +40,6 @@ from mrl_analysis.plots.plot_settings import *
 from vis_utils.vis_logging import log_all, _frames_to_gif
 import pandas as pd
 
-
 ### this train_striding_predictor.py is used to evaluate the low level policy(cheetah velocity tracking) perfomance in the subgoal tracking
 ### when the subgoal is clearly given by the high level simple env agent and the step predictor
 
@@ -95,6 +94,74 @@ class Memory():
         mu = torch.cat(batch.mu).view(N, latent_dim).to(DEVICE)
         
         return tasks, simple_obs, simple_action, mu
+
+# help function that sets global seed for reproducibility
+def set_global_seed(seed: int):
+
+
+    # Python
+    random.seed(seed)
+
+    # NumPy
+    np.random.seed(seed)
+
+    # PyTorch
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+    # cuDNN（⚠️ 会略微降低速度，但换来可复现性）
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+    # Python hash（dict / set 顺序）
+    os.environ["PYTHONHASHSEED"] = str(seed)
+
+    print(f"[SEED] Global seed set to {seed}")
+
+
+
+def seed_env_compat(env, seed: int):
+    """
+    兼容 old gym / mujoco / 自定义 env 的 seed 方法
+    """
+    # action / obs space
+    try:
+        env.action_space.seed(seed)
+    except Exception:
+        pass
+    try:
+        env.observation_space.seed(seed)
+    except Exception:
+        pass
+
+    # 新 gym API
+    try:
+        env.reset(seed=seed)
+        return
+    except TypeError:
+        pass
+
+    # 老 gym API
+    try:
+        env.seed(seed)
+    except Exception:
+        pass
+
+    # mujoco / 自定义 RNG
+    for attr in ["np_random", "_np_random"]:
+        if hasattr(env, attr):
+            try:
+                getattr(env, attr).seed(seed)
+            except Exception:
+                pass
+
+    # 最后兜底 reset
+    try:
+        env.reset()
+    except Exception:
+        pass
+
 
 def get_encoder(path, shared_dim, encoder_input_dim):
     path = os.path.join(path, 'weights')
@@ -217,8 +284,13 @@ def get_decoder(path, action_dim, obs_dim, reward_dim, latent_dim, output_action
         param.requires_grad = True
 
     # ===== 3. 解冻倒数第二层 fc2 =====
-    # for p in decoder.task_decoder.fc2.parameters():
-    #     p.requires_grad = True
+    for p in decoder.task_decoder.fc2.parameters():
+        p.requires_grad = True
+
+
+    # # ===== 3. 解冻倒数第3层 fc1 =====
+    for p in decoder.task_decoder.fc1.parameters():
+        p.requires_grad = True
 
     decoder.to(DEVICE)
     return decoder
@@ -294,7 +366,7 @@ def _balanced_task_for_episode(env, range_dict, episode, rng=None):
     spec 从各自区间随机采样（back 及 backward 取负号）
     """
     if rng is None:
-        rng = np.random.default_rng()
+        rng = np.random
     t = env.config['tasks']  # 例如 {'goal_front':0, 'goal_back':1, 'forward_vel':2, 'backward_vel':3}
 
     order = ['goal_front', 'goal_back', 'forward_vel', 'backward_vel']
@@ -381,6 +453,19 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
         num_trajectory= num_trajectories
     #start rollout for each trajectory
     for episode in range(num_trajectory):
+        # === Task hysteresis state ===
+        exec_task = None              # 当前真正执行的任务
+        candidate_task = None         # 当前候选切换任务
+        candidate_count = 0
+        TASK_SWITCH_THRESHOLD = 3
+
+        # === Late-stage task frequency lock (ONLY for goal tasks) ===
+        LOCK_START_STEP = 55        # 从第 60 个 high-level step 开始考虑锁定
+        LOCK_RATIO = 0.6            # 至少 60% 的历史占比才允许锁定
+        task_counter = {0: 0, 1: 0, 2: 0, 3: 0}
+        locked_task = None
+
+
         sim_time_steps_list = []  # 用于记录本 episode 每次预测的步长
         video = False
         if episode % 1 == 0:#for each of the episodes
@@ -419,6 +504,7 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
         episode_reward = 0
         loss = []
         v_subgoal_prev = None
+        x_subgoal_prev = None
         value_loss, q_loss, policy_loss = [], [], []
         # old sampling method    
         # if tasks:
@@ -518,6 +604,56 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
                 _, _, logits = decoder(ptu.from_numpy(simple_obs_before), simple_action, 0, mu.squeeze())
                 task_prediction = torch.argmax(torch.nn.functional.softmax(logits, dim=0))
                 pred_label = int(task_prediction.item())
+
+                # === Task hysteresis logic ===
+
+                if exec_task is None:
+                    # 第一次，直接初始化执行任务
+                    exec_task = pred_label
+                    candidate_task = None
+                    candidate_count = 0
+
+                else:
+                    if pred_label == exec_task:
+                        # 和当前执行任务一致 → 重置候选
+                        candidate_task = None
+                        candidate_count = 0
+
+                    else:
+                        # 预测和当前执行任务不同
+                        if candidate_task == pred_label:
+                            candidate_count += 1
+                        else:
+                            candidate_task = pred_label
+                            candidate_count = 1
+
+                        # 达到阈值 → 切换任务
+                        if candidate_count >= TASK_SWITCH_THRESHOLD:
+                            exec_task = candidate_task
+                            candidate_task = None
+                            candidate_count = 0
+
+                # === Late-stage task frequency lock (ONLY for goal tasks) ===
+                # 统计真正执行的任务
+                task_counter[exec_task] += 1
+
+                # 后期才允许锁定，且只锁 goal 任务
+                if path_length >= LOCK_START_STEP and locked_task is None:
+                    total = sum(task_counter.values())
+                    dominant_task = max(task_counter, key=task_counter.get)
+                    dominant_ratio = task_counter[dominant_task] / max(total, 1)
+
+                    if dominant_task in [idx_GF, idx_GB] and dominant_ratio >= LOCK_RATIO:
+                        locked_task = dominant_task
+                        print(
+                            f"[GOAL-LOCK] ep={episode}, step={path_length}, "
+                            f"task={locked_task}, ratio={dominant_ratio:.2f}"
+                        )
+
+                # 一旦锁定，强制覆盖 exec_task
+                if locked_task is not None:
+                    exec_task = locked_task
+                    
             else:
                 # 不用 decoder 的模式下，直接把 task_prediction 设为真值任务
                 task_prediction = torch.tensor(true_task_idx, device=DEVICE)
@@ -662,22 +798,36 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             # ===== Decoder 模式（train_stride & decoder_eval）=====
             else:
                 # decoder decides the task,  simple_action not decide the task type
-                base_task_pred = int(task_prediction.item())
+                # base_task_pred = int(task_prediction.item())
+                base_task_pred = int(exec_task)
                 cur_x = float(simple_obs_before[0])
                 cur_v = float(simple_obs_before[1])
                 goal_val = true_goal_value
+                if v_subgoal_prev is None:
+                    v_subgoal_prev = cur_v
+                if x_subgoal_prev is None:
+                    x_subgoal_prev = cur_x
                 raw = float(simple_action.squeeze())      # [-1, 1]
                 alpha = 0.5 * (raw + 1.0)                 # [0, 1]
                 if base_task_pred in [idx_GF, idx_GB]:
                     # position task: contractive subgoal
-                    x_subgoal = cur_x + alpha * (goal_val - cur_x)
-                    simple_obs[base_task_pred] = x_subgoal
-
+                    # x_subgoal = cur_x + alpha * (goal_val - cur_x)
+                    # simple_obs[base_task_pred] = x_subgoal
+                    x_subgoal = x_subgoal_prev + alpha * (goal_val - x_subgoal_prev)
+                    simple_obs[true_task_idx] = x_subgoal
+                    x_subgoal_prev = x_subgoal
+                    
                 elif base_task_pred in [idx_FV, idx_BV]:
                     # velocity task: contractive subgoal
-                    v_subgoal = cur_v + alpha * (goal_val - cur_v)
+                    # v_subgoal = cur_v + alpha * (goal_val - cur_v)
+                    # v_subgoal = float(np.clip(v_subgoal, -3.0, 3.0))
+                    # simple_obs[base_task_pred] = v_subgoal
+
+                    v_subgoal = v_subgoal_prev + alpha * (goal_val - v_subgoal_prev)
                     v_subgoal = float(np.clip(v_subgoal, -3.0, 3.0))
+
                     simple_obs[base_task_pred] = v_subgoal
+                    v_subgoal_prev = v_subgoal
 
             #get the the base task prediction from the simple_obs one-hot vector
             #DEBUG: why not use task_prediction directly?
@@ -1022,7 +1172,11 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             plt.subplots_adjust(hspace=0.4)
 
             # Save the figure to a fileHalfCheetahMixtureEnv
-            dir = Path(os.path.join('{os.getcwd()}/trajectories', experiment_name, current_inference_path_name, 'beta0.1_old'))
+            # dir = Path(os.path.join('{os.getcwd()}/trajectories', experiment_name, current_inference_path_name, 'beta0.1_old'))
+            dir = (
+                Path(save_video_path)
+                / "Inference-trajectories"
+            )
             filename = os.path.join(dir,f"epoch_{episode}.png")
             filename = os.path.join(dir,f"epoch_{episode}.pdf")
 
@@ -1168,6 +1322,9 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
 
 
 if __name__ == "__main__":
+
+    SEED = 42
+    set_global_seed(SEED)
     from configs.transfer_config import transfer_config as config
 
     inference_path = config['inference_path']
@@ -1193,12 +1350,16 @@ if __name__ == "__main__":
         env = WalkerGoal()
     elif env_config['env'] == 'half_cheetah_multi':
         env = HalfCheetahMixtureEnv(env_config)
+        seed_env_compat(env, SEED)
     elif env_config['env'] == 'hopper_multi':
         env = HopperMulti(env_config)
+        seed_env_compat(env, SEED)
     elif env_config['env'] == 'walker_multi':
         env = WalkerMulti(env_config)
+        seed_env_compat(env, SEED)
     elif env_config['env'] == 'ant_multi':
         env = AntMulti()
+        seed_env_compat(env, SEED)
     env.render_mode = 'rgb_array'
 
     with open(f'{inference_path}/variant.json', 'r') as file:
@@ -1206,6 +1367,8 @@ if __name__ == "__main__":
 
     m = variant['algo_params']['sac_layer_size']
     simple_env = ENVS[variant['env_name']](**variant['env_params'])         # Just used for initilization purposes
+    seed_env_compat(simple_env, SEED + 12345)
+ 
 
     ### PARAMETERS ###
     obs_dim = int(np.prod(simple_env.observation_space.shape))
@@ -1307,8 +1470,8 @@ if __name__ == "__main__":
                 ]
     rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor,
                                     transfer_function, memory, variant, obs_dim, action_dim, 
-                                    max_path_len, n_tasks=1, inner_loop_steps=10, save_video_path=os.path.join(inference_path, "ORACLE_EVAL"), experiment_name=complex_agent['experiment_name'],
-                                    current_inference_path_name=current_inference_path_name, tasks=tasks, mode = "oracle_eval")
+                                    max_path_len, n_tasks=1, inner_loop_steps=10, save_video_path=os.path.join(inference_path, "DECODER_EVAL"), experiment_name=complex_agent['experiment_name'],
+                                    current_inference_path_name=current_inference_path_name, tasks=tasks, mode = "decoder_eval")
 
 
     '''

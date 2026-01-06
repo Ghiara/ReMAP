@@ -25,11 +25,11 @@ config = dict(
     env = 'walker_multi',
     # experiment_name = 'Walker_deeper_really_change_task',
     experiment_name = 'walker_full_06_07',
-    # task_dim = 2,
+    task_dim = 5,
 
     tasks = dict(
-                goal_front=0, goal_back=0, 
-                forward_vel=1, backward_vel=1
+                forward_vel=2, backward_vel=3,
+                goal_front=0, goal_back=1,
                  ),
 
     hidden_layers_actor = [300,300,300,300],

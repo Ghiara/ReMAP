@@ -25,7 +25,7 @@ config = dict(
     env = 'hopper_multi',
     # experiment_name = 'Walker_deeper_really_change_task',
     experiment_name = 'hopper_multi',
-    task_dim = 2,
+    task_dim = 5,
 
     hidden_layers_actor = [300,300,300,300],
     hidden_layers_critic = [300,300,300,300],
@@ -34,8 +34,8 @@ config = dict(
     plot_every = 50,
 
     tasks = dict(
-                goal_front=0, goal_back=0, 
-                forward_vel=1, backward_vel=1
+                forward_vel=2, backward_vel=3,
+                goal_front=0, goal_back=1,
                 ),
     
     curriculum = dict(

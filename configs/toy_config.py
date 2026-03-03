@@ -48,7 +48,7 @@ toy_config = dict(
         use_data_normalization=False,  # normalize data from experience
         sampling_mode=[None, 'linear'][0], # can be one of None, 'linear'
         use_fixed_seeding=True,  # seeding, make comparison more robust
-        seed=0,  # seeding, make comparison more robust
+        seed=2,  # seeding, make comparison more robust
 
         encoding_mode=['transitionSharedY', 'trajectory'][0],  # encoding mode, will be set automatically if wrong is chosen
         encoder_type=['gru', 'mlp', 'conv', 'transformer'][0],
@@ -95,8 +95,8 @@ toy_config = dict(
 
     reconstruction_params=dict(
         use_state_diff=False,  # determines if decoder uses state or state difference as target
-
-        num_classes=8,  # number of base classes in the class encoder
+        # nummber of classes in the GMM
+        num_classes=2,  # number of base classes in the class encoder
 
         lr_encoder=3e-4,  # learning rate decoder (ADAM) 3e-4 when combine with combination trainer,
         lr_decoder=3e-4,  # learning rate decoder (ADAM) 3e-4 when combine with combination trainer,
@@ -105,6 +105,7 @@ toy_config = dict(
         beta_euclid=0.0005,  # weighting factor euclid loss of z means
         gamma_sparsity=0.001,  # weighting factor sparsity of latent space
 
+        #TODO:  set to False for another ablation study
         use_regularization_loss=True,  # classification regularization
         regularization_lambda=0.1,  # weighting factor classification regularization
 

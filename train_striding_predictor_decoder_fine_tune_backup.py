@@ -620,29 +620,29 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
                 _, _, logits = decoder(ptu.from_numpy(simple_obs_before), simple_action, 0, mu.squeeze())
                 
 
-                # # ===== This patch only for true_gmm =====
+                # ===== This patch only for true_gmm =====
 
-                # # env 中合法的 task ids
-                # valid_task_ids = [
-                #     env.config['tasks']['goal_front'],
-                #     env.config['tasks']['goal_back'],
-                #     env.config['tasks']['forward_vel'],
-                #     env.config['tasks']['backward_vel'],
-                # ]
+                # env 中合法的 task ids
+                valid_task_ids = [
+                    env.config['tasks']['goal_front'],
+                    env.config['tasks']['goal_back'],
+                    env.config['tasks']['forward_vel'],
+                    env.config['tasks']['backward_vel'],
+                ]
 
-                # # logits shape: (8,)
-                # masked_logits = logits.clone()
-                # invalid_ids = [i for i in range(logits.shape[-1]) if i not in valid_task_ids]
-                # masked_logits[invalid_ids] = -1e9
+                # logits shape: (8,)
+                masked_logits = logits.clone()
+                invalid_ids = [i for i in range(logits.shape[-1]) if i not in valid_task_ids]
+                masked_logits[invalid_ids] = -1e9
 
-                # task_prediction = torch.argmax(masked_logits)
-                # pred_label = int(task_prediction.item())
+                task_prediction = torch.argmax(masked_logits)
+                pred_label = int(task_prediction.item())
 
 
 
                 
-                task_prediction = torch.argmax(torch.nn.functional.softmax(logits, dim=0))
-                pred_label = int(task_prediction.item())
+                # task_prediction = torch.argmax(torch.nn.functional.softmax(logits, dim=0))
+                # pred_label = int(task_prediction.item())
 
                 # === Task hysteresis logic ===
 
@@ -732,7 +732,7 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             
             
             # comment out for changing the subgoal generation method
-            _simple_obs,_,_,_ = simple_env.step(simple_action.detach().cpu().numpy())
+            #_simple_obs,_,_,_ = simple_env.step(simple_action.detach().cpu().numpy())
             
             
             
@@ -781,8 +781,6 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             #         simple_obs[env.config.get('tasks',{}).get('backward_vel')] = np.clip(_simple_obs[1].item(), -3,3)
 
             action_normalize =  None
-            cur_x = float(simple_obs_before[0])
-            cur_v = float(simple_obs_before[1])
             # ===== Oracle 模式：直接使用真实任务类型 + 真实方向 =====
             if USE_TRUE_TASK:
                 spec = true_spec
@@ -838,55 +836,37 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
 
             # ===== Decoder 模式（train_stride & decoder_eval）=====
             else:
-                # # decoder decides the task,  simple_action not decide the task type
-                # # base_task_pred = int(task_prediction.item())
-                # base_task_pred = int(exec_task)
-                # cur_x = float(simple_obs_before[0])
-                # cur_v = float(simple_obs_before[1])
-                # goal_val = true_goal_value
-                # if v_subgoal_prev is None:
-                #     v_subgoal_prev = cur_v
-                # if x_subgoal_prev is None:
-                #     x_subgoal_prev = cur_x
-                # raw = float(simple_action.squeeze())      # [-1, 1]
-                # alpha = 0.5 * (raw + 1.0)                 # [0, 1]
-                # if base_task_pred in [idx_GF, idx_GB]:
-                #     # position task: contractive subgoal
-                #     # x_subgoal = cur_x + alpha * (goal_val - cur_x)
-                #     # simple_obs[base_task_pred] = x_subgoal
-                #     x_subgoal = x_subgoal_prev + alpha * (goal_val - x_subgoal_prev)
-                #     simple_obs[true_task_idx] = x_subgoal
-                #     x_subgoal_prev = x_subgoal
-                    
-                # elif base_task_pred in [idx_FV, idx_BV]:
-                #     # velocity task: contractive subgoal
-                #     # v_subgoal = cur_v + alpha * (goal_val - cur_v)
-                #     # v_subgoal = float(np.clip(v_subgoal, -3.0, 3.0))
-                #     # simple_obs[base_task_pred] = v_subgoal
-
-                #     v_subgoal = v_subgoal_prev + alpha * (goal_val - v_subgoal_prev)
-                #     v_subgoal = float(np.clip(v_subgoal, -3.0, 3.0))
-
-                #     simple_obs[base_task_pred] = v_subgoal
-                #     v_subgoal_prev = v_subgoal
-
-
-                # === NEW: subgoal from high-level env rollout ===
-
+                # decoder decides the task,  simple_action not decide the task type
+                # base_task_pred = int(task_prediction.item())
                 base_task_pred = int(exec_task)
-
-                simple_obs = torch.zeros_like(torch.tensor(task)).to(DEVICE)
-
+                cur_x = float(simple_obs_before[0])
+                cur_v = float(simple_obs_before[1])
+                goal_val = true_goal_value
+                if v_subgoal_prev is None:
+                    v_subgoal_prev = cur_v
+                if x_subgoal_prev is None:
+                    x_subgoal_prev = cur_x
+                raw = float(simple_action.squeeze())      # [-1, 1]
+                alpha = 0.5 * (raw + 1.0)                 # [0, 1]
                 if base_task_pred in [idx_GF, idx_GB]:
-                    # 位置任务：用 simple_env rollout 的 x
-                    x_subgoal = float(_simple_obs[0])
-                    simple_obs[base_task_pred] = x_subgoal
-
+                    # position task: contractive subgoal
+                    # x_subgoal = cur_x + alpha * (goal_val - cur_x)
+                    # simple_obs[base_task_pred] = x_subgoal
+                    x_subgoal = x_subgoal_prev + alpha * (goal_val - x_subgoal_prev)
+                    simple_obs[true_task_idx] = x_subgoal
+                    x_subgoal_prev = x_subgoal
+                    
                 elif base_task_pred in [idx_FV, idx_BV]:
-                    # 速度任务：用 simple_env rollout 的 vx
-                    v_subgoal = float(np.clip(_simple_obs[1], -3.0, 3.0))
-                    simple_obs[base_task_pred] = v_subgoal
+                    # velocity task: contractive subgoal
+                    # v_subgoal = cur_v + alpha * (goal_val - cur_v)
+                    # v_subgoal = float(np.clip(v_subgoal, -3.0, 3.0))
+                    # simple_obs[base_task_pred] = v_subgoal
 
+                    v_subgoal = v_subgoal_prev + alpha * (goal_val - v_subgoal_prev)
+                    v_subgoal = float(np.clip(v_subgoal, -3.0, 3.0))
+
+                    simple_obs[base_task_pred] = v_subgoal
+                    v_subgoal_prev = v_subgoal
 
             #get the the base task prediction from the simple_obs one-hot vector
             #DEBUG: why not use task_prediction directly?
@@ -903,18 +883,10 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             # if simple_obs_before[0] != 0:
             #     action_normalize = simple_obs_before[0].item() - simple_obs[0].item()
             
-
-            # action_normalize for subgoal generator
-            # if base_task_pred in [idx_GF, idx_GB]:
-            #     action_normalize = abs(goal_val - cur_x) + 1e-3
-            # elif base_task_pred in [idx_FV, idx_BV]:
-            #     action_normalize = abs(goal_val - cur_v) + 1e-3
-
             if base_task_pred in [idx_GF, idx_GB]:
-                action_normalize = abs(simple_obs[base_task_pred].item() - cur_x) + 1e-3
+                action_normalize = abs(goal_val - cur_x) + 1e-3
             elif base_task_pred in [idx_FV, idx_BV]:
-                action_normalize = abs(simple_obs[base_task_pred].item() - cur_v) + 1e-3
-
+                action_normalize = abs(goal_val - cur_v) + 1e-3
 
             #set the maximal steps for the step predictor
             max_steps = 20
@@ -1046,42 +1018,42 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
                 low_level_losses = step_predictor.train(episode, False)
 
                 # decoder finetune training
-                if len(memory) >= memory.batch_size:
-                    batch = memory.sample(memory.batch_size)
-                    tasks_batch, simple_obs_batch, simple_action_batch, mu_batch = memory.unpack(batch)
+                # if len(memory) >= memory.batch_size:
+                #     batch = memory.sample(memory.batch_size)
+                #     tasks_batch, simple_obs_batch, simple_action_batch, mu_batch = memory.unpack(batch)
 
-                    _, _, logits_batch = decoder(
-                        simple_obs_batch.detach(),
-                        simple_action_batch.detach(),
-                        0,
-                        mu_batch.squeeze().detach()
-                    )
+                #     _, _, logits_batch = decoder(
+                #         simple_obs_batch.detach(),
+                #         simple_action_batch.detach(),
+                #         0,
+                #         mu_batch.squeeze().detach()
+                #     )
 
-                    loss = loss_criterion(
-                        logits_batch,
-                        tasks_batch.view(-1)  # (B,)
-                    )
-                    optimizer.zero_grad()
-                    loss.backward()
-                    optimizer.step()
+                #     loss = loss_criterion(
+                #         logits_batch,
+                #         tasks_batch.view(-1)  # (B,)
+                #     )
+                #     optimizer.zero_grad()
+                #     loss.backward()
+                #     optimizer.step()
 
-                    decoder_loss_history.append(loss.item())
+                #     decoder_loss_history.append(loss.item())
 
-                    true_labels_flat = tasks_batch.view(-1)
-                    preds = torch.argmax(logits_batch, dim=1)
-                    for t in range(4):
-                        mask = (true_labels_flat == t)
-                        if mask.any():
-                            cls_loss = loss_criterion(
-                                logits_batch[mask],
-                                true_labels_flat[mask]
-                            ).item()
-                        else:
-                            cls_loss = np.nan 
-                        task_loss_hist[t].append(cls_loss)
+                #     true_labels_flat = tasks_batch.view(-1)
+                #     preds = torch.argmax(logits_batch, dim=1)
+                #     for t in range(4):
+                #         mask = (true_labels_flat == t)
+                #         if mask.any():
+                #             cls_loss = loss_criterion(
+                #                 logits_batch[mask],
+                #                 true_labels_flat[mask]
+                #             ).item()
+                #         else:
+                #             cls_loss = np.nan 
+                #         task_loss_hist[t].append(cls_loss)
 
-                    acc = (preds == tasks_batch.view(-1)).float().mean().item()
-                    decoder_acc_history.append(acc)
+                #     acc = (preds == tasks_batch.view(-1)).float().mean().item()
+                #     decoder_acc_history.append(acc)
 
 
             # else:

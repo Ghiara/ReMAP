@@ -42,17 +42,25 @@ class AugmentedTrainer(BaseTrainer):
 
         # Get data from real replay buffer
         # TODO: Think about normalization
-        data = self.replay_buffer.sample_random_few_step_batch(indices, self.batch_size, normalize=self.use_data_normalization)
+        e_data, d_data = self.replay_buffer.sample_random_few_step_batch(
+            indices,
+            self.batch_size,
+            normalize=self.use_data_normalization,
+            prio='linear'
+        )
 
         # Prepare for usage in decoder
-        actions = ptu.from_numpy(data['actions'])[:, 1:, :]
-        states = ptu.from_numpy(data['observations'])[:, 1:, :]
-        next_states = ptu.from_numpy(data['next_observations'])[:, 1:, :]
-        rewards = ptu.from_numpy(data['rewards'])[:, 1:, :]
-        terminals = ptu.from_numpy(data['terminals'])[:, 1:, :]
+        actions = ptu.from_numpy(d_data['actions'])[:, 1:, :]
+        states = ptu.from_numpy(d_data['observations'])[:, 1:, :]
+        next_states = ptu.from_numpy(d_data['next_observations'])[:, 1:, :]
+        rewards = ptu.from_numpy(d_data['rewards'])[:, 1:, :]
+        terminals = ptu.from_numpy(d_data['terminals'])[:, 1:, :]
 
         # Remove last (trailing) dimension here
-        true_task = np.array([a['base_task'] for a in data['true_tasks'][:, -1, 0]], dtype=int)
+        true_task = np.array(
+            [a['base_task'] for a in d_data['true_tasks'][:, -1, 0]],
+            dtype=int
+        )
         unique_tasks = torch.unique(ptu.from_numpy(true_task).long()).tolist()
         targets = ptu.from_numpy(true_task).long()
 
@@ -63,7 +71,7 @@ class AugmentedTrainer(BaseTrainer):
         '''
 
         # Prepare for usage in encoder
-        encoder_input = self.replay_buffer.make_encoder_data(data, self.batch_size)
+        encoder_input = self.replay_buffer.make_encoder_data(e_data, self.batch_size)
 
         # Forward pass through encoder
         latent_distributions, logits = self.encoder.encode(encoder_input)
@@ -79,7 +87,16 @@ class AugmentedTrainer(BaseTrainer):
 
         # Calculate standard losses
         # Put in decoder to get likelihood
-        state_estimate, reward_estimate = self.decoder(states, actions, decoder_state_target, latent_variables.unsqueeze(1).repeat(1, self.timesteps, 1))
+        assert latent_variables.ndim == 2  # [B, latent_dim]
+        T = states.shape[1]
+        z = latent_variables.unsqueeze(1).repeat(1, T, 1)
+
+        state_estimate, reward_estimate, task_logits = self.decoder(
+            states,
+            actions,
+            decoder_state_target,
+            z
+        )
         mixture_state_loss = torch.mean((decoder_state_target - state_estimate) ** 2, dim=[-2, -1])
         mixture_reward_loss = torch.mean((rewards - reward_estimate) ** 2, dim=[-2, -1])
 
@@ -265,7 +282,16 @@ class AugmentedTrainer(BaseTrainer):
 
             # Calculate standard losses
             # Put in decoder to get likelihood
-            state_estimate, reward_estimate = self.decoder(states, actions, decoder_state_target, latent_variables)
+            assert latent_variables.ndim == 2  # [B, latent_dim]
+            T = states.shape[1]
+            z = latent_variables.unsqueeze(1).repeat(1, T, 1)
+
+            state_estimate, reward_estimate, task_logits = self.decoder(
+                states,
+                actions,
+                decoder_state_target,
+                z
+            )
             mixture_state_loss = torch.mean((state_estimate - decoder_state_target) ** 2, dim=-1)
             mixture_reward_loss = torch.mean((reward_estimate - rewards) ** 2, dim=-1)
 

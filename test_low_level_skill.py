@@ -4,15 +4,19 @@ import torch
 import matplotlib.pyplot as plt
 
 from sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
+from sac_envs.walker_multi import WalkerMulti
+from sac_envs.hopper_multi import HopperMulti
 from model import PolicyNetwork as TransferFunction
 from train_striding_predictor import get_complex_agent
+
+# train_striding_predictor_LL_vel_evaluation
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ==== 这些常量记得改成你自己的 ====
 LOW_LEVEL_EXPERIMENTS_REPO = "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy/"
-LOW_LEVEL_EXPERIMENT_NAME  = "new_cheetah_training_server1_diff_taskid"
-LOW_LEVEL_EPOCH            = 300
+LOW_LEVEL_EXPERIMENT_NAME  = "cheetah_multitask_changed_color"
+LOW_LEVEL_EPOCH            = 100
 # ===================================
 
 
@@ -174,7 +178,7 @@ def evaluate_skill(env, policy, value, skill_type,
         plot_single_episode(
             traj, traj_ma, phys_target,
             skill_label=f"{skill_type} target={phys_target:.2f}",
-            save_path=f"plots/{skill_type}_ep{ep}_value{value}.png"
+            save_path=f"{LOW_LEVEL_EXPERIMENT_NAME}_plots/{skill_type}_ep{ep}_value{value}.png"
         )
 
     return np.array(all_t), np.array(all_track)
@@ -229,8 +233,8 @@ def main():
                 plt.title(f"All episodes – {skill}, Target Value={phys_target}")
                 plt.legend()
 
-                os.makedirs("plots", exist_ok=True)
-                plt.savefig(f"plots/{skill}_ALL_value{v}.png", dpi=200)
+                os.makedirs("{LOW_LEVEL_EXPERIMENT_NAME}_plots", exist_ok=True)
+                plt.savefig(f"{LOW_LEVEL_EXPERIMENT_NAME}_plots/{skill}_ALL_value{v}.png", dpi=200)
                 plt.close()
 
     env.close()

@@ -18,15 +18,15 @@ transfer_config = dict(
 
 
     inference_path = dict(
-        name = '2025_12_07_15_06_43_default_true_gmm_timesteps_64',
-        path = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2025_12_07_15_06_43_default_true_gmm_timesteps_64'
+        name = '2026_01_13_21_46_39_default_dpmm_seed1_regular_loss_true_time_steps48',
+        path = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2026_01_13_21_46_39_default_dpmm_seed1_regular_loss_true_time_steps48'
     ),
 
     
     ### Define the low-level controller and agent to reuse the inference mechanism
 
     complex_agent = dict(
-        environment = WalkerMulti,
+        environment = HalfCheetahMixtureEnv,
         experiments_repo = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy/',
         experiment_name = 'new_cheetah_training_server1_diff_taskid',
         epoch = 300,

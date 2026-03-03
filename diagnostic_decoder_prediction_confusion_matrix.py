@@ -51,12 +51,17 @@ def plot_confusion_matrix(true, pred, save_path=None, task_names=None):
     cm = confusion_matrix(true, pred, labels=labels)
 
     plt.figure(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
+    #blend the number in the heatmap
+    sns.heatmap(cm, annot=False, fmt="d", cmap="Blues",
                 xticklabels=task_names, yticklabels=task_names)
     
-    plt.xlabel("Predicted")
-    plt.ylabel("True")
-    plt.title("Decoder Prediction Confusion Matrix")
+    #make the font size larger
+    plt.xlabel("Predicted", fontsize=16)
+    plt.ylabel("True-Tasks", fontsize=16)
+    plt.title("Decoder Prediction Confusion Matrix", fontsize=18)
+
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
 
     if save_path:
         plt.savefig(save_path, dpi=300)
@@ -65,7 +70,7 @@ def plot_confusion_matrix(true, pred, save_path=None, task_names=None):
 
 if __name__ == "__main__":
     # ===== 修改这个路径 =====
-    LOG_DIR = "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2025_12_07_15_06_43_default_true_gmm_timesteps_64/DECODER_EVAL/logs"   # 例如 /home/.../EVAL/logs
+    LOG_DIR = "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2026_01_13_21_46_39_default_dpmm_seed1_regular_loss_true_time_steps48/DECODER_EVAL/logs"   # 例如 /home/.../EVAL/logs
 
     # 你的 cheetah 任务顺序（你在代码里写过）
     task_names = ["goal_front", "goal_back", "forward_vel", "backward_vel"]

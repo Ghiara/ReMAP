@@ -589,9 +589,9 @@ if __name__ == "__main__":
     # from experiments_configs.half_cheetah_multi_env import config as env_config
     #inference path here will be never used, just a verfication of the toy agent
 
-    inference_path = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2025_12_07_15_06_43_default_true_gmm_timesteps_64'
+    inference_path = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2026_01_06_20_48_55_default_single_gaussian_seed0_regular_loss_true_time_steps48'
     paths = [
-        '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2025_12_07_15_06_43_default_true_gmm_timesteps_64',
+        '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2026_01_06_20_48_55_default_single_gaussian_seed0_regular_loss_true_time_steps48',
         # {'name': 'inference_path_3', 'path': '/path/to/inference_path_3'},
     ]
     tasks = [

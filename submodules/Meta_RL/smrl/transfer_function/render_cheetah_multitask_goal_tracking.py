@@ -18,8 +18,8 @@ from model import PolicyNetwork as LowLevelPolicy
 
 # ========== CONFIG ==========
 EXPERIMENTS_REPO = "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy"
-EXPERIMENT_NAME  = "new_cheetah_training_server1_diff_taskid"   # ⚠️ 改成你的 cheetah multi-task 实验目录
-EPOCH            = 300                                                # 想看的 epoch
+EXPERIMENT_NAME  = "cheetah_multitask_changed_color"   # ⚠️ 改成你的 cheetah multi-task 实验目录
+EPOCH            = 100                                                # 想看的 epoch
 OUT_VIDEO        = f"cheetah_multitask_goal_epoch{EPOCH}.mp4"
 MAX_PATH_LENGTH  = 500
 FPS              = 30

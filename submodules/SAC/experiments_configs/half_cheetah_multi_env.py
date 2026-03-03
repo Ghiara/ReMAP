@@ -24,7 +24,7 @@ config = dict(
 
     env = 'half_cheetah_multi',
     # experiment_name = 'Walker_deeper_really_change_task',
-    experiment_name = 'new_cheetah_training_iter2_C3',
+    experiment_name = 'cheetah_multitask_changed_color',
     task_dim = 5,
 
     hidden_layers_actor = [300,300,300,300],

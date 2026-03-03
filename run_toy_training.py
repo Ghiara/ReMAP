@@ -27,8 +27,8 @@ from tigr.training_algorithm import TrainingAlgorithm
 # from tigr.task_inference.true_gmm_inference import DecoupledEncoder
 # from tigr.trainer.true_gmm_trainer import AugmentedTrainer
 from tigr.task_inference.dpmm_bnp import BNPModel
-from tigr.task_inference.dpmm_inference import DecoupledEncoder
-from tigr.trainer.dpmm_trainer import AugmentedTrainer
+# from tigr.task_inference.dpmm_inference import DecoupledEncoder
+# from tigr.trainer.dpmm_trainer import AugmentedTrainer
 # from tigr.task_inference.stick_break_inference import DecoupledEncoder
 # from tigr.trainer.stick_break_trainer import AugmentedTrainer
 
@@ -108,18 +108,71 @@ def experiment(variant):
 
     #if use dpmm model, then comment out the if-else statement, if use stick-breaking uncomment it
     # if variant['inference_option'] == "dpmm":
-    bnp_model = BNPModel(
-        save_dir=variant['dpmm_params']['save_dir'],
-        start_epoch=variant['dpmm_params']['start_epoch'],
-        gamma0=variant['dpmm_params']['gamma0'],
-        num_lap=variant['dpmm_params']['num_lap'],
-        fit_interval=variant['dpmm_params']['fit_interval'],
-        kl_method=variant['dpmm_params']['kl_method'],
-        birth_kwargs=variant['dpmm_params']['birth_kwargs'],
-        merge_kwargs=variant['dpmm_params']['merge_kwargs']
-    )
-    # else:
-    #     bnp_model = None 
+    # bnp_model = BNPModel(
+    #     save_dir=variant['dpmm_params']['save_dir'],
+    #     start_epoch=variant['dpmm_params']['start_epoch'],
+    #     gamma0=variant['dpmm_params']['gamma0'],
+    #     num_lap=variant['dpmm_params']['num_lap'],
+    #     fit_interval=variant['dpmm_params']['fit_interval'],
+    #     kl_method=variant['dpmm_params']['kl_method'],
+    #     birth_kwargs=variant['dpmm_params']['birth_kwargs'],
+    #     merge_kwargs=variant['dpmm_params']['merge_kwargs']
+    # )
+    # # else:
+    # #     bnp_model = None 
+
+    # =========================
+    # Select inference baseline
+    # =========================
+    ti_option = variant.get('inference_option', 'dpmm')
+
+    if ti_option == 'dpmm':
+        from tigr.task_inference.dpmm_inference import DecoupledEncoder
+        from tigr.trainer.dpmm_trainer import AugmentedTrainer
+
+        bnp_model = BNPModel(
+            save_dir=variant['dpmm_params']['save_dir'],
+            start_epoch=variant['dpmm_params']['start_epoch'],
+            gamma0=variant['dpmm_params']['gamma0'],
+            num_lap=variant['dpmm_params']['num_lap'],
+            fit_interval=variant['dpmm_params']['fit_interval'],
+            kl_method=variant['dpmm_params']['kl_method'],
+            birth_kwargs=variant['dpmm_params']['birth_kwargs'],
+            merge_kwargs=variant['dpmm_params']['merge_kwargs']
+        )
+
+    elif ti_option == 'single_gaussian':
+        # 注意：这里仍然使用 dpmm_inference + dpmm_trainer，
+        # 但 bnp_model.model 永远保持 None，从而退化为 KL(q||N(0,I)) 的单高斯baseline
+        from tigr.task_inference.dpmm_inference import DecoupledEncoder
+        from tigr.trainer.dpmm_trainer import AugmentedTrainer
+
+        bnp_model = BNPModel(
+            save_dir=variant['dpmm_params']['save_dir'],
+            # 关键：让它永远不进入 fit 阶段
+            start_epoch=int(1e12),
+            gamma0=variant['dpmm_params']['gamma0'],
+            num_lap=variant['dpmm_params']['num_lap'],
+            fit_interval=variant['dpmm_params']['fit_interval'],  # 保持原值即可，因为 start_epoch 超大
+            kl_method=variant['dpmm_params']['kl_method'],
+            birth_kwargs=variant['dpmm_params']['birth_kwargs'],
+            merge_kwargs=variant['dpmm_params']['merge_kwargs']
+        )
+
+    elif ti_option == 'true_gmm':
+        from tigr.task_inference.true_gmm_inference import DecoupledEncoder
+        from tigr.trainer.true_gmm_trainer import AugmentedTrainer
+        bnp_model = None
+
+    elif ti_option == 'stick_break':
+        from tigr.task_inference.stick_break_inference import DecoupledEncoder
+        from tigr.trainer.stick_break_trainer import AugmentedTrainer
+        bnp_model = None
+
+    else:
+        raise ValueError(f'Unknown inference_option: {ti_option}')
+
+
 
     encoder = DecoupledEncoder(
         shared_dim,
@@ -132,6 +185,9 @@ def experiment(variant):
         encoder_type=variant['algo_params']['encoder_type'],
         bnp_model=bnp_model
     )
+
+
+
 
     decoder = DecoderMDP(
         action_dim,

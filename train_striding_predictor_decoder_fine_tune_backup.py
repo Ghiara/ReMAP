@@ -1018,42 +1018,42 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
                 low_level_losses = step_predictor.train(episode, False)
 
                 # decoder finetune training
-                # if len(memory) >= memory.batch_size:
-                #     batch = memory.sample(memory.batch_size)
-                #     tasks_batch, simple_obs_batch, simple_action_batch, mu_batch = memory.unpack(batch)
+                if len(memory) >= memory.batch_size:
+                    batch = memory.sample(memory.batch_size)
+                    tasks_batch, simple_obs_batch, simple_action_batch, mu_batch = memory.unpack(batch)
 
-                #     _, _, logits_batch = decoder(
-                #         simple_obs_batch.detach(),
-                #         simple_action_batch.detach(),
-                #         0,
-                #         mu_batch.squeeze().detach()
-                #     )
+                    _, _, logits_batch = decoder(
+                        simple_obs_batch.detach(),
+                        simple_action_batch.detach(),
+                        0,
+                        mu_batch.squeeze().detach()
+                    )
 
-                #     loss = loss_criterion(
-                #         logits_batch,
-                #         tasks_batch.view(-1)  # (B,)
-                #     )
-                #     optimizer.zero_grad()
-                #     loss.backward()
-                #     optimizer.step()
+                    loss = loss_criterion(
+                        logits_batch,
+                        tasks_batch.view(-1)  # (B,)
+                    )
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
 
-                #     decoder_loss_history.append(loss.item())
+                    decoder_loss_history.append(loss.item())
 
-                #     true_labels_flat = tasks_batch.view(-1)
-                #     preds = torch.argmax(logits_batch, dim=1)
-                #     for t in range(4):
-                #         mask = (true_labels_flat == t)
-                #         if mask.any():
-                #             cls_loss = loss_criterion(
-                #                 logits_batch[mask],
-                #                 true_labels_flat[mask]
-                #             ).item()
-                #         else:
-                #             cls_loss = np.nan 
-                #         task_loss_hist[t].append(cls_loss)
+                    true_labels_flat = tasks_batch.view(-1)
+                    preds = torch.argmax(logits_batch, dim=1)
+                    for t in range(4):
+                        mask = (true_labels_flat == t)
+                        if mask.any():
+                            cls_loss = loss_criterion(
+                                logits_batch[mask],
+                                true_labels_flat[mask]
+                            ).item()
+                        else:
+                            cls_loss = np.nan 
+                        task_loss_hist[t].append(cls_loss)
 
-                #     acc = (preds == tasks_batch.view(-1)).float().mean().item()
-                #     decoder_acc_history.append(acc)
+                    acc = (preds == tasks_batch.view(-1)).float().mean().item()
+                    decoder_acc_history.append(acc)
 
 
             # else:

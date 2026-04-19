@@ -13,14 +13,15 @@ import cv2
 
 # ========== TODO: 根据你项目实际路径修改 ==========
 from sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
+from sac_envs.hopper_multi import HopperMulti
 from model import PolicyNetwork as LowLevelPolicy
 # =============================================
 
 # ========== CONFIG ==========
 EXPERIMENTS_REPO = "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy"
-EXPERIMENT_NAME  = "cheetah_multitask_changed_color"   # ⚠️ 改成你的 cheetah multi-task 实验目录
-EPOCH            = 100                                                # 想看的 epoch
-OUT_VIDEO        = f"cheetah_multitask_goal_epoch{EPOCH}.mp4"
+EXPERIMENT_NAME  = "hopper_multi"   # ⚠️ 改成你的 cheetah multi-task 实验目录
+EPOCH            = 3000                                                # 想看的 epoch
+OUT_VIDEO        = f"hopper_multitask_goal_epoch{EPOCH}.mp4"
 MAX_PATH_LENGTH  = 500
 FPS              = 30
 # ============================
@@ -39,7 +40,7 @@ def load_env_and_policy():
     print("Loaded config from:", config_path)
 
     # ---- 创建 Cheetah multi-task 环境 ----
-    env = HalfCheetahMixtureEnv(env_config, render_mode="rgb_array")
+    env = HopperMulti(env_config, render_mode="rgb_array")
 
     # ---- 获取状态/动作空间维度 ----
     n_states = env.observation_space.shape[0]

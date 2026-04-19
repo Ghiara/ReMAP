@@ -70,11 +70,13 @@ class HopperMulti(HopperEnv):
 
         posafter, height, ang = self.sim.data.qpos[0:3]
         s = self.state_vector()
+        # Relax ang limit for backward_vel to allow backward leaning gait
+        ang_limit = 0.35 if self.base_task == self.config.get('tasks', {}).get('backward_vel') else 0.2
         terminated = not (
             np.isfinite(s).all()
             and (np.abs(s[2:]) < 100).all()
             and (height > 0.7)
-            and (abs(ang) < 0.2)
+            and (abs(ang) < ang_limit)
         )
         healthy_penalty = 0
         if terminated:
@@ -88,10 +90,12 @@ class HopperMulti(HopperEnv):
         #     reward = reward_ctrl * 1.0 + reward_run / np.abs(self.task_specification)
         
         if self.base_task in [self.config.get('tasks',{}).get('goal_front'), self.config.get('tasks',{}).get('goal_back')]:  # 'goal
-            # reward_run = -(distance_after - distance_before)/np.abs(self.task[0])
-            reward_run = -np.abs(xposafter-self.task[self.base_task])/np.abs(self.norm)
-            # reward_run = reward_run.clip(-2,0)
-            reward_ctrl = -0.5 * 1e-1 * np.sum(np.square(action))
+            dist_before = np.abs(xposbefore - self.task[self.base_task])
+            dist_after  = np.abs(xposafter  - self.task[self.base_task])
+            progress    = dist_before - dist_after   # >0 means getting closer to goal
+            alpha       = 0.5                        # progress reward weight
+            reward_run  = -np.abs(xposafter - self.task[self.base_task]) / np.abs(self.norm) \
+                          + alpha * progress / np.abs(self.norm)
             reward_ctrl = 0
             healthy_reward = 1
             if terminated:
@@ -159,7 +163,11 @@ class HopperMulti(HopperEnv):
         # {'velocity_forward': 0, 'velocity_backward': 1, 'goal_forward': 4, 'goal_backward': 5, 
         # 'flip_forward': 6, 'stand_front': 3, 'stand_back': 2, 'jump': 7, flip_backward = 8,
         # 'direction_forward': -1, 'direction_backward': -1, 'velocity': -1}
-        base_task = np.random.choice(list(self.config['tasks'].keys()))
+        # Oversample hard tasks (backward_vel, goal_front) to compensate for difficulty
+        task_keys = list(self.config['tasks'].keys())
+        task_weights = np.array([2.0 if k in ('backward_vel', 'goal_front') else 1.0 for k in task_keys])
+        task_weights = task_weights / task_weights.sum()
+        base_task = np.random.choice(task_keys, p=task_weights)
         self.base_task = self.config.get('tasks',{}).get(base_task)
         mult = np.random.random()
         if task:
@@ -167,19 +175,11 @@ class HopperMulti(HopperEnv):
             self.base_task = self.config.get('tasks',{}).get(base_task)
             mult = task['specification']
         if base_task == 'goal_front':
-            if test:
-                self.task[self.base_task] = mult * (self.config['max_goal'][1] - self.config['max_goal'][0]) + self.config['max_goal'][0]
-                self.norm = self.task[self.base_task]
-            else:
-                self.norm = mult + 0.5
-                self.task[self.base_task] = self.sim.data.qpos[0] + self.norm
+            self.task[self.base_task] = mult * (self.config['max_goal'][1] - self.config['max_goal'][0]) + self.config['max_goal'][0]
+            self.norm = self.task[self.base_task]
         elif base_task == 'goal_back':
-            if test:
-                self.task[self.base_task] = - (mult * (self.config['max_goal'][1] - self.config['max_goal'][0]) + self.config['max_goal'][0])
-                self.norm = self.task[self.base_task]
-            else:
-                self.norm = mult + 0.5
-                self.task[self.base_task] = self.sim.data.qpos[0] - self.norm
+            self.task[self.base_task] = - (mult * (self.config['max_goal'][1] - self.config['max_goal'][0]) + self.config['max_goal'][0])
+            self.norm = self.task[self.base_task]
         elif base_task == 'forward_vel':
             self.task[self.base_task] = mult * (self.config['max_vel'][1] - self.config['max_vel'][0]) + self.config['max_vel'][0]
             self.norm = self.task[self.base_task]

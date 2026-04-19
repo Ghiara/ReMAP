@@ -26,10 +26,10 @@ transfer_config = dict(
     ### Define the low-level controller and agent to reuse the inference mechanism
 
     complex_agent = dict(
-        environment = HalfCheetahMixtureEnv,
+        environment = WalkerMulti,
         experiments_repo = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy/',
-        experiment_name = 'new_cheetah_training_server1_diff_taskid',
-        epoch = 300,
+        experiment_name = 'walker_full_06_07',
+        epoch = 3000,
     ),
     # complex_agent = dict(
     #     experiments_repo = '/home/ubuntu/juan/Meta-RL/experiments_transfer_function/',

@@ -15,8 +15,8 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ==== 这些常量记得改成你自己的 ====
 LOW_LEVEL_EXPERIMENTS_REPO = "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy/"
-LOW_LEVEL_EXPERIMENT_NAME  = "cheetah_multitask_changed_color"
-LOW_LEVEL_EPOCH            = 100
+LOW_LEVEL_EXPERIMENT_NAME  = "hopper_multi"
+LOW_LEVEL_EPOCH            = 3000
 # ===================================
 
 
@@ -42,7 +42,7 @@ def make_env():
     else:
         env_cfg = cfg
 
-    env = HalfCheetahMixtureEnv(env_cfg)
+    env = HopperMulti(env_cfg)
     return env
 
 
@@ -233,7 +233,7 @@ def main():
                 plt.title(f"All episodes – {skill}, Target Value={phys_target}")
                 plt.legend()
 
-                os.makedirs("{LOW_LEVEL_EXPERIMENT_NAME}_plots", exist_ok=True)
+                os.makedirs(f"{LOW_LEVEL_EXPERIMENT_NAME}_plots", exist_ok=True)
                 plt.savefig(f"{LOW_LEVEL_EXPERIMENT_NAME}_plots/{skill}_ALL_value{v}.png", dpi=200)
                 plt.close()
 

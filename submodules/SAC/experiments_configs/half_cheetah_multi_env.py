@@ -5,7 +5,7 @@ import numpy as np
 pi = 3.141592
 
 config = dict(
-    epochs = 30000,
+    epochs = 3000,
     max_traj_len = 500,
     memory_size = 1e+6,
     batch_size_memory = 256,
@@ -19,12 +19,12 @@ config = dict(
     max_goal = [0.2, 10],
     max_jump = [1.5, 3.],
     max_rot = [pi / 6., pi / 2.],
-    max_vel = [0.0, 2.5],
+    max_vel = [0.0, 1],
     max_rot_vel = [2. * pi, 4. * pi],
 
     env = 'half_cheetah_multi',
     # experiment_name = 'Walker_deeper_really_change_task',
-    experiment_name = 'cheetah_multitask_changed_color',
+    experiment_name = 'cheetah_multitask_big_range_goal_tracking_small_range_vel',
     task_dim = 5,
 
     hidden_layers_actor = [300,300,300,300],
@@ -34,16 +34,16 @@ config = dict(
     plot_every = 10,
 
     #here to modify reward function (velocity tracking )weights
-    reward_params = dict(
-        w_track = 1.0,
-        w_energy = 1e-3,
-        w_smooth_vel = 0.35,
-        w_smooth_act = 6e-3,
-        w_pitch = 0.5,
-        vx_filter_alpha = 0.90,
-        reward_scale = 3.0,
-    )
-    ,
+    # reward_params = dict(
+    #     w_track = 1.0,
+    #     w_energy = 1e-3,
+    #     w_smooth_vel = 0.35,
+    #     w_smooth_act = 6e-3,
+    #     w_pitch = 0.5,
+    #     vx_filter_alpha = 0.90,
+    #     reward_scale = 3.0,
+    # )
+    # ,
 
 
     tasks = dict(

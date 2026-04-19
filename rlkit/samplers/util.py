@@ -35,7 +35,12 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, animated=Fal
     if plotting:
         zs = np.zeros((1, agent.latent_dim*2))
 
-    o = env.reset()
+    reset_result = env.reset()
+    # Handle gym 0.26+ returning (obs, info) tuple
+    if isinstance(reset_result, tuple):
+        o = reset_result[0]
+    else:
+        o = reset_result
     next_o = None
     path_length = 0
     if animated:
@@ -77,7 +82,12 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, animated=Fal
             env_info['frame'] = image
         env_infos.append(env_info)
 
-    next_task_indicator = agent.get_action(next_o)[1]
+    if next_o is not None:
+        next_task_indicator = agent.get_action(next_o)[1]
+    else:
+        # If episode ended naturally, next_o is None
+        next_o = o  # Use last observation
+        next_task_indicator = agent.get_action(next_o)[1]
     actions = np.array(actions)
     if len(actions.shape) == 1:
         actions = np.expand_dims(actions, 1)
@@ -85,7 +95,7 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, animated=Fal
     task_indicators = np.array(task_indicators)
     if len(observations.shape) == 1:
         observations = np.expand_dims(observations, 1)
-        task_indicators. np.expand_dim(task_indicators, 1)
+        task_indicators = np.expand_dims(task_indicators, 1)
         next_o = np.array([next_o])
         next_task_indicator = np.array([next_task_indicator])
     next_observations = np.vstack(

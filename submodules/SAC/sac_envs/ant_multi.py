@@ -198,7 +198,7 @@ class AntMulti(AntEnv, utils.EzPickle):
 
     def recolor(self):
         geom_rgba = self._init_geom_rgba.copy()
-        rgb_value = None
+        rgb_value = self.color
         geom_rgba[1:, :3] = np.asarray(rgb_value)
         self.model.geom_rgba[:] = geom_rgba
 

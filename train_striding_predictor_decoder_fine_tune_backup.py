@@ -446,9 +446,11 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
 
 
     # === 🧩 新增：t-SNE latent 导出设置 ===
-    EXPORT_ROOT = os.path.join(save_video_path, "tensorboard_transfer")
-    EXPORT_SAMPLES_PER_STEP = 1000  # 每导出一次保存多少个样本点，可自行调大
-    export_latents, export_true, export_pred = [], [], []
+    EXPORT_ROOT     = os.path.join(save_video_path, "tensorboard_transfer")          # mu only
+    EXPORT_ROOT_DEC = os.path.join(save_video_path, "tensorboard_transfer_dec_input")  # obs + mu (decoder task-head input)
+    EXPORT_SAMPLES_PER_STEP = 1200  # 每导出一次保存多少个样本点，可自行调大
+    export_latents,     export_true, export_pred = [], [], []  # mu-only track
+    export_latents_dec = []                                    # decoder-task-input track (obs + mu)
     export_step_idx = 1
 
 
@@ -607,6 +609,13 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             #simple_obs_before: [pos_x, vel_x]
             simple_obs_before = general_obs_map(env)
 
+            # === decoder task-input embedding (obs + mu, exact input to task_decoder head) ===
+            _dec_feat = np.concatenate([
+                simple_obs_before.flatten(),
+                mu.detach().cpu().numpy().squeeze()
+            ])
+            export_latents_dec.append(_dec_feat)
+
             # Save latent vars
             #simple_obs_before: [pos_x, vel_x]  mu:[mu_1, mu_2, ..., mu_d]
             #policy_input: [pos_x, vel_x, mu_1, mu_2, ..., mu_d]
@@ -705,7 +714,12 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
                     EXPORT_ROOT, export_step_idx,
                     export_latents, export_true, export_pred, export_specs
                 )
-                export_latents, export_true, export_pred, export_specs = [], [], [], []
+                _write_tensorboard_step(
+                    EXPORT_ROOT_DEC, export_step_idx,
+                    export_latents_dec, export_true, export_pred, export_specs
+                )
+                export_latents,     export_true, export_pred, export_specs = [], [], [], []
+                export_latents_dec  = []
                 export_step_idx += 1
 
             # === FINETUNE decoder数据收集（仅在 train_stride 模式下）===
@@ -1229,8 +1243,11 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             if len(export_latents) > 0:
                 _write_tensorboard_step(EXPORT_ROOT, export_step_idx,
                                         export_latents, export_true, export_pred, export_specs)
+                _write_tensorboard_step(EXPORT_ROOT_DEC, export_step_idx,
+                                        export_latents_dec, export_true, export_pred, export_specs)
                 print(f"[INFO] Saved final latent batch to step {export_step_idx}")
-            print(f"[INFO] Latent embeddings exported under {EXPORT_ROOT}")
+            print(f"[INFO] mu-only embeddings        -> {EXPORT_ROOT}")
+            print(f"[INFO] decoder-input embeddings  -> {EXPORT_ROOT_DEC}")
         # ✅ 检查采样均衡性（插在 for episode 的结尾）
         if (episode + 1) % 4 == 0 or episode == num_trajectory - 1:
             from collections import Counter

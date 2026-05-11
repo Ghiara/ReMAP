@@ -6,20 +6,20 @@ pi = 3.141592
 
 config = dict(
     epochs = 30000,
-    max_traj_len = 300,
+    max_traj_len = 500,
     memory_size = 1e+6,
     batch_size = 20,
     batch_size_memory = 256,
-    policy_update_steps = 1028, 
+    policy_update_steps = 2048,
     gamma = 0.99,
     alpha = 0.2,
     lr = 3e-4,
-    reward_scale = 5,
+    reward_scale = 1,
 
-    max_goal = [2, 15],
+    max_goal = [0.5, 10],
     max_jump = [1.5, 3.],
     max_rot = [pi / 6., pi / 2.],
-    max_vel = [1.0, 3.0],
+    max_vel = [0.0, 2.0],
     max_rot_vel = [2. * pi, 4. * pi],
 
     env = 'hopper_multi',
@@ -39,12 +39,12 @@ config = dict(
                 ),
     
     curriculum = dict(
-        max_vel=500,
+        max_vel=200,
         change_tasks_after = [200,300,400,600,1000],
         changes_per_trajectory = [0,2,4,6,8],
         max_steps_epochs = [200,400,600],
         max_steps = [300,600,1000],
-        random_initialization = 400,
+        random_initialization = 1,
     ),
     # pretrained=dict(
     #     path = '/home/ubuntu/juan/Meta-RL/experiments_transfer_function/hopper_multi_back_to_roots_change_task',

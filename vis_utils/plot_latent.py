@@ -18,15 +18,15 @@ MARKERS = ['.', '^', 's', 'p', '*', 'X', 'h', 'd', '+', 'P']
 # f'{os.getcwd()}/output/toy1d-multi-task/2025_02_14_15_42_58_default_stick_breaking_run2_seed499'
 def main(path, run_name=None, show_='last', save=True, use_tsne=True, DIM_RED=2, hardcoded=None):
    
-    data_dir = os.path.join(path,'TRAIN_STRIDE','tensorboard_transfer')
+    data_dir = os.path.join(path,'tensorboard')
     # data_dir = '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_07_11_15_51_58_default_true_gmm'
-    fig_dir = os.path.join(path,'TRAIN_STRIDE','log', 'encodings')
+    fig_dir = os.path.join(path,'log', 'encodings')
     # run_name = DATA_DIR
     # if run_name is not None and os.path.exists(os.path.join(run_name, 'tensorboard')):
     #         DATA_DIR = os.path.join(run_name, 'tensorboard')
     # else:
     #     raise FileNotFoundError('Not a valid path %s' % run_name)
-    data_dir_run = os.path.join(path,'tensorboard_transfer')
+    data_dir_run = os.path.join(path,'tensorboard')
     run_name = Path(data_dir_run).parent
     # run_name = Path(data_dir)
 
@@ -137,11 +137,13 @@ def main(path, run_name=None, show_='last', save=True, use_tsne=True, DIM_RED=2,
                  'goal_up': 'Goal Up', 'goal_down': 'Goal Down', 'goal_right': 'Goal Right', 'goal_left': 'Goal Left'}
     
     # === Stable task color mapping for paper plots ===
+    # Keys are the integer-string task IDs written into metadata.tsv
+    # (0=goal_front, 1=goal_back, 2=forward_vel, 3=backward_vel)
     TASK_COLOR_MAP = {
-        'velocity_forward': '#1f77b4',   # deep blue
-        'velocity_backward': '#d55e00',  # dark orange
-        'goal_forward': '#b22222',       # dark red
-        'goal_backward': '#6a3d9a',      # muted purple
+        '0': '#b22222',   # goal_front  - dark red
+        '1': '#6a3d9a',   # goal_back   - muted purple
+        '2': '#1f77b4',   # forward_vel - deep blue
+        '3': '#d55e00',   # backward_vel - dark orange
     }
 
     # Plotting
@@ -410,7 +412,7 @@ if __name__ == '__main__':
     # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_16_15_34_37_default_true_gmm',     # keep training var0.1 step 32, with var 0.1 ??
     # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_21_11_05_23_default_true_gmm',     # var 0.05
     # '/home/ubuntu/juan/melts/output/toy1d-multi-task/2024_09_21_11_06_00_default_true_gmm',     # var 0.02
-    '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2026_01_06_20_48_56_default_dpmm_seed0_regular_loss_true_time_steps48',     # var 0.05
+    '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2026_01_06_20_48_55_default_single_gaussian_seed0_regular_loss_true_time_steps48',     # var 0.05
 
 
         ]

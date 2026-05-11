@@ -21,7 +21,8 @@ import argparse
 '''
 Choose the experiment to run here
 '''
-from experiments_configs.half_cheetah_multi_env import config
+# from experiments_configs.half_cheetah_multi_env import config
+from experiments_configs.ant_multi_task import config
 
 
 import matplotlib.pyplot as plt
@@ -252,13 +253,14 @@ def train(env, agent, epochs, experiment_name, save_after_episodes, policy_updat
 
 def load_config(env_name):
     if env_name == "cheetah":
+        # from experiments_configs.half_cheetah_multi_env import config
         from experiments_configs.half_cheetah_multi_env import config
     elif env_name == "hopper":
         from experiments_configs.hopper_multi import config
     elif env_name == "walker2d":
         from experiments_configs.walker_multi import config
     elif env_name == "ant":
-        from experiments_configs.ant_multi import config
+        from experiments_configs.ant_multi_task import config
     else:
         raise ValueError(f"Unsupported environment: {env_name}")
     return config

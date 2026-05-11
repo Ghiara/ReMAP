@@ -14,7 +14,6 @@ Usage:
 import os, sys, json, argparse
 import numpy as np
 from pathlib import Path
-from collections import defaultdict
 
 import torch
 import matplotlib
@@ -26,9 +25,8 @@ sys.path.insert(0, str(project_root))
 
 from rlkit.envs import ENVS
 from rlkit.envs.wrappers import NormalizedBoxEnv
-from rlkit.torch.networks import FlattenMlp
-from rlkit.torch.rl2.networks import LSTMQFunction
 from rlkit.torch.rl2.rl2_agent import RL2Agent
+from rlkit.samplers.util import rollout
 from configs.rl2_default import default_config
 import rlkit.torch.pytorch_util as ptu
 
@@ -40,8 +38,8 @@ TASK_NAMES = {
 }
 
 # Observation indices (cheetah-multi-task)
-OBS_X_VEL = 8
-OBS_X_POS = 17
+OBS_X_VEL = 8    # qvel[0]
+OBS_X_POS = 17   # body_com("torso")[0]
 
 
 def deep_update_dict(fr, to):
@@ -71,57 +69,21 @@ def load_agent(variant, weights_dir):
     )
 
     policy_path = os.path.join(weights_dir, 'policy.pth')
-    if os.path.exists(policy_path):
-        print(f"Loading policy weights from {policy_path}")
-        agent.policy.load_state_dict(
-            torch.load(policy_path, map_location='cpu'))
-    else:
-        # Try loading from snapshot (rlkit logger saves params.pkl)
-        import pickle
-        params_path = os.path.join(weights_dir, 'params.pkl')
-        if os.path.exists(params_path):
-            print(f"Loading from params.pkl at {params_path}")
-            data = torch.load(params_path, map_location='cpu')
-            if 'policy' in data:
-                agent.policy.load_state_dict(data['policy'])
-        else:
-            raise FileNotFoundError(
-                f"No weights found at {weights_dir}. "
-                "Expected policy.pth or params.pkl"
-            )
-
+    if not os.path.exists(policy_path):
+        raise FileNotFoundError(
+            f"Policy weights not found at {policy_path}. "
+            "Make sure --exp-dir points to the experiment root (containing weights/)."
+        )
+    print(f"Loading policy weights from {policy_path}")
+    state_dict = torch.load(policy_path, map_location='cpu')
+    # The logger saves state_dicts directly; handle both raw state_dict
+    # and wrapped dict (e.g. {'policy': state_dict})
+    if isinstance(state_dict, dict) and 'policy' in state_dict and not any(
+            k.startswith('lstm') or k.startswith('mean') or k.startswith('log_std')
+            for k in state_dict):
+        state_dict = state_dict['policy']
+    agent.policy.load_state_dict(state_dict)
     return env, agent
-
-
-# ------------------------------------------------------------------ #
-#  RL2-specific rollout (carries LSTM hidden state)
-# ------------------------------------------------------------------ #
-
-def rl2_rollout(env, agent, max_path_length, deterministic=False):
-    """
-    Collect one episode while carrying the LSTM hidden state.
-    Returns a dict with observations, actions, rewards.
-    """
-    observations, actions, rewards = [], [], []
-    obs = env.reset()
-    if isinstance(obs, tuple):
-        obs = obs[0]
-
-    for _ in range(max_path_length):
-        (action, _agent_info), _z = agent.get_action(obs, deterministic=deterministic)
-        next_obs, r, d, info = env.step(action)
-        observations.append(obs)
-        actions.append(action)
-        rewards.append(r)
-        obs = next_obs
-        if d:
-            break
-
-    return {
-        'observations': np.array(observations),
-        'actions': np.array(actions),
-        'rewards': np.array(rewards),
-    }
 
 
 # ------------------------------------------------------------------ #
@@ -129,14 +91,21 @@ def rl2_rollout(env, agent, max_path_length, deterministic=False):
 # ------------------------------------------------------------------ #
 
 def set_velocity_task(env, vel):
-    env._task = {'base_task': 0, 'specification': vel, 'color': np.array([1, 0, 0])}
-    env.base_task = 0
+    """Set env to a velocity task with given target velocity.
+    Positive vel -> base_task 0 (velocity_forward).
+    Negative vel -> base_task 1 (velocity_backward).
+    """
+    base_task = 0 if vel >= 0 else 1
+    color = np.array([1, 0, 0]) if vel >= 0 else np.array([0, 0, 1])
+    env._task = {'base_task': base_task, 'specification': vel, 'color': color}
+    env.base_task = base_task
     env.task_specification = vel
     env._goal = vel
     env.reset()
 
 
 def set_goal_task(env, goal):
+    """Set env to a goal_forward/backward task with given target position."""
     base_task = 2 if goal >= 0 else 3
     env._task = {
         'base_task': base_task, 'specification': goal,
@@ -153,19 +122,29 @@ def set_goal_task(env, goal):
 # ------------------------------------------------------------------ #
 
 def evaluate_velocity_tracking(env, agent, variant, velocities, num_trajs=3):
+    """
+    For each target velocity, run num_trajs episodes with the LSTM state
+    preserved across episodes (RL2 in-context adaptation).
+    Record per-timestep achieved velocity.
+    """
     max_path_length = variant['algo_params']['max_path_length']
     results = {}
 
     for vel in velocities:
         set_velocity_task(env, vel)
-        agent.clear_z()
+        agent.clear_z()   # reset LSTM hidden state for this task
 
         all_vels, all_returns = [], []
         for traj_idx in range(num_trajs):
-            path = rl2_rollout(env, agent, max_path_length, deterministic=(traj_idx == num_trajs - 1))
-            achieved_vel = path['observations'][:, OBS_X_VEL]
+            # LSTM state carries over between trajectories (RL2 adaptation)
+            path = rollout(env, agent, max_path_length=max_path_length,
+                           accum_context=True)
+            obs = path['observations']   # (T, obs_dim)
+            achieved_vel = obs[:, OBS_X_VEL]
             all_vels.append(achieved_vel)
             all_returns.append(float(np.sum(path['rewards'])))
+            # infer_posterior is a no-op for RL2 but kept for interface parity
+            agent.infer_posterior(agent.context)
 
         last_vel = all_vels[-1]
         results[vel] = {
@@ -178,26 +157,33 @@ def evaluate_velocity_tracking(env, agent, variant, velocities, num_trajs=3):
             'adapted_return': all_returns[-1],
         }
         print(f"  vel_target={vel:>5.1f}  achieved={np.mean(last_vel):>6.2f}"
-              f"±{np.std(last_vel):>5.2f}  error={np.mean(np.abs(last_vel - vel)):>5.2f}"
+              f"\xb1{np.std(last_vel):>5.2f}  error={np.mean(np.abs(last_vel - vel)):>5.2f}"
               f"  return={all_returns[-1]:>8.2f}")
 
     return results
 
 
 def evaluate_goal_tracking(env, agent, variant, goals, num_trajs=3):
+    """
+    For each target goal, run num_trajs episodes with LSTM state preserved.
+    Record per-timestep x-position.
+    """
     max_path_length = variant['algo_params']['max_path_length']
     results = {}
 
     for goal in goals:
         set_goal_task(env, goal)
-        agent.clear_z()
+        agent.clear_z()   # reset LSTM hidden state for this task
 
         all_pos, all_returns = [], []
         for traj_idx in range(num_trajs):
-            path = rl2_rollout(env, agent, max_path_length, deterministic=(traj_idx == num_trajs - 1))
-            achieved_pos = path['observations'][:, OBS_X_POS]
+            path = rollout(env, agent, max_path_length=max_path_length,
+                           accum_context=True)
+            obs = path['observations']
+            achieved_pos = obs[:, OBS_X_POS]
             all_pos.append(achieved_pos)
             all_returns.append(float(np.sum(path['rewards'])))
+            agent.infer_posterior(agent.context)
 
         last_pos = all_pos[-1]
         final_pos = float(last_pos[-1])
@@ -210,9 +196,8 @@ def evaluate_goal_tracking(env, agent, variant, goals, num_trajs=3):
             'returns': all_returns,
             'adapted_return': all_returns[-1],
         }
-        print(f"  goal_target={goal:>6.1f}  final_pos={final_pos:>7.2f}"
-              f"  dist_to_goal={np.abs(final_pos - goal):>6.2f}"
-              f"  return={all_returns[-1]:>8.2f}")
+        print(f"  goal_target={goal:>6.1f}  final_pos={final_pos:>7.2f}  "
+              f"dist_to_goal={np.abs(final_pos - goal):>6.2f}  return={all_returns[-1]:>8.2f}")
 
     return results
 
@@ -222,12 +207,16 @@ def evaluate_goal_tracking(env, agent, variant, goals, num_trajs=3):
 # ------------------------------------------------------------------ #
 
 def plot_velocity_tracking_curves(vel_results, save_dir):
-    fig, axes = plt.subplots(3, 3, figsize=(15, 12))
-    axes = axes.flatten()
     velocities = sorted(vel_results.keys())
+    n = len(velocities)
+    cols = min(n, 4)
+    rows = (n + cols - 1) // cols
+    fig, axes = plt.subplots(rows, cols, figsize=(5 * cols, 4 * rows))
+    if n == 1:
+        axes = [axes]
+    else:
+        axes = np.atleast_1d(axes).flatten()
     for i, vel in enumerate(velocities):
-        if i >= len(axes):
-            break
         ax = axes[i]
         trajs = vel_results[vel]['achieved_velocities']
         for j, tv in enumerate(trajs):
@@ -236,10 +225,14 @@ def plot_velocity_tracking_curves(vel_results, save_dir):
             label = f'Traj {j+1}' + (' (adapted)' if j == len(trajs)-1 else ' (explore)')
             ax.plot(tv, alpha=alpha, linewidth=lw, label=label)
         ax.axhline(y=vel, color='r', linestyle='--', linewidth=2, label=f'Target={vel:.1f}')
-        ax.set_title(f'Target Velocity = {vel:.1f}', fontsize=11, fontweight='bold')
-        ax.set_xlabel('Timestep'); ax.set_ylabel('X-Velocity')
-        ax.legend(fontsize=7); ax.grid(True, alpha=0.3)
-    for i in range(len(velocities), len(axes)):
+        direction = 'Backward' if vel < 0 else 'Forward'
+        ax.set_title(f'Target Vel = {vel:.1f} ({direction})', fontsize=10, fontweight='bold')
+        ax.set_xlabel('Timestep')
+        ax.set_ylabel('X-Velocity')
+        ax.legend(fontsize=7, loc='best')
+        ax.grid(True, alpha=0.3)
+        ax.set_ylim(vel - 3, vel + 3)
+    for i in range(n, len(axes)):
         fig.delaxes(axes[i])
     fig.suptitle('RL2: Velocity Tracking per Timestep', fontsize=14, fontweight='bold')
     plt.tight_layout()
@@ -254,17 +247,23 @@ def plot_velocity_summary(vel_results, save_dir):
     achieved = [vel_results[v]['mean_achieved_vel'] for v in velocities]
     errors = [vel_results[v]['tracking_error'] for v in velocities]
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
-    x = np.arange(len(velocities)); width = 0.35
-    ax1.bar(x - width/2, targets, width, label='Target', color='#2196F3', alpha=0.8)
-    ax1.bar(x + width/2, achieved, width, label='Achieved (RL2)', color='#FF9800', alpha=0.8)
-    ax1.set_xlabel('Velocity Task'); ax1.set_ylabel('Velocity')
+    x = np.arange(len(velocities))
+    width = 0.35
+    ax1.bar(x - width/2, targets, width, label='Target Velocity', color='#2196F3', alpha=0.8)
+    ax1.bar(x + width/2, achieved, width, label='Achieved Velocity (RL2)', color='#FF9800', alpha=0.8)
+    ax1.set_xlabel('Velocity Task')
+    ax1.set_ylabel('Velocity')
     ax1.set_title('Target vs Achieved Velocity', fontweight='bold')
-    ax1.set_xticks(x); ax1.set_xticklabels([f'{v:.1f}' for v in velocities])
-    ax1.legend(); ax1.grid(True, axis='y', alpha=0.3)
+    ax1.set_xticks(x)
+    ax1.set_xticklabels([f'{v:.1f}' for v in velocities])
+    ax1.legend()
+    ax1.grid(True, axis='y', alpha=0.3)
     ax2.bar(x, errors, color='#f44336', alpha=0.8)
-    ax2.set_xlabel('Target Velocity'); ax2.set_ylabel('Mean |Achieved - Target|')
+    ax2.set_xlabel('Target Velocity')
+    ax2.set_ylabel('Mean |Achieved - Target|')
     ax2.set_title('Velocity Tracking Error', fontweight='bold')
-    ax2.set_xticks(x); ax2.set_xticklabels([f'{v:.1f}' for v in velocities])
+    ax2.set_xticks(x)
+    ax2.set_xticklabels([f'{v:.1f}' for v in velocities])
     ax2.grid(True, axis='y', alpha=0.3)
     fig.suptitle('RL2 Baseline: Velocity Tracking Performance', fontsize=13, fontweight='bold')
     plt.tight_layout()
@@ -275,22 +274,30 @@ def plot_velocity_summary(vel_results, save_dir):
 
 def plot_goal_tracking_curves(goal_results, save_dir):
     goals = sorted(goal_results.keys())
-    n = len(goals); cols = min(n, 3); rows = (n + cols - 1) // cols
+    n = len(goals)
+    cols = min(n, 3)
+    rows = (n + cols - 1) // cols
     fig, axes = plt.subplots(rows, cols, figsize=(5*cols, 4*rows))
-    axes = np.atleast_1d(axes).flatten()
+    if n == 1:
+        axes = [axes]
+    else:
+        axes = axes.flatten() if hasattr(axes, 'flatten') else [axes]
     for i, goal in enumerate(goals):
-        if i >= len(axes): break
+        if i >= len(axes):
+            break
         ax = axes[i]
         trajs = goal_results[goal]['achieved_positions']
         for j, tp in enumerate(trajs):
-            alpha = 0.3 if j < len(trajs)-1 else 1.0
-            lw = 1 if j < len(trajs)-1 else 2
+            alpha = 0.3 if j < len(trajs) - 1 else 1.0
+            lw = 1 if j < len(trajs) - 1 else 2
             label = f'Traj {j+1}' + (' (adapted)' if j == len(trajs)-1 else ' (explore)')
             ax.plot(tp, alpha=alpha, linewidth=lw, label=label)
         ax.axhline(y=goal, color='r', linestyle='--', linewidth=2, label=f'Target={goal:.0f}')
         ax.set_title(f'Target Goal = {goal:.0f}', fontsize=11, fontweight='bold')
-        ax.set_xlabel('Timestep'); ax.set_ylabel('X-Position')
-        ax.legend(fontsize=7); ax.grid(True, alpha=0.3)
+        ax.set_xlabel('Timestep')
+        ax.set_ylabel('X-Position')
+        ax.legend(fontsize=7, loc='best')
+        ax.grid(True, alpha=0.3)
     for i in range(len(goals), len(axes)):
         fig.delaxes(axes[i])
     fig.suptitle('RL2: Goal Position Tracking per Timestep', fontsize=14, fontweight='bold')
@@ -359,14 +366,20 @@ def plot_combined_scatter(vel_results, goal_results, save_dir):
 def main():
     parser = argparse.ArgumentParser(description='RL2 Velocity/Goal Tracking Evaluation')
     parser.add_argument('--exp-dir', type=str, required=True,
-                        help='Experiment output directory (contains params.pkl or weights/)')
+                        help='Experiment root directory (e.g. output/cheetah-multi-task/<TIMESTAMP>)')
     parser.add_argument('--config', type=str, default='configs/rl2_cheetah_config.json')
     parser.add_argument('--gpu', type=int, default=0)
-    parser.add_argument('--num-trajs', type=int, default=3)
-    parser.add_argument('--velocities', type=str, default='1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0')
-    parser.add_argument('--goals', type=str, default='5.0,10.0,15.0,20.0,25.0')
+    parser.add_argument('--num-trajs', type=int, default=3,
+                        help='Trajectories per task (LSTM state preserved across them)')
+    parser.add_argument('--velocities', type=str, nargs='+',
+                        default=['-3.0,-2.0,-1.0,1.0,2.0,3.0,4.0,5.0'],
+                        help='Target velocities, comma-separated (spaces around commas are fine)')
+    parser.add_argument('--goals', type=str, nargs='+',
+                        default=['-15.0,-10.0,-5.0,5.0,10.0,15.0,20.0,25.0'],
+                        help='Target goal positions, comma-separated (spaces around commas are fine)')
     args = parser.parse_args()
 
+    # Load config
     variant = default_config.copy()
     if args.config and os.path.exists(args.config):
         with open(args.config, 'r') as f:
@@ -375,40 +388,36 @@ def main():
 
     ptu.set_gpu_mode(True, args.gpu)
 
-    # Try several common weight locations
-    weights_dir = args.exp_dir
-    for subdir in ['weights', '']:
-        candidate = os.path.join(args.exp_dir, subdir) if subdir else args.exp_dir
-        if os.path.exists(os.path.join(candidate, 'policy.pth')) or \
-           os.path.exists(os.path.join(candidate, 'params.pkl')):
-            weights_dir = candidate
-            break
-
+    # Weights are saved by the rlkit logger under <exp_dir>/weights/
+    weights_dir = os.path.join(args.exp_dir, 'weights')
     print(f"Loading model from: {weights_dir}")
     env, agent = load_agent(variant, weights_dir)
     if ptu.gpu_enabled():
-        agent.to(ptu.device)
+        agent.to('cuda')
 
-    velocities = [float(v.strip()) for v in args.velocities.split(',')]
-    goals = [float(g.strip()) for g in args.goals.split(',')]
+    velocities = [float(v) for v in ','.join(args.velocities).replace(' ', '').split(',') if v]
+    goals = [float(g) for g in ','.join(args.goals).replace(' ', '').split(',') if g]
 
     plot_dir = os.path.join(args.exp_dir, 'tracking_plots')
     os.makedirs(plot_dir, exist_ok=True)
 
-    print(f"\nMax path length: {variant['algo_params']['max_path_length']}")
+    print(f"\nEnvironment: {variant['env_name']}")
+    print(f"Max path length: {variant['algo_params']['max_path_length']}")
     print(f"Trajectories per task: {args.num_trajs}")
 
     # ==================== Velocity Tracking ====================
     print(f"\n{'='*70}")
     print(f" Velocity Tracking Evaluation: {velocities}")
     print(f"{'='*70}")
-    vel_results = evaluate_velocity_tracking(env, agent, variant, velocities, num_trajs=args.num_trajs)
+    vel_results = evaluate_velocity_tracking(env, agent, variant, velocities,
+                                             num_trajs=args.num_trajs)
 
     # ==================== Goal Tracking ====================
     print(f"\n{'='*70}")
     print(f" Goal Reaching Evaluation: {goals}")
     print(f"{'='*70}")
-    goal_results = evaluate_goal_tracking(env, agent, variant, goals, num_trajs=args.num_trajs)
+    goal_results = evaluate_goal_tracking(env, agent, variant, goals,
+                                          num_trajs=args.num_trajs)
 
     # ==================== Generate Plots ====================
     print(f"\n{'='*70}")
@@ -430,7 +439,7 @@ def main():
         json.dump(save_data, f, indent=2)
     print(f"\n  Raw data saved to: {data_path}")
 
-    # ==================== Summary ====================
+    # ==================== Print Summary Table ====================
     print(f"\n{'='*70}")
     print(" VELOCITY TRACKING SUMMARY")
     print(f"{'='*70}")
@@ -451,7 +460,9 @@ def main():
         print(f"{goal:>8.1f} {r['final_position']:>10.2f} {r['distance_to_goal']:>10.2f} "
               f"{r['adapted_return']:>10.2f}")
 
-    print("\nDone!")
+    print(f"\nAll plots saved to: {plot_dir}/")
+    env.close()
+    print("Done!")
 
 
 if __name__ == '__main__':

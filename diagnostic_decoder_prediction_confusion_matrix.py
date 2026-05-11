@@ -70,7 +70,7 @@ def plot_confusion_matrix(true, pred, save_path=None, task_names=None):
 
 if __name__ == "__main__":
     # ===== 修改这个路径 =====
-    LOG_DIR = "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2026_01_13_21_46_39_default_dpmm_seed1_regular_loss_true_time_steps48/DECODER_EVAL/logs"   # 例如 /home/.../EVAL/logs
+    LOG_DIR = "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2026_01_06_20_48_56_default_dpmm_seed0_regular_loss_true_time_steps48_ant/DECODER_EVAL/logs"   # 例如 /home/.../EVAL/logs
 
     # 你的 cheetah 任务顺序（你在代码里写过）
     task_names = ["goal_front", "goal_back", "forward_vel", "backward_vel"]

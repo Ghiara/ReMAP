@@ -7,9 +7,16 @@
 
 
 
+#use the following command to run the script: 
+# cd /home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization
+# export PYTHONPATH=$PYTHONPATH:/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization
+# python various_experiments/train_task_classification_test_toy.py
+
+
 from tigr.task_inference.dpmm_inference import DecoupledEncoder
 # from configs.toy_config import toy_config
 import numpy as np
+import csv
 from rlkit.envs import ENVS
 from tigr.task_inference.dpmm_bnp import BNPModel
 import torch
@@ -52,7 +59,7 @@ ptu.set_gpu_mode(True)
 # TODO: einheitliches set to device
 simple_env_dt = 0.05
 sim_time_steps = 10
-max_path_len=50
+max_path_len=100
 
 loss_criterion = nn.CrossEntropyLoss()
 
@@ -404,6 +411,9 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, transfer_function, m
     #     stats_dict = json.load(file)
 
     loss_history = []
+    all_csv_rows = []
+    all_tensors_rows = []
+    all_metadata_rows = []
 
 
     tasks_pos, tasks_vel = [], []
@@ -455,6 +465,7 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, transfer_function, m
         elif env.base_task == env.config.get('tasks',{}).get('backward_vel'):
             simple_env.base_task = 1
         simple_env.task_specification = env.task[env.base_task]
+        csv_rows = []
         for path_length in range(max_path_len):
 
 
@@ -470,6 +481,8 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, transfer_function, m
             simple_action = simple_agent.get_torch_actions(policy_input, deterministic=True)
             
             # _,_, logits = decoder(ptu.from_numpy(simple_obs_before), simple_action, 0, mu.squeeze())
+            x_before = simple_env.sim.data.qpos[0]
+            vx_before = simple_env.sim.data.qvel[0]
             _simple_obs,r,_,_ = simple_env.step(simple_action.detach().cpu().numpy())
             image = simple_env.render()
             # imageio.imwrite('{os.getcwd()}/toy.pdf', image)
@@ -479,6 +492,25 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, transfer_function, m
 
             x_pos_curr.append(simple_env.sim.data.qpos[0])
             x_vel_curr.append(simple_env.sim.data.qvel[0])
+
+            csv_rows.append({
+                't': path_length,
+                'episode': episode,
+                'mu': mu.detach().cpu().tolist(),
+                'true_task_idx': env.base_task,
+                'pred_task_idx': env.base_task,
+                'exec_task_idx': env.base_task,
+                'simple_action': simple_action.detach().cpu().item(),
+                'subgoal_value': float('nan'),
+                'sim_time_steps': sim_time_steps,
+                'x_before': x_before,
+                'vx_before': vx_before,
+                'x_after': simple_env.sim.data.qpos[0],
+                'vx_after': simple_env.sim.data.qvel[0],
+                'low_level_r': r,
+                'spec_of_episode': tasks[episode]['specification'],
+                'true_goal': env.task[env.base_task],
+            })
 
             episode_reward += r
             task_idx = env.base_task
@@ -506,6 +538,39 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, transfer_function, m
             #     _loss.append(loss)
             _loss = []
 
+
+        # Accumulate and save trajectory + latent data
+        all_csv_rows.extend(csv_rows)
+        for _row in csv_rows:
+            _mu_flat = _row['mu'][0] if isinstance(_row['mu'][0], list) else _row['mu']
+            all_tensors_rows.append(_mu_flat)
+            all_metadata_rows.append(
+                f"{_row['true_task_idx']} [{_row['spec_of_episode']:.3f}] -> {_row['pred_task_idx']}"
+            )
+
+        csv_log_dir = Path(os.path.join(save_video_path, 'toy_test', 'logs'))
+        csv_log_dir.mkdir(exist_ok=True, parents=True)
+
+        # subgoals_epN.csv — cumulative (ep 0..N)
+        csv_file = csv_log_dir / f'subgoals_ep{episode}.csv'
+        _csv_fields = ['t', 'episode', 'mu', 'true_task_idx', 'pred_task_idx', 'exec_task_idx',
+                       'simple_action', 'subgoal_value', 'sim_time_steps',
+                       'x_before', 'vx_before', 'x_after', 'vx_after',
+                       'low_level_r', 'spec_of_episode', 'true_goal']
+        with open(csv_file, 'w', newline='') as _f:
+            _writer = csv.DictWriter(_f, fieldnames=_csv_fields)
+            _writer.writeheader()
+            _writer.writerows(all_csv_rows)
+
+        # toy_latent: tensors.tsv + metadata.tsv — cumulative, same format as tensorboard_transfer
+        tsne_dir = csv_log_dir / f'toy_latent_ep{episode}'
+        tsne_dir.mkdir(exist_ok=True, parents=True)
+        with open(tsne_dir / 'tensors.tsv', 'w', newline='') as _tf:
+            for _mu_vals in all_tensors_rows:
+                _tf.write('\t'.join(f'{v:.18e}' for v in _mu_vals) + '\n')
+        with open(tsne_dir / 'metadata.tsv', 'w', newline='') as _mf:
+            for _label in all_metadata_rows:
+                _mf.write(_label + '\n')
 
         if env.base_task in [env.config.get('tasks',{}).get('goal_front'), env.config.get('tasks',{}).get('goal_back')]:
             tasks_pos.append(simple_env.task_specification)

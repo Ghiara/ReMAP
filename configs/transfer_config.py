@@ -3,6 +3,7 @@
 from sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
 from sac_envs.hopper_multi import HopperMulti
 from sac_envs.walker_multi import WalkerMulti
+from sac_envs.ant_multi_old import AntMulti
 
 transfer_config = dict(
 
@@ -15,22 +16,25 @@ transfer_config = dict(
     ### Define inference module to be reused
     
     # inference_path = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2025_12_07_15_01_42_default_true_gmm_timesteps_48',
-
+    
 
     inference_path = dict(
-        name = '2026_01_13_21_46_39_default_dpmm_seed1_regular_loss_true_time_steps48',
-        path = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2026_01_13_21_46_39_default_dpmm_seed1_regular_loss_true_time_steps48'
+        name = '2026_01_06_20_48_56_default_dpmm_seed0_regular_loss_true_time_steps48_test_case',
+        path = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2026_01_06_20_48_56_default_dpmm_seed0_regular_loss_true_time_steps48_test_case'
     ),
 
-    
+
     ### Define the low-level controller and agent to reuse the inference mechanism
 
     complex_agent = dict(
-        environment = WalkerMulti,
+        environment = AntMulti,
         experiments_repo = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy/',
-        experiment_name = 'walker_full_06_07',
-        epoch = 3000,
+        experiment_name = 'ant_multitask_vel_goal',
+        epoch = 600,
     ),
+
+
+
     # complex_agent = dict(
     #     experiments_repo = '/home/ubuntu/juan/Meta-RL/experiments_transfer_function/',
     #     experiment_name = 'walker_full_06_07',
@@ -43,5 +47,5 @@ transfer_config = dict(
     #     experiment_name = 'hopper_full_sac0.2_reward1_randomchange',
     #     epoch = 1400,
     # )
-
-)
+    
+)   

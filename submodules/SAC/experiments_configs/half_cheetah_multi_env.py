@@ -19,7 +19,7 @@ config = dict(
     max_goal = [0.2, 10],
     max_jump = [1.5, 3.],
     max_rot = [pi / 6., pi / 2.],
-    max_vel = [0.0, 1],
+    max_vel = [0.0, 2.5],
     max_rot_vel = [2. * pi, 4. * pi],
 
     env = 'half_cheetah_multi',

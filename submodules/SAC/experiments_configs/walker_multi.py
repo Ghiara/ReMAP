@@ -16,10 +16,13 @@ config = dict(
     lr = 3e-4,
     reward_scale = 5,
 
-    max_goal = [2, 15],
-    max_jump = [1.5, 3.],
+    # max_goal = [2, 15],
+    # max_jump = [1.5, 3.],
+    # max_vel = [1.0, 5.0],
+    max_goal = [0.2, 10],
+    max_vel = [1.0, 3.0],
     max_rot = [pi / 6., pi / 2.],
-    max_vel = [1.0, 5.0],
+
     max_rot_vel = [2. * pi, 4. * pi],
 
     env = 'walker_multi',

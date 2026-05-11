@@ -212,7 +212,7 @@ def get_decoder(path, action_dim, obs_dim, reward_dim, latent_dim, output_action
         p.requires_grad = True
 
 
-    # # ===== 3. 解冻倒数第3层 fc1 =====
+    # ===== 3. 解冻倒数第3层 fc1 =====
     for p in decoder.task_decoder.fc1.parameters():
         p.requires_grad = True
 

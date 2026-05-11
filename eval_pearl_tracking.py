@@ -99,9 +99,14 @@ def load_agent(variant, weights_dir):
 
 
 def set_velocity_task(env, vel):
-    """Set env to a velocity_forward task with given target velocity."""
-    env._task = {'base_task': 0, 'specification': vel, 'color': np.array([1, 0, 0])}
-    env.base_task = 0
+    """Set env to a velocity task (forward for +, backward for -)."""
+    base_task = 0 if vel >= 0 else 1
+    env._task = {
+        'base_task': base_task,
+        'specification': vel,
+        'color': np.array([1, 0, 0]) if vel >= 0 else np.array([0, 0, 1]),
+    }
+    env.base_task = base_task
     env.task_specification = vel
     env._goal = vel
     env.reset()
@@ -416,8 +421,8 @@ def main():
     parser.add_argument('--config', type=str, default='configs/pearl_cheetah_multi_config.json')
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--num-trajs', type=int, default=3)
-    parser.add_argument('--velocities', type=str, default='1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0')
-    parser.add_argument('--goals', type=str, default='5.0,10.0,15.0,20.0,25.0')
+    parser.add_argument('--velocities', type=str, default='-2.5,-1.5,-1.0,1.0,1.5,2.5')
+    parser.add_argument('--goals', type=str, default='-10.0,-5.0,-2.0,2.0,5.0,10.0')
     args = parser.parse_args()
 
     # Load config

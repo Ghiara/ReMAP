@@ -234,7 +234,7 @@ class MetaRLAlgorithm(metaclass=abc.ABCMeta):
 
     def _try_to_eval(self, epoch):
         # TODO: Remove skip
-        if epoch % 5 != 0: return
+        # if epoch % 5 != 0: return  # changed to eval every epoch
         logger.save_extra_data(self.get_extra_data_to_save(epoch))
         if self._can_evaluate():
             self.evaluate(epoch)

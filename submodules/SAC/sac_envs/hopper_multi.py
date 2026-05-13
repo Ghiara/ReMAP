@@ -50,6 +50,17 @@ class HopperMulti(HopperEnv):
         camera.elevation = -20
         sim.add_render_context(self.viewer)
 
+    def viewer_setup(self):
+        self.viewer.cam.type = 2
+        self.viewer.cam.fixedcamid = 0
+
+    def get_image(self, width=256, height=256, camera_name=None):
+        if self.viewer is None or type(self.viewer) != mujoco_py.MjRenderContextOffscreen:
+            self.viewer = mujoco_py.MjRenderContextOffscreen(self.sim)
+            self.viewer_setup()
+            self._viewers['rgb_array'] = self.viewer
+        return self.sim.render(width, height, camera_name=camera_name)
+
     def step(self, action, healthy_scale=None):
         if healthy_scale is not None:
             self.healthy_scale = healthy_scale
@@ -71,7 +82,7 @@ class HopperMulti(HopperEnv):
         posafter, height, ang = self.sim.data.qpos[0:3]
         s = self.state_vector()
         # Relax ang limit for backward_vel to allow backward leaning gait
-        ang_limit = 0.35 if self.base_task == self.config.get('tasks', {}).get('backward_vel') else 0.2
+        ang_limit = 0.5 if self.base_task == self.config.get('tasks', {}).get('backward_vel') else 0.4
         terminated = not (
             np.isfinite(s).all()
             and (np.abs(s[2:]) < 100).all()
@@ -147,7 +158,7 @@ class HopperMulti(HopperEnv):
         # new_obs = np.append(self.get_body_com("torso")[0], obs[0])
 
         qpos = self.init_qpos + self.np_random.uniform(
-            low=-0.1, high=0.1, size=self.model.nq
+            low=-0.02, high=0.02, size=self.model.nq
         )
         qvel = self.init_qvel + self.np_random.standard_normal(self.model.nv) * 0.1
         qpos[0] = np.random.random() * (x_pos_range[1] - x_pos_range[0]) + x_pos_range[0]

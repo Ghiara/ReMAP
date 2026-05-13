@@ -7,6 +7,7 @@ from sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
 from sac_envs.hopper_multi import HopperMulti
 from sac_envs.walker_multi import WalkerMulti
 from sac_envs.ant_multi import AntMulti
+from sac_envs.ant_multi_new import AntMixtureEnv
 import torch
 import cv2
 from typing import List, Any, Dict, Callable
@@ -423,6 +424,8 @@ if __name__ == "__main__":
         env = WalkerMulti(config)
     elif config['env'] == 'ant_multi':
         env = AntMulti()
+    elif config['env'] == 'ant_multi_new':
+        env = AntMixtureEnv(config)
     else:
         print('Invalid argument for environment name... Instantiating hopper env instead')
         env = HopperGoal()

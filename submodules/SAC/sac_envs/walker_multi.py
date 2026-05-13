@@ -33,6 +33,17 @@ class WalkerMulti(Walker2dEnv):
         camera.elevation = -20
         sim.add_render_context(self.viewer)
 
+    def viewer_setup(self):
+        self.viewer.cam.type = 2
+        self.viewer.cam.fixedcamid = 0
+
+    def get_image(self, width=256, height=256, camera_name=None):
+        if self.viewer is None or type(self.viewer) != mujoco_py.MjRenderContextOffscreen:
+            self.viewer = mujoco_py.MjRenderContextOffscreen(self.sim)
+            self.viewer_setup()
+            self._viewers['rgb_array'] = self.viewer
+        return self.sim.render(width, height, camera_name=camera_name)
+
         # How to make the reward robust (combination of healthy reward, distance_to_goal)
     def step(self, action, healthy_scale=None):
         if healthy_scale is not None:

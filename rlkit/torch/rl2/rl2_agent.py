@@ -63,6 +63,9 @@ class RL2Agent(nn.Module):
         self.z_vars = ptu.ones(1, self.latent_dim)
         # Context buffer
         self.context = None
+        # Previous action/reward for RL2 LSTM input
+        self._prev_action = torch.zeros(1, action_dim)
+        self._prev_reward = torch.zeros(1, 1)
 
     # ---------- PEARL-compatible interface ----------
 
@@ -73,6 +76,8 @@ class RL2Agent(nn.Module):
         self.z_means = ptu.zeros(num_tasks, self.latent_dim)
         self.z_vars = ptu.ones(num_tasks, self.latent_dim)
         self.context = None
+        self._prev_action = ptu.zeros(num_tasks, self.action_dim)
+        self._prev_reward = ptu.zeros(num_tasks, 1)
 
     def detach_z(self):
         """Detach hidden state from computation graph."""
@@ -87,20 +92,22 @@ class RL2Agent(nn.Module):
 
     def update_context(self, inputs):
         """
-        Append a single transition to the context buffer.
-        For RL2 the LSTM hidden state already incorporates the trajectory
-        during get_action(), so this just stores data for compatibility.
+        Append a single transition to the context buffer and update
+        prev_action/prev_reward for the next LSTM step.
         """
         o, a, r, no, d, info = inputs
         o = ptu.from_numpy(o[None, None, ...])
-        a = ptu.from_numpy(a[None, None, ...])
-        r = ptu.from_numpy(np.array([r])[None, None, ...])
+        a_tensor = ptu.from_numpy(a[None, None, ...])
+        r_tensor = ptu.from_numpy(np.array([r])[None, None, ...])
         no = ptu.from_numpy(no[None, None, ...])
-        data = torch.cat([o, a, r], dim=2)
+        data = torch.cat([o, a_tensor, r_tensor], dim=2)
         if self.context is None:
             self.context = data
         else:
             self.context = torch.cat([self.context, data], dim=1)
+        # Update previous action/reward for next LSTM step
+        self._prev_action = ptu.from_numpy(a[None])                            # (1, action_dim)
+        self._prev_reward = ptu.from_numpy(np.array([[r]], dtype=np.float32))  # (1, 1)
 
     def infer_posterior(self, context):
         """
@@ -124,14 +131,13 @@ class RL2Agent(nn.Module):
         if isinstance(obs, np.ndarray):
             obs = ptu.from_numpy(obs[None])  # (1, obs_dim)
 
-        # Ensure hidden state batch size matches input (e.g., after training with meta_batch > 1)
-        if self._hidden_state is not None:
-            h, c = self._hidden_state
-            if h.size(1) != obs.size(0):
-                self._hidden_state = self.policy.init_hidden(obs.size(0))
-
         with torch.no_grad():
-            mean, log_std, new_hidden = self.policy(obs, self._hidden_state)
+            mean, log_std, new_hidden = self.policy(
+                obs,
+                prev_action=self._prev_action,
+                prev_reward=self._prev_reward,
+                hidden_state=self._hidden_state,
+            )
             self._hidden_state = new_hidden
 
             if deterministic:
@@ -162,9 +168,9 @@ class RL2Agent(nn.Module):
 
     # ---------- Training helpers ----------
 
-    def forward_policy(self, obs, hidden_state=None):
+    def forward_policy(self, obs, prev_action=None, prev_reward=None, hidden_state=None):
         """Forward pass through policy for training."""
-        return self.policy(obs, hidden_state)
+        return self.policy(obs, prev_action=prev_action, prev_reward=prev_reward, hidden_state=hidden_state)
 
     def update_policy(self, loss):
         """Update policy with given loss."""

@@ -26,7 +26,7 @@ from sac_envs.ant_multi import AntMulti
 from rlkit.envs.toy1d_multi import Toy1dMultiTaskkWrappedEnv
 
 # ─── Output directory ────────────────────────────────────────────────────────
-OUTPUT_ROOT = 'agent_task_frames'
+OUTPUT_ROOT = 'toy_test'
 N_FRAMES    = 100
 IMG_W       = 400
 IMG_H       = 400
@@ -259,15 +259,13 @@ def record_toy_goal_forward():
         task_variants=['goal_forward', 'goal_backward', 'velocity_forward', 'velocity_backward'],
     )
 
-    # toy1d XML camera is mode="trackcom" — it follows the box, so the box
-    # always looks stationary.  Use a free camera (type=0) fixed in world space
-    # so the box can actually be seen sliding across the scene.
+    # Tracking camera follows the box body; floor checker scrolls to show motion
     sim = env.sim
     viewer = mujoco_py.MjRenderContextOffscreen(sim)
     camera = viewer.cam
-    camera.type = 0             # mjCAMERA_FREE — fixed world-space position
-    camera.lookat[:] = [4.0, 0.0, 0.3]   # look at the middle of travel range
-    camera.distance = 14.0     # wide enough to see full motion
+    camera.type = 1             # mjCAMERA_TRACKING - follows the tracked body
+    camera.trackbodyid = 1      # body 1 = "box"
+    camera.distance = 5.0      # close enough to see the box clearly
     camera.elevation = -20     # same tilt as cheetah
     camera.azimuth = 90        # side view: x-axis goes left->right
     sim.add_render_context(viewer)
@@ -299,7 +297,7 @@ def record_toy_goal_forward():
         # sim.forward() to propagate qpos -> body xpos before rendering
         env.sim.forward()
 
-        frame = render_frame(env)
+        frame = render_frame(env, width=800, height=800)
         frame = add_label(frame, task_label, label_color)
         imageio.imwrite(os.path.join(out_dir, f'frame_{step:04d}.png'), frame)
 

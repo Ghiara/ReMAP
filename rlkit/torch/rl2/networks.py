@@ -32,9 +32,9 @@ class LSTMPolicy(nn.Module):
         self.num_layers = num_layers
         self.use_tanh = use_tanh
         
-        # LSTM layer
+        # LSTM layer - standard RL2 input: [obs, prev_action, prev_reward]
         self.lstm = nn.LSTM(
-            input_size=obs_dim,
+            input_size=obs_dim + action_dim + 1,
             hidden_size=hidden_size,
             num_layers=num_layers,
             batch_first=True
@@ -50,12 +50,14 @@ class LSTMPolicy(nn.Module):
         self.log_std_fc.weight.data.uniform_(-init_w, init_w)
         self.log_std_fc.bias.data.uniform_(-init_w, init_w)
         
-    def forward(self, obs, hidden_state=None):
+    def forward(self, obs, prev_action=None, prev_reward=None, hidden_state=None):
         """
         Args:
             obs: (batch, seq_len, obs_dim) or (batch, obs_dim)
+            prev_action: (batch, action_dim) or None -> zeros
+            prev_reward: (batch, 1) or None -> zeros
             hidden_state: tuple of (h, c) for LSTM state
-        
+
         Returns:
             mean: (batch, seq_len, action_dim) or (batch, action_dim)
             log_std: (batch, seq_len, action_dim) or (batch, action_dim)
@@ -67,17 +69,30 @@ class LSTMPolicy(nn.Module):
             squeeze_output = True
         else:
             squeeze_output = False
-        
-        lstm_out, hidden_state = self.lstm(obs, hidden_state)
-        
+        batch_size, seq_len, _ = obs.shape
+
+        if prev_action is None:
+            prev_action = torch.zeros(batch_size, seq_len, self.action_dim, device=obs.device)
+        elif prev_action.dim() == 2:
+            prev_action = prev_action.unsqueeze(1)
+
+        if prev_reward is None:
+            prev_reward = torch.zeros(batch_size, seq_len, 1, device=obs.device)
+        elif prev_reward.dim() == 2:
+            prev_reward = prev_reward.unsqueeze(1)
+
+        # Concatenate to form RL2 input: [obs, prev_action, prev_reward]
+        lstm_input = torch.cat([obs, prev_action, prev_reward], dim=-1)
+        lstm_out, hidden_state = self.lstm(lstm_input, hidden_state)
+
         mean = self.mean_fc(lstm_out)
         log_std = self.log_std_fc(lstm_out)
         log_std = torch.clamp(log_std, -20, 2)
-        
+
         if squeeze_output:
             mean = mean.squeeze(1)
             log_std = log_std.squeeze(1)
-        
+
         return mean, log_std, hidden_state
     
     def init_hidden(self, batch_size):

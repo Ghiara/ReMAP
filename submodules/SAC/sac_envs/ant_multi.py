@@ -45,6 +45,7 @@ class AntMulti(AntEnv, utils.EzPickle):
         self.negative_change_point = self.negative_change_point_basis - np.random.random() * self.change_point_interval
 
         self.model_path = os.path.join(os.getcwd(), 'submodules', 'meta_rand_envs', 'meta_rand_envs', 'ant.xml')
+        kwargs.pop('task_variants', None)
         super().__init__(render_mode=render_mode,*args, **kwargs)
         self.observation_space = Box(low=-np.inf, high=np.inf, shape=(29,), dtype=np.float64)
 

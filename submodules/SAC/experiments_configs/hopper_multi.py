@@ -5,7 +5,7 @@ import numpy as np
 pi = 3.141592
 
 config = dict(
-    epochs = 30000,
+    epochs = 3000,
     max_traj_len = 500,
     memory_size = 1e+6,
     batch_size = 20,
@@ -19,12 +19,12 @@ config = dict(
     max_goal = [0.5, 10],
     max_jump = [1.5, 3.],
     max_rot = [pi / 6., pi / 2.],
-    max_vel = [0.0, 2.0],
+    max_vel = [0.0, 2.5],
     max_rot_vel = [2. * pi, 4. * pi],
 
     env = 'hopper_multi',
     # experiment_name = 'Walker_deeper_really_change_task',
-    experiment_name = 'hopper_multi',
+    experiment_name = 'hopper_multi_new_config',
     task_dim = 5,
 
     hidden_layers_actor = [300,300,300,300],
@@ -44,7 +44,7 @@ config = dict(
         changes_per_trajectory = [0,2,4,6,8],
         max_steps_epochs = [200,400,600],
         max_steps = [300,600,1000],
-        random_initialization = 1,
+        random_initialization = 500,
     ),
     # pretrained=dict(
     #     path = '/home/ubuntu/juan/Meta-RL/experiments_transfer_function/hopper_multi_back_to_roots_change_task',

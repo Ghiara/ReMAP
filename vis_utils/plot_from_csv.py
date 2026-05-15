@@ -122,9 +122,9 @@ def load_and_plot(csv_files, column_name, plot_name, rows_range=(0,2400)):
     # Call the save_plot function with all the extracted data
     save_plot(loss_histories, names, plot_name, path=f'{os.getcwd()}/experiment_plots', figure_size=(20, 10), fill=True, rolling_window=50, fill_scaling_factor=1.0)
 csv_file_paths = dict(
-    paths = ['/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/melts_baseline/cheetah-multi-task/2026_05_12_06_36_21_melts_cheetah_dpmm/progress.csv'],
+    paths = ['/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/cemrl_baseline_run2/cheetah-multi-task/2026_05_12_11_29_10_cemrl_cheetah_true_gmm/progress.csv'],
     names = ['No random']
 )
 column_name = 'train_eval_avg_reward_deterministic'
-plot_name = 'melts_0'
+plot_name = 'cemrl_1'
 load_and_plot(csv_file_paths, column_name, plot_name)

@@ -136,9 +136,9 @@ def build_env(agent_name, acfg):
         return HopperMulti(cfg), cfg
     elif agent_name == 'ant':
         cfg = json.load(open(acfg['cfg_path']))
-        task_variants = acfg['task_variants']
-        env = AntMulti(task_variants=task_variants)
-        return env, cfg
+        # task_variants = acfg['task_variants']
+        # env = AntMulti(task_variants=task_variants)
+        return AntMulti(cfg), cfg
     elif agent_name == 'cheetah':
         all_variants = ['velocity_forward', 'velocity_backward',
                         'goal_forward', 'goal_backward']

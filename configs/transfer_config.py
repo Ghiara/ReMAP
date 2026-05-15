@@ -27,10 +27,10 @@ transfer_config = dict(
     ### Define the low-level controller and agent to reuse the inference mechanism
 
     complex_agent = dict(
-        environment = AntMulti,
+        environment = HopperMulti,
         experiments_repo = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy/',
-        experiment_name = 'ant_multitask_vel_goal',
-        epoch = 600,
+        experiment_name = 'hopper_multi_new_config',
+        epoch = 200,
     ),
 
 

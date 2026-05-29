@@ -1,10 +1,11 @@
 # ReMAP
 
+<div align="center">
+
 Official implementation of the paper:
 
 **Knowledge Reutilization in Meta-Reinforcement Learning**
 
-## Authors
 
 Yuan Meng<sup>1,3,*</sup>, Bo Wang<sup>1,3,*</sup>, Juan de los Rios Ruiz<sup>1</sup>, Xiangtong Yao<sup>1</sup>, Kai Huang<sup>2</sup>, Yang Gao<sup>3</sup>, Fuchun Sun<sup>4</sup>, Alois Knoll<sup>1</sup>, and Zhenshan Bing<sup>3,&dagger;</sup>
 
@@ -15,6 +16,8 @@ Yuan Meng<sup>1,3,*</sup>, Bo Wang<sup>1,3,*</sup>, Juan de los Rios Ruiz<sup>1<
 
 <sup>*</sup>Equal contribution. The work was done during the research visit at Nanjing University.  
 <sup>&dagger;</sup>Corresponding author: bing@nju.edu.cn
+
+</div>
 
 ## Abstract
 

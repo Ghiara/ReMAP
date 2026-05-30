@@ -6,13 +6,12 @@ Official implementation of the paper: **Knowledge Reutilization in Meta-Reinforc
 <div align="center">
 
 
-Yuan Meng<sup>1,3,*</sup>, Bo Wang<sup>1,3,*</sup>, Juan de los Rios Ruiz<sup>1</sup>, Xiangtong Yao<sup>1</sup>, Kai Huang<sup>2</sup>,  
-Yang Gao<sup>3</sup>, Fuchun Sun<sup>4</sup>, Alois Knoll<sup>1</sup>, and Zhenshan Bing<sup>3,&dagger;</sup>
+Yuan Meng<sup>1,2,*</sup>, Bo Wang<sup>1,2,*</sup>, Juan de los Rios Ruiz<sup>1</sup>, Xiangtong Yao<sup>1</sup>, 
+Zhenshan Bing<sup>2,&dagger;</sup>, Fuchun Sun<sup>3</sup>, and Alois Knoll<sup>1</sup> 
 
 <sup>1</sup>School of Computation, Information and Technology, Technical University of Munich, Munich, Germany  
-<sup>2</sup>School of Computer Science and Engineering, Sun Yat-sen University, Guangzhou, China  
-<sup>3</sup>State Key Laboratory for Novel Software Technology, Nanjing University, Suzhou, China  
-<sup>4</sup>Department of Computer Science and Technology, Tsinghua University, Beijing, China
+<sup>2</sup>State Key Laboratory for Novel Software Technology, Nanjing University, Suzhou, China  
+<sup>3</sup>Department of Computer Science and Technology, Tsinghua University, Beijing, China
 
 <sup>*</sup>Equal contribution. The work was done during the research visit at Nanjing University.  
 <sup>&dagger;</sup>Corresponding author: bing@nju.edu.cn

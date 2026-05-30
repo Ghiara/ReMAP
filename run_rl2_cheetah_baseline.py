@@ -40,6 +40,7 @@ rl2_default_config = {
         'num_train_steps_per_itr': 2000,
         'num_evals': 2,
         'num_steps_per_eval': 600,
+        'full_eval_interval': 50,
         'batch_size': 256,
         'embedding_batch_size': 64,
         'embedding_mini_batch_size': 64,

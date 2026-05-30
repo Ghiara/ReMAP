@@ -19,10 +19,11 @@ import copy
 import json
 import os
 import sys
+from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from run_toy_training import experiment, deep_update_dict
+from run_task_inference_high_level_policy_training import experiment, deep_update_dict
 from configs.default import default_config
 
 
@@ -77,17 +78,26 @@ def main():
     variant['inference_option'] = 'dpmm'
     variant['train_or_showcase'] = 'train'
 
+    if 'dpmm_params' in variant:
+        temp_root = variant['dpmm_params'].get('save_dir', 'melts/temp_bnp')
+        run_name = f"{datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}_{variant['util_params']['exp_name']}"
+        unique_temp_dir = os.path.join(temp_root, run_name)
+        variant['dpmm_params']['save_dir'] = unique_temp_dir
+        if 'reconstruction_params' in variant:
+            variant['reconstruction_params']['temp_folder'] = unique_temp_dir
+
     os.makedirs(args.output_dir, exist_ok=True)
     os.makedirs('logs', exist_ok=True)
-    os.makedirs('melts/temp_bnp', exist_ok=True)
     if 'dpmm_params' in variant:
-        os.makedirs(variant['dpmm_params'].get('save_dir', 'melts/temp_bnp'), exist_ok=True)
+        os.makedirs(variant['dpmm_params']['save_dir'], exist_ok=True)
 
     print("=" * 70)
     print("MELTS Training  (dpmm inference, cheetah-multi-task)")
     print(f"  Output dir : {args.output_dir}")
     print(f"  GPU        : {args.gpu}")
     print(f"  Epochs     : {variant['algo_params']['num_train_epochs']}")
+    if 'dpmm_params' in variant:
+        print(f"  DPMM temp  : {variant['dpmm_params']['save_dir']}")
     print("=" * 70)
 
     experiment(variant)

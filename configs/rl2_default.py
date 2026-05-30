@@ -23,6 +23,7 @@ default_config = dict(
         num_train_steps_per_itr=2000,
         num_evals=2,
         num_steps_per_eval=600,
+        full_eval_interval=50,
         
         # RL2-specific parameters
         inner_lr=1e-4,

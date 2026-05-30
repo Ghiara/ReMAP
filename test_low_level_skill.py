@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
 from sac_envs.walker_multi import WalkerMulti
 from sac_envs.hopper_multi import HopperMulti
+from sac_envs.ant_multi_old import AntMulti
 from model import PolicyNetwork as TransferFunction
 from train_striding_predictor import get_complex_agent
 
@@ -14,9 +15,9 @@ from train_striding_predictor import get_complex_agent
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ==== 这些常量记得改成你自己的 ====
-LOW_LEVEL_EXPERIMENTS_REPO = "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy/"
-LOW_LEVEL_EXPERIMENT_NAME  = "hopper_multi"
-LOW_LEVEL_EPOCH            = 3000
+LOW_LEVEL_EXPERIMENTS_REPO = "/root/bayes-tmp/bowang/Inference-reutilization-MRL/output/low_level_policy/"
+LOW_LEVEL_EXPERIMENT_NAME  = "ant_multi_new_config_v3"
+LOW_LEVEL_EPOCH            = 500
 # ===================================
 
 
@@ -42,7 +43,20 @@ def make_env():
     else:
         env_cfg = cfg
 
-    env = HopperMulti(env_cfg)
+    env_name = env_cfg.get("env")
+    if env_name == "half_cheetah_multi":
+        env = HalfCheetahMixtureEnv(env_cfg)
+    elif env_name == "hopper_multi":
+        env = HopperMulti(env_cfg)
+    elif env_name == "walker_multi":
+        env = WalkerMulti(env_cfg)
+    elif env_name == "ant_multi":
+        env = AntMulti(env_cfg)
+        # if not hasattr(env, "config") or env.config is None:
+        #     env.config = env_cfg
+    else:
+        raise ValueError(f"Unsupported env '{env_name}' in {config_path}")
+
     return env
 
 
@@ -154,9 +168,9 @@ def evaluate_skill(env, policy, value, skill_type,
 
             # ========== 根据技能类型选 tracking 变量 ==========
             if "vel" in skill_type:
-                track_val = float(env.sim.data.qvel[0])   # cheetah torso vx
+                track_val = float(env.sim.data.qvel[0])   # root x velocity across supported mujoco agents
             else:
-                track_val = float(env.sim.data.qpos[0])   # cheetah torso x-position
+                track_val = float(env.sim.data.qpos[0])   # root x position across supported mujoco agents
 
             traj.append(track_val)
             all_track.append(track_val)

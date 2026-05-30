@@ -45,6 +45,7 @@ class MetaRLAlgorithm(metaclass=abc.ABCMeta):
             save_environment=False,
             render_eval_paths=False,
             dump_eval_paths=False,
+            full_eval_interval=None,
             plotter=None,
     ):
         """
@@ -88,6 +89,9 @@ class MetaRLAlgorithm(metaclass=abc.ABCMeta):
         self.eval_statistics = None
         self.render_eval_paths = render_eval_paths
         self.dump_eval_paths = dump_eval_paths
+        if full_eval_interval is None:
+            full_eval_interval = max(1, num_iterations // max(1, num_evals))
+        self.full_eval_interval = full_eval_interval
         self.plotter = plotter
 
         self.sampler = InPlacePathSampler(
@@ -120,6 +124,8 @@ class MetaRLAlgorithm(metaclass=abc.ABCMeta):
         self._old_table_keys = None
         self._current_path_builder = PathBuilder()
         self._exploration_paths = []
+        self._epoch_train_returns = []
+        self._last_average_test_return = np.nan
 
     def make_exploration_policy(self, policy):
          return policy
@@ -190,7 +196,7 @@ class MetaRLAlgorithm(metaclass=abc.ABCMeta):
 
             self.training_mode(False)
 
-            # eval
+            # Lightweight per-epoch logging, with full eval only on the configured cadence.
             self._try_to_eval(it_)
             gt.stamp('eval')
 
@@ -229,15 +235,16 @@ class MetaRLAlgorithm(metaclass=abc.ABCMeta):
             if update_posterior_rate != np.inf:
                 context = self.sample_context(self.task_idx)
                 self.agent.infer_posterior(context)
+            self._epoch_train_returns.extend(
+                eval_util.get_average_returns([path]) for path in paths
+            )
         self._n_env_steps_total += num_transitions
         gt.stamp('sample')
 
     def _try_to_eval(self, epoch):
-        # TODO: Remove skip
-        # if epoch % 5 != 0: return  # changed to eval every epoch
         logger.save_extra_data(self.get_extra_data_to_save(epoch))
         if self._can_evaluate():
-            self.evaluate(epoch)
+            self.evaluate(epoch, full_eval=self._should_full_eval(epoch))
 
             params = self.get_epoch_snapshot(epoch)
             logger.save_itr_params(epoch, params)
@@ -279,6 +286,14 @@ class MetaRLAlgorithm(metaclass=abc.ABCMeta):
         else:
             logger.log("Skipping eval for now.")
 
+    def _should_full_eval(self, epoch):
+        if self.full_eval_interval is None or self.full_eval_interval <= 0:
+            return epoch == self.num_iterations - 1
+        return (
+            (epoch + 1) % self.full_eval_interval == 0
+            or epoch == self.num_iterations - 1
+        )
+
     def _can_evaluate(self):
         """
         One annoying thing about the logger table is that the keys at each
@@ -309,6 +324,7 @@ class MetaRLAlgorithm(metaclass=abc.ABCMeta):
     def _start_epoch(self, epoch):
         self._epoch_start_time = time.time()
         self._exploration_paths = []
+        self._epoch_train_returns = []
         self._do_train_time = 0
         logger.push_prefix('Iteration #%d | ' % epoch)
 
@@ -398,9 +414,25 @@ class MetaRLAlgorithm(metaclass=abc.ABCMeta):
         online_returns = [t[:n] for t in online_returns]
         return final_returns, online_returns
 
-    def evaluate(self, epoch):
+    def evaluate(self, epoch, full_eval=True):
         if self.eval_statistics is None:
             self.eval_statistics = OrderedDict()
+
+        if not full_eval:
+            avg_train_return = (
+                np.mean(self._epoch_train_returns)
+                if len(self._epoch_train_returns) > 0
+                else np.nan
+            )
+            self.eval_statistics['AverageTrainReturn_all_train_tasks'] = avg_train_return
+            self.eval_statistics['AverageReturn_all_train_tasks'] = avg_train_return
+            self.eval_statistics['AverageReturn_all_test_tasks'] = self._last_average_test_return
+            self.agent.log_diagnostics(self.eval_statistics)
+
+            for key, value in self.eval_statistics.items():
+                logger.record_tabular(key, value)
+            self.eval_statistics = None
+            return
 
         ### sample trajectories from prior for debugging / visualization
         if self.dump_eval_paths:
@@ -457,6 +489,7 @@ class MetaRLAlgorithm(metaclass=abc.ABCMeta):
 
         avg_train_return = np.mean(train_final_returns)
         avg_test_return = np.mean(test_final_returns)
+        self._last_average_test_return = avg_test_return
         avg_train_online_return = np.mean(np.stack(train_online_returns), axis=0)
         avg_test_online_return = np.mean(np.stack(test_online_returns), axis=0)
         self.eval_statistics['AverageTrainReturn_all_train_tasks'] = train_returns

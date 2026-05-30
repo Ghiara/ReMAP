@@ -1,10 +1,19 @@
 import os
-import bnpy
 import numpy as np
 import torch
 from itertools import cycle
-from bnpy.data.XData import XData
 from matplotlib import pylab
+
+# Compatibility shim for older bnpy releases on NumPy >= 1.20.
+if "float" not in np.__dict__:
+    np.float = float
+if "int" not in np.__dict__:
+    np.int = int
+if "bool" not in np.__dict__:
+    np.bool = bool
+
+import bnpy
+from bnpy.data.XData import XData
 
 class BNPModel:
     def __init__(self, save_dir, gamma0=5.0, start_epoch=0, num_lap=200,
@@ -57,6 +66,13 @@ class BNPModel:
         #     m_pair_ranking_direction='descending',
         # )
 
+    def _get_latest_lap(self, task_output_path):
+        snapshot_path = os.path.join(task_output_path, 'snapshot_lap.txt')
+        if os.path.exists(snapshot_path):
+            laps = np.atleast_1d(np.loadtxt(snapshot_path))
+            return float(laps[-1])
+        return float(self.num_lap)
+
     def fit(self, z):
         z = XData(z.detach().cpu().numpy())
         if not self.model:
@@ -73,10 +89,13 @@ class BNPModel:
                                                                      self.merge_kwargs.items()]), []))
                                                   )
         else:
+            prev_task_output_path = self.info_dict['task_output_path']
+            prev_lap = self._get_latest_lap(prev_task_output_path)
             self.model, self.info_dict = bnpy.run(z, 'DPMixtureModel', 'DiagGauss', 'memoVB',
                                                   output_path=os.path.join(self.save_dir,
                                                                            str(next(self.iterator))),
-                                                  initname=self.info_dict['task_output_path'],
+                                                  initname=prev_task_output_path,
+                                                  initLapFrac=prev_lap,
                                                   K=self.info_dict['K_history'][-1], gamma0=self.gamma0,
                                                   # sF=1, ECovMat='eye',
                                                   moves='birth,merge', nBatch=5, nLap=self.num_lap,

@@ -96,7 +96,7 @@ toy_config = dict(
     reconstruction_params=dict(
         use_state_diff=False,  # determines if decoder uses state or state difference as target
         # nummber of classes in the GMM
-        num_classes=2,  # number of base classes in the class encoder
+        num_classes=4,  # number of base classes in the class encoder
 
         lr_encoder=3e-4,  # learning rate decoder (ADAM) 3e-4 when combine with combination trainer,
         lr_decoder=3e-4,  # learning rate decoder (ADAM) 3e-4 when combine with combination trainer,

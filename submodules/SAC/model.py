@@ -198,12 +198,7 @@ class PolicyNetwork(nn.Module):
         return dist
 
     def sample_or_likelihood(self, states, tasks, max_action=False, sigmoid=False):
-        if sigmoid:
-            if max_action:
-                dist = self(states, tasks, max_action, sigmoid=True)
-                action_selector_input = torch.cat((self.x, tasks), dim=-1)  # Concatenate self.x and tasks
-                m = torch.argmax(nn.functional.softmax(self.action_selector(action_selector_input), dim=-1))
-                return dist, m
+        if max_action or sigmoid:
             return self(states, tasks, max_action, sigmoid=True), None
         dist = self(states, tasks, max_action)
         # Reparameterization trick
@@ -214,12 +209,10 @@ class PolicyNetwork(nn.Module):
         log_prob -= torch.log(1 - action ** 2 + 1e-6)
         log_prob = log_prob.sum(-1, keepdim=True)
         # return (action * self.action_bounds[1]).clamp_(self.action_bounds[0], self.action_bounds[1]), log_prob
-        if max_action:
-            return action.clamp(self.action_bounds[0], self.action_bounds[1]), log_prob, m
         return action.clamp(self.action_bounds[0], self.action_bounds[1]), log_prob
     
-    def get_action(self, states, tasks, return_dist=False):
-        return self.sample_or_likelihood(states, tasks)[0]
+    def get_action(self, states, tasks, return_dist=False, deterministic=False):
+        return self.sample_or_likelihood(states, tasks, max_action=deterministic)[0]
     
     def load_model(self, path):
         network = torch.load(path)

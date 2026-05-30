@@ -28,17 +28,19 @@
 
 
       "python.analysis.extraPaths": [
-        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization",
-        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL/submodules/meta-environments-main",
-        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/meta_rand_envs",
-        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL/submodules/MRL-analysis-tools-main",
-        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/rand_param_envs",
-        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL/submodules/rlkit",
-        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/SAC",
-        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL",
-        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL/submodules/symmetrizer",
-        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/MRL-Inference-Reutilization/submodules",
-        "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/tigr"
+        "/root/bayes-tmp/bowang/Inference-reutilization-MRL",
+        "/root/bayes-tmp/bowang/Inference-reutilization-MRL/submodules/Meta_RL/submodules/meta-environments-main",
+        "/root/bayes-tmp/bowang/Inference-reutilization-MRL/submodules/meta_rand_envs",
+        "/root/bayes-tmp/bowang/Inference-reutilization-MRL/submodules/Meta_RL/submodules/MRL-analysis-tools-main",
+        "/root/bayes-tmp/bowang/Inference-reutilization-MRL/submodules/rand_param_envs",
+        "/root/bayes-tmp/bowang/Inference-reutilization-MRL/submodules/Meta_RL/submodules/rlkit",
+        "/root/bayes-tmp/bowang/Inference-reutilization-MRL/submodules/SAC",
+        "/root/bayes-tmp/bowang/Inference-reutilization-MRL/submodules/Meta_RL",
+        "/root/bayes-tmp/bowang/Inference-reutilization-MRL/submodules/Meta_RL/submodules/symmetrizer",
+        "/root/bayes-tmp/bowang/Inference-reutilization-MRL/submodules",
+        "/root/bayes-tmp/bowang/Inference-reutilization-MRL/tigr"
+    ],
 
-    ]
+      "python.envFile": "${workspaceFolder}/.env",
+      "python.terminal.useEnvFile": true
 }

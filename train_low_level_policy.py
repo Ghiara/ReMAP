@@ -61,14 +61,17 @@ def train(env, agent, epochs, experiment_name, save_after_episodes, policy_updat
     # change_after = config['change_tasks_after']
     plot_every = config['plot_every']
     change_task = 0
-    max_vel = False
     random_init = False
+    random_reset_pos_range = config.get('random_reset_pos_range', [-50, 50])
+    random_reset_vel_range = config.get('random_reset_vel_range', [-0.1, 0.1])
 
 
     for episode in range(1, epochs + 1):
         print("\033[1m" + f"Episode: {episode}" + "\033[0m")
-        # If using ant_multi env, set the epoch for the env
-        # env.set_epoch(episode)
+        if hasattr(env, 'set_training_episode'):
+            env.set_training_episode(episode)
+        if hasattr(env, 'set_epoch'):
+            env.set_epoch(episode)
         '''
         Initialize list for logging
         '''
@@ -78,6 +81,7 @@ def train(env, agent, epochs, experiment_name, save_after_episodes, policy_updat
         number_of_changes = 0
         env.reached_goal = 0
         batch_reward = []
+        batch_traj_len = []
         task_changes = 0
 
         '''
@@ -89,8 +93,7 @@ def train(env, agent, epochs, experiment_name, save_after_episodes, policy_updat
                 if episode/change_epoch>1:
                     task_changes = config['curriculum']['changes_per_trajectory'][i]
 
-            if episode%config['curriculum']['max_vel']==0:
-                max_vel=True
+            max_vel = episode >= config['curriculum']['max_vel']
 
             for j, max_steps_epoch in enumerate(config['curriculum']['max_steps_epochs']):
                 if episode/max_steps_epoch>1:
@@ -122,7 +125,7 @@ def train(env, agent, epochs, experiment_name, save_after_episodes, policy_updat
             Used to randomly initialize the agent's position
             '''
             if random_init:
-                state = env.random_reset(x_pos_range=[-50,50])[0]
+                state = env.random_reset(x_pos_range=random_reset_pos_range, x_vel_range=random_reset_vel_range)[0]
             else:
                 state = env.reset()[0]
             done = 0
@@ -172,13 +175,19 @@ def train(env, agent, epochs, experiment_name, save_after_episodes, policy_updat
                 '''
                 Save the position for plotting trajectories
                 '''
-                if env.base_task == env.config.get('tasks',{}).get('goal_left'):
+                if env.base_task in [
+                    env.config.get('tasks',{}).get('goal_left'),
+                    env.config.get('tasks',{}).get('goal_right'),
+                    env.config.get('tasks',{}).get('goal_front'),
+                    env.config.get('tasks',{}).get('goal_back'),
+                ]:
                     curr_state = env.sim.data.qpos[0]
-                elif env.base_task == env.config.get('tasks',{}).get('goal_right'):
-                    curr_state = env.sim.data.qpos[0]
-                elif env.base_task == env.config.get('tasks',{}).get('velocity_left'):
-                    curr_state = env.sim.data.qvel[0]
-                elif env.base_task == env.config.get('tasks',{}).get('velocity_right'):
+                elif env.base_task in [
+                    env.config.get('tasks',{}).get('velocity_left'),
+                    env.config.get('tasks',{}).get('velocity_right'),
+                    env.config.get('tasks',{}).get('forward_vel'),
+                    env.config.get('tasks',{}).get('backward_vel'),
+                ]:
                     curr_state = env.sim.data.qvel[0]
                 elif env.base_task == env.config.get('tasks',{}).get('stand_front'):
                     curr_state = env.sim.data.qpos[2]
@@ -219,11 +228,12 @@ def train(env, agent, epochs, experiment_name, save_after_episodes, policy_updat
         
             
             batch_reward.append(episode_reward)
+            batch_traj_len.append(j)
             if record_video:
                 save_video_path = f'{path}/videos/{episode}_{batch}.mp4'
                 _frames_to_gif(frames, image_info, save_video_path)
 
-        traj_len.append(j)
+        traj_len.append(float(np.mean(batch_traj_len)) if batch_traj_len else 0.0)
         rew_history.append(np.mean(batch_reward))
         value_loss_history.append(np.mean(value_loss))
         policy_loss_history.append(np.mean(policy_loss))

@@ -348,11 +348,12 @@ def save_plot(loss_history, name:str, path=f'{os.getcwd()}/plots'):
 
 
 # === 🧩 工具函数：保存一个 tensorboard step ===
-def _write_tensorboard_step(save_root, step_idx, latents, true_ids, pred_ids, specs=None):
+def _write_tensorboard_step(save_root, step_idx, latents, true_ids, pred_ids, specs=None, component_ids=None):
     """
     把一批样本写成 tensorboard 兼容格式：
     <root>/<00001>/default/{metadata.tsv, tensors.tsv}
     metadata 每行: "<true_id> [<spec>] -> <pred_id>"
+    components.tsv 每行: "<component_id>"（与 tensors.tsv 行对齐）
     """
     import csv, os, numpy as np
     step_dir = os.path.join(save_root, f"{step_idx:05d}", "default")
@@ -363,11 +364,18 @@ def _write_tensorboard_step(save_root, step_idx, latents, true_ids, pred_ids, sp
 
     if specs is None:
         specs = [0.0] * len(true_ids)
+    if component_ids is None:
+        component_ids = [-1] * len(true_ids)
 
     with open(os.path.join(step_dir, "metadata.tsv"), "w", newline="") as f:
         writer = csv.writer(f, delimiter="\t")
         for t, s, p in zip(true_ids, specs, pred_ids):
             writer.writerow([f"{int(t)} [{float(s):.3f}] -> {int(p)}"])
+
+    with open(os.path.join(step_dir, "components.tsv"), "w", newline="") as f:
+        writer = csv.writer(f, delimiter="\t")
+        for c in component_ids:
+            writer.writerow([f"{int(c)}"])
 
 
 
@@ -450,6 +458,7 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
     EXPORT_ROOT_DEC = os.path.join(save_video_path, "tensorboard_transfer_dec_input")  # obs + mu (decoder task-head input)
     EXPORT_SAMPLES_PER_STEP = 1200  # 每导出一次保存多少个样本点，可自行调大
     export_latents,     export_true, export_pred = [], [], []  # mu-only track
+    export_components = []                                      # DPMM component id per sample
     export_latents_dec = []                                    # decoder-task-input track (obs + mu)
     export_step_idx = 1
 
@@ -588,6 +597,13 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             #input the context to the encoder to get the latent variable
             #mu: task latent variable(very important for task inference!!!)
             mu, log_var = encoder(encoder_input)
+            component_id = -1
+            if hasattr(encoder, "bnp_model") and getattr(encoder.bnp_model, "model", None):
+                try:
+                    _, comp_arr = encoder.bnp_model.cluster_assignments(mu.detach())
+                    component_id = int(np.asarray(comp_arr).reshape(-1)[0])
+                except Exception:
+                    component_id = -1
 
             # === 🧩 记录 latent (μ) 与任务标签 ===
             export_latents.append(mu.detach().cpu().numpy().squeeze())
@@ -600,8 +616,9 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             except NameError:
                 export_specs = []
             export_specs.append(spec_for_logging)   
+            export_components.append(component_id)
 
-            #get the real observation from the complex env
+#get the real observation from the complex env
             obs_before_sim = env._get_obs()
             # map the complex observation to simple observation, not in toy env
             #simple_obs_before: as input to the simple agent to get the simple action
@@ -712,13 +729,13 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             if len(export_latents) >= EXPORT_SAMPLES_PER_STEP:
                 _write_tensorboard_step(
                     EXPORT_ROOT, export_step_idx,
-                    export_latents, export_true, export_pred, export_specs
+                    export_latents, export_true, export_pred, export_specs, export_components
                 )
                 _write_tensorboard_step(
                     EXPORT_ROOT_DEC, export_step_idx,
-                    export_latents_dec, export_true, export_pred, export_specs
+                    export_latents_dec, export_true, export_pred, export_specs, export_components
                 )
-                export_latents,     export_true, export_pred, export_specs = [], [], [], []
+                export_latents,     export_true, export_pred, export_specs, export_components = [], [], [], [], []
                 export_latents_dec  = []
                 export_step_idx += 1
 
@@ -1242,9 +1259,9 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             # === 🧩 写出最后未满批次的数据 ===
             if len(export_latents) > 0:
                 _write_tensorboard_step(EXPORT_ROOT, export_step_idx,
-                                        export_latents, export_true, export_pred, export_specs)
+                                        export_latents, export_true, export_pred, export_specs, export_components)
                 _write_tensorboard_step(EXPORT_ROOT_DEC, export_step_idx,
-                                        export_latents_dec, export_true, export_pred, export_specs)
+                                        export_latents_dec, export_true, export_pred, export_specs, export_components)
                 print(f"[INFO] Saved final latent batch to step {export_step_idx}")
             print(f"[INFO] mu-only embeddings        -> {EXPORT_ROOT}")
             print(f"[INFO] decoder-input embeddings  -> {EXPORT_ROOT_DEC}")

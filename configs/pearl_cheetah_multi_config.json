@@ -12,13 +12,13 @@
   "algo_params": {
     "meta_batch": 16,
     "num_iterations": 1000,
-    "num_initial_steps": 2000,
-    "num_tasks_sample": 5,
-    "num_steps_prior": 400,
+    "num_initial_steps": 1000,
+    "num_tasks_sample": 4,
+    "num_steps_prior": 300,
     "num_steps_posterior": 0,
-    "num_extra_rl_steps_posterior": 400,
-    "num_train_steps_per_itr": 2000,
-    "num_evals": 2,
+    "num_extra_rl_steps_posterior": 300,
+    "num_train_steps_per_itr": 1500,
+    "num_evals": 1,
     "num_steps_per_eval": 600,
     "batch_size": 256,
     "embedding_batch_size": 64,
@@ -38,7 +38,8 @@
     "update_post_train": 1,
     "num_exp_traj_eval": 1,
     "recurrent": false,
-    "dump_eval_paths": false
+    "dump_eval_paths": false,
+    "full_eval_interval": 50
   },
   "util_params": {
     "base_log_dir": "output",

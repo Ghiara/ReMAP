@@ -654,9 +654,9 @@ if __name__ == "__main__":
     # from experiments_configs.half_cheetah_multi_env import config as env_config
     #inference path here will be never used, just a verfication of the toy agent
 
-    inference_path = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2026_01_06_20_48_55_default_single_gaussian_seed0_regular_loss_true_time_steps48'
+    inference_path = '/root/bayes-tmp/bowang/Inference-reutilization-MRL/output/toy1d-multi-task/2026_01_06_20_48_56_default_dpmm_seed0_regular_loss_true_time_steps48_tsne_test'
     paths = [
-        '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2026_01_06_20_48_55_default_single_gaussian_seed0_regular_loss_true_time_steps48',
+        '/root/bayes-tmp/bowang/Inference-reutilization-MRL/output/toy1d-multi-task/2026_01_06_20_48_56_default_dpmm_seed0_regular_loss_true_time_steps48_tsne_test',
         # {'name': 'inference_path_3', 'path': '/path/to/inference_path_3'},
     ]
     tasks = [
@@ -678,8 +678,8 @@ if __name__ == "__main__":
     for inference_path in paths:
 
             complex_agent_config = dict(
-                experiments_repo = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy/',
-                experiment_name = 'new_cheetah_training_server1_diff_taskid',
+                experiments_repo = '/root/bayes-tmp/bowang/Inference-reutilization-MRL/output/low_level_policy/',
+                experiment_name = 'new_cheetah_training_server1_diff_taskid_multi_tasks',
                 epoch = 300,
             )
 

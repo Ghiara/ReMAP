@@ -6,6 +6,7 @@ import os
 from gym.spaces import Box
 import re
 import tempfile
+from pathlib import Path
 
 
 class Toy1dMultiTask(RandomEnv, utils.EzPickle):
@@ -52,8 +53,8 @@ class Toy1dMultiTask(RandomEnv, utils.EzPickle):
         self.positive_change_point = self.positive_change_point_basis + np.random.random() * self.change_point_interval
         self.negative_change_point = self.negative_change_point_basis - np.random.random() * self.change_point_interval
 
-        self.model_path = os.path.join(os.getcwd(), 'submodules', 'meta_rand_envs', 'meta_rand_envs',
-                                       'toy1d.xml')
+        # toy path patch: resolve XML relative to this source file, not the current working directory
+        self.model_path = str(Path(__file__).resolve().with_name('toy1d.xml'))
         if 'env_init' in kwargs:
             parameters = dict(
                 dt = kwargs['env_init']['dt'],
@@ -96,9 +97,10 @@ class Toy1dMultiTask(RandomEnv, utils.EzPickle):
         # Convert modified XML back to a string
         modified_xml_string = etree.tostring(root, pretty_print=True).decode()
 
-        temp_dir = os.path.join(os.getcwd(), 'temp')
-        os.makedirs(temp_dir, exist_ok=True)
-        modified_xml_path = os.path.join(temp_dir, 'modified_model.xml')
+        # toy path patch: keep generated XML beside the env package so any launch cwd works
+        temp_dir = Path(__file__).resolve().parent / 'temp'
+        temp_dir.mkdir(exist_ok=True)
+        modified_xml_path = str(temp_dir / 'modified_model.xml')
         with open(modified_xml_path, 'w') as file:
             file.write(modified_xml_string)
         return modified_xml_path

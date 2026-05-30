@@ -163,6 +163,7 @@ class RL2SoftActorCritic(MetaRLAlgorithm):
             self.agent.detach_z()
 
         self._update_target_network()
+        self.agent.clear_z(num_tasks=1)  # reset to single-task mode for rollout
 
     def _take_step(self, indices):
         num_tasks = len(indices)

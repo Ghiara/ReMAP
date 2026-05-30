@@ -19,18 +19,18 @@ transfer_config = dict(
     
 
     inference_path = dict(
-        name = '2026_01_06_20_48_56_default_dpmm_seed0_regular_loss_true_time_steps48_test_case',
-        path = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/toy1d-multi-task/2026_01_06_20_48_56_default_dpmm_seed0_regular_loss_true_time_steps48_test_case'
+        name = '2026_05_24_16_23_33_default_dpmm_seed2_regular_loss_true_time_steps48_v1',
+        path = '/root/bayes-tmp/bowang/Inference-reutilization-MRL/output/toy1d-multi-task/2026_05_24_16_23_33_default_dpmm_seed2_regular_loss_true_time_steps48_v1'
     ),
 
 
     ### Define the low-level controller and agent to reuse the inference mechanism
 
     complex_agent = dict(
-        environment = HopperMulti,
-        experiments_repo = '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/output/low_level_policy/',
-        experiment_name = 'hopper_multi_new_config',
-        epoch = 200,
+        environment = WalkerMulti,
+        experiments_repo = '/root/bayes-tmp/bowang/Inference-reutilization-MRL/output/low_level_policy/',
+        experiment_name = 'walker_multi_new_config_v0',
+        epoch = 1000,
     ),
 
 

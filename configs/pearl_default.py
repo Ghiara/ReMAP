@@ -22,6 +22,7 @@ default_config = dict(
         num_train_steps_per_itr=2000, # number of meta-gradient steps taken per iteration
         num_evals=2, # number of independent evals
         num_steps_per_eval=600,  # nuumber of transitions to eval on
+        full_eval_interval=50,  # run full train/test eval every N epochs; train return is logged every epoch
         batch_size=256, # number of transitions in the RL batch
         embedding_batch_size=64, # number of transitions in the context batch
         embedding_mini_batch_size=64, # number of context transitions to backprop through (should equal the arg above except in the recurrent encoder case)

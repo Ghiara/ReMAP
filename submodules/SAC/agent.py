@@ -161,14 +161,10 @@ class SAC:
         tasks = np.expand_dims(tasks, axis=0)
         tasks = from_numpy(tasks).float().to(self.device)
         if max_action:
-            action, m = self.policy_network.sample_or_likelihood(states, tasks, max_action, sigmoid=sigmoid)
-            mask = torch.nn.functional.one_hot(m, num_classes=self.n_actions).float()
-            # Apply the mask to retain only the max entry, while keeping gradients
-            action = action * mask
+            action, _ = self.policy_network.sample_or_likelihood(states, tasks, max_action=True, sigmoid=sigmoid)
             if use_torch:
                 return action.detach()
-            else:
-                action.detach().cpu().numpy()[0]
+            return action.detach().cpu().numpy()[0]
 
         action, _ = self.policy_network.sample_or_likelihood(states, tasks, max_action, sigmoid=sigmoid)
         if use_torch:

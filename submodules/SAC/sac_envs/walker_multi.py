@@ -18,6 +18,7 @@ class WalkerMulti(Walker2dEnv):
         self.screen_height = 400
         self.screen_width = 400
         self.config = config
+        self.training_episode = 0
         self.task = self.sample_task()
         
         # Think about changing it to normalize by max_task
@@ -45,6 +46,18 @@ class WalkerMulti(Walker2dEnv):
         return self.sim.render(width, height, camera_name=camera_name)
 
         # How to make the reward robust (combination of healthy reward, distance_to_goal)
+    def set_training_episode(self, episode: int):
+        self.training_episode = int(episode)
+
+    def _curriculum_scale(self) -> float:
+        milestones = [1, 200, 500, 900, 1400]
+        scales = [0.45, 0.60, 0.75, 0.90, 1.00]
+        idx = 0
+        for i, m in enumerate(milestones):
+            if self.training_episode >= m:
+                idx = i
+        return scales[idx]
+
     def step(self, action, healthy_scale=None):
         if healthy_scale is not None:
             self.healthy_scale = healthy_scale
@@ -67,26 +80,36 @@ class WalkerMulti(Walker2dEnv):
         #     reward_ctrl = -0.5 * 1e-1 * np.sum(np.square(action))
         #     reward = reward_ctrl * 1.0 + reward_run / np.abs(self.task_specification)
         
-        if self.base_task in [self.config.get('tasks',{}).get('goal_front'), self.config.get('tasks',{}).get('goal_back')]:  # 'goal
-            # reward_run = -(distance_after - distance_before)/np.abs(self.task[0])
-            reward_run = -np.abs(xposafter-self.task[self.base_task])/np.abs(self.norm)
-            # reward_run = reward_run.clip(-2,0)
-            reward_ctrl = -0.5 * 1e-1 * np.sum(np.square(action))
-            healthy_reward = 1
-            if terminated:
-                healthy_penalty = -10
-            reward_ctrl = 0
-            rewards = reward_run + healthy_reward * self.healthy_scale # Reward is negative distance to the goal
-            reward = rewards + reward_ctrl
+        if self.base_task in [self.config.get('tasks',{}).get('goal_front'), self.config.get('tasks',{}).get('goal_back')]:  # goal tracking
+            dist_before = np.abs(xposbefore - self.task[self.base_task])
+            dist_after = np.abs(xposafter - self.task[self.base_task])
+            progress = dist_before - dist_after
+            goal_norm = max(float(self.config['max_goal'][1]), 1.0)
 
-        elif self.base_task in [self.config.get('tasks',{}).get('forward_vel'), self.config.get('tasks',{}).get('backward_vel')]: # velocity
-            healthy_reward = 1
+            reward_run = -dist_after / goal_norm + 0.8 * progress / goal_norm
+            if dist_after < 1.0:
+                reward_run += 0.5
+            if dist_after < 0.4:
+                reward_run += 0.7
+
+            reward_ctrl = -1e-3 * np.sum(np.square(action))
+            healthy_reward = 1.0
+            reward = reward_run + reward_ctrl + healthy_reward * self.healthy_scale
+
+        elif self.base_task in [self.config.get('tasks',{}).get('forward_vel'), self.config.get('tasks',{}).get('backward_vel')]:  # velocity tracking
+            healthy_reward = 1.0
             forward_vel = (xposafter - xposbefore) / self.dt
-            reward_run = -1.0 * np.abs(forward_vel - self.task[self.base_task]) / np.abs(self.norm)
-            # reward_run = reward_run.clip(-2,0)
-            reward_ctrl = -0.5 * 1e-1 * np.sum(np.square(action))
-            reward_ctrl = 0
-            reward = reward_ctrl * 1.0 + reward_run + healthy_reward * self.healthy_scale
+            vel_norm = max(float(self.config['max_vel'][1]), 1.0)
+            vel_error = np.abs(forward_vel - self.task[self.base_task])
+
+            reward_run = -vel_error / vel_norm
+            if vel_error < 0.35:
+                reward_run += 0.4
+            if vel_error < 0.20:
+                reward_run += 0.5
+
+            reward_ctrl = -2e-3 * np.sum(np.square(action))
+            reward = reward_run + reward_ctrl + healthy_reward * self.healthy_scale
             # if np.abs(forward_vel - self.task[3]) < 0.1:
             #     self.reached_goal += 1
             #     if self.reached_goal == 20:
@@ -139,33 +162,39 @@ class WalkerMulti(Walker2dEnv):
         # {'velocity_forward': 0, 'velocity_backward': 1, 'goal_forward': 4, 'goal_backward': 5, 
         # 'flip_forward': 6, 'stand_front': 3, 'stand_back': 2, 'jump': 7, flip_backward = 8,
         # 'direction_forward': -1, 'direction_backward': -1, 'velocity': -1}
-        base_task = np.random.choice(list(self.config['tasks'].keys()))
+        task_keys = list(self.config['tasks'].keys())
+        task_weights = np.array([2.0 if k in ('backward_vel', 'goal_front') else 1.0 for k in task_keys])
+        task_weights = task_weights / task_weights.sum()
+        base_task = np.random.choice(task_keys, p=task_weights)
         self.base_task = self.config.get('tasks',{}).get(base_task)
         mult = np.random.random()
         if task:
             base_task = task['base_task']
             self.base_task = self.config.get('tasks',{}).get(base_task)
             mult = task['specification']
+
+        scale = self._curriculum_scale()
+        goal_min, goal_max = self.config['max_goal']
+        vel_min, vel_max = self.config['max_vel']
+        goal_upper = goal_min + (goal_max - goal_min) * scale
+        vel_upper = vel_min + (vel_max - vel_min) * scale
+
         if base_task == 'goal_front':
-            if test:
-                self.task[self.base_task] = mult * (self.config['max_goal'][1] - self.config['max_goal'][0]) + self.config['max_goal'][0]
-                self.norm = self.task[self.base_task]
-            else:
-                self.norm = mult + 0.5
-                self.task[self.base_task] = self.sim.data.qpos[0] + self.norm
+            mag = goal_min + (goal_upper - goal_min) * (mult ** 0.7)
+            self.task[self.base_task] = mag
+            self.norm = max(goal_max, 1.0)
         elif base_task == 'goal_back':
-            if test:
-                self.task[self.base_task] = - (mult * (self.config['max_goal'][1] - self.config['max_goal'][0]) + self.config['max_goal'][0])
-                self.norm = self.task[self.base_task]
-            else:
-                self.norm = mult + 0.5
-                self.task[self.base_task] = self.sim.data.qpos[0] - self.norm
+            mag = goal_min + (goal_upper - goal_min) * (mult ** 0.7)
+            self.task[self.base_task] = -mag
+            self.norm = max(goal_max, 1.0)
         elif base_task == 'forward_vel':
-            self.task[self.base_task] = mult * (self.config['max_vel'][1] - self.config['max_vel'][0]) + self.config['max_vel'][0]
-            self.norm = self.task[self.base_task]
+            mag = vel_min + (vel_upper - vel_min) * (mult ** 0.75)
+            self.task[self.base_task] = mag
+            self.norm = max(vel_max, 1.0)
         elif base_task == 'backward_vel':
-            self.task[self.base_task] = - (mult * (self.config['max_vel'][1] - self.config['max_vel'][0]) + self.config['max_vel'][0])
-            self.norm = self.task[self.base_task]
+            mag = vel_min + (vel_upper - vel_min) * (mult ** 0.75)
+            self.task[self.base_task] = -mag
+            self.norm = max(vel_max, 1.0)
         elif base_task == 'stand_front':
             self.task[self.base_task] = mult * (self.config['max_rot'][1] - self.config['max_rot'][0]) + self.config['max_rot'][0]
             self.norm = self.task[self.base_task]

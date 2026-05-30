@@ -21,8 +21,11 @@ Yuan Meng<sup>1,3,*</sup>, Bo Wang<sup>1,3,*</sup>, Juan de los Rios Ruiz<sup>1<
 
 ## Abstract
 
-Meta-reinforcement learning aims to enable fast adaptation to unseen tasks by extracting shared structure from a distribution of related tasks. However, existing end-to-end methods often learn this structure jointly with embodiment-specific control dynamics, which can entangle task semantics with agent-specific motion patterns and limit cross-agent reuse. We propose ReMAP, a meta-knowledge reutilization framework that learns task-level meta-knowledge on a dynamics-simplified agent and transfers it to heterogeneous agents. A DPMM-regularized task inference module captures non-parametric task semantics, while a high-level policy generates task-level magnitude guidance. To bridge this reusable knowledge with different robot embodiments, we introduce the Semantic-Magnitude Alignment Interface, which converts task semantics and magnitudes into shared subgoals for embodiment-specific low-level controllers. Experiments across multiple locomotion agents show that ReMAP reduces final-step tracking MSE by 94.75%-99.79% compared with Meta-RL baselines and achieves state-of-the-art deployment performance with about 23.8% of the interactions required by recent baselines.
+Meta-reinforcement learning enables fast adaptation by extracting shared structure from related tasks, but existing end-to-end methods often couple task inference with embodiment-specific control. This coupling can obscure non-parametric task semantics, reduce sample efficiency, and limit cross-agent reuse. We propose ReMAP, a meta-knowledge reutilization framework that learns task-level meta-knowledge on a dynamics-simplified agent and transfers it to heterogeneous agents. ReMAP uses a DPMM-regularized task inference module to organize non-parametric task modes and a high-level policy to generate task-level magnitude guidance. To bridge reusable task knowledge with different embodiments, we introduce the Semantic-Magnitude Alignment Interface and a lightweight stride predictor, which convert frozen meta-knowledge into temporally aligned semantic-magnitude subgoals for embodiment-specific low-level controllers. Experiments on multiple locomotion agents show that ReMAP reduces final-step tracking MSE by \(94.75\%\)--\(99.79\%\) and achieves state-of-the-art deployment performance with about \(23.8\%\) of the interactions required by MELTS.
 
 ## Introduction to Repository
 
 Code coming soon.
+
+
+

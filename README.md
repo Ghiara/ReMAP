@@ -31,3 +31,9 @@ Experiments on multiple locomotion agents show that our framework reduces final-
 
 Code coming soon.
 
+## Data
+
+The source data for the paper experiments are provided in [`data/`](data/).
+They include CSV files for ReMAP results, baseline comparisons, ablation
+studies, reward statistics, and single-task case studies used in the main paper
+and supplementary material.

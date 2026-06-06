@@ -16,6 +16,8 @@ failed_experiments/
 Dockerfile
 data/*
 output/
+logs/
+final_results/
 temp_bnp/
 checkpoints/
 videos/

@@ -12,6 +12,9 @@ from train_striding_predictor import get_complex_agent
 
 # train_striding_predictor_LL_vel_evaluation
 
+
+#这个脚本是用来测试训练出来的低层技能的。它会加载指定实验的低层策略，并在对应环境中执行预设的技能（如前向速度、后向速度、前向位置、后向位置），记录并绘制跟踪值（如实际速度或位置）随时间的变化，以评估技能的效果。
+
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ==== 这些常量记得改成你自己的 ====

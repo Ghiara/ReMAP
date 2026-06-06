@@ -1,10 +1,11 @@
 # ReMAP
 
 
-Official implementation of the paper: **Knowledge Reutilization in Meta-Reinforcement Learning**
+
 
 <div align="center">
 
+Official implementation of the paper: **Knowledge Reutilization in Meta-Reinforcement Learning**
 
 Yuan Meng<sup>1,2,*</sup>, Bo Wang<sup>1,2,*</sup>, Juan de los Rios Ruiz<sup>1</sup>, Xiangtong Yao<sup>1</sup>, 
 Zhenshan Bing<sup>2,&dagger;</sup>, Fuchun Sun<sup>3</sup>, and Alois Knoll<sup>1</sup> 

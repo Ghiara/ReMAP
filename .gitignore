@@ -37,7 +37,7 @@ temp/
 trajectories_plots/
 ### Visual Studio Code ###
 .vscode/*
-!.vscode/settings.json
+
 
 
 ### Python ### 

@@ -24,14 +24,14 @@ SAC_ROOT = ROOT / "submodules" / "SAC"
 if str(SAC_ROOT) not in sys.path:
     sys.path.insert(0, str(SAC_ROOT))
 
-from sac_envs.ant_multi_old import AntMulti
-from sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
-from sac_envs.hopper_multi import HopperMulti
-from sac_envs.walker_multi import WalkerMulti
-from model import PolicyNetwork as TransferFunction
-from rlkit.envs import ENVS  # toy patch
-from rlkit.torch.sac.policies import MakeDeterministic, TanhGaussianPolicy  # toy patch
-from tigr.task_inference.dpmm_inference import DecoupledEncoder  # toy patch
+from third_party.SAC.sac_envs.ant_multi import AntMulti
+from third_party.SAC.sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
+from third_party.SAC.sac_envs.hopper_multi import HopperMulti
+from third_party.SAC.sac_envs.walker_multi import WalkerMulti
+from third_party.SAC.model import PolicyNetwork as TransferFunction
+from third_party.rlkit.envs import ENVS  # toy patch
+from third_party.rlkit.torch.sac.policies import MakeDeterministic, TanhGaussianPolicy  # toy patch
+from third_party.tigr.task_inference.dpmm_inference import DecoupledEncoder  # toy patch
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

@@ -29,10 +29,10 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from sac_envs.walker_multi import WalkerMulti
-from sac_envs.hopper_multi import HopperMulti
-from sac_envs.ant_multi_old import AntMulti
-from rlkit.envs.toy1d_multi import Toy1dMultiTaskkWrappedEnv
+from third_party.SAC.sac_envs.walker_multi import WalkerMulti
+from third_party.SAC.sac_envs.hopper_multi import HopperMulti
+from third_party.SAC.sac_envs.ant_multi import AntMulti
+from third_party.rlkit.envs.toy1d_multi import Toy1dMultiTaskkWrappedEnv
 
 # ─── Output directory ────────────────────────────────────────────────────────
 OUTPUT_ROOT = 'toy_test'

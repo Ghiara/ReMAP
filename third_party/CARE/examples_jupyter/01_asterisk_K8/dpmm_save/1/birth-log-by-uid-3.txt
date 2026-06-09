@@ -1,0 +1,135 @@
+STATUS uid     3  lap   1.000 lapCeil     1 batchPos   0/1 batchID   0  N_b 10472.016 N_ttl 10472.016 ELIGIBLE 
+Creating proposal for targetUID 3 at lap 1.00 batchID 0
+Preparing target dataset for Bregman k-means analysis...
+  Targeted comp has 10472.02 atoms assigned out of 60000.
+  Filtering to find atoms with resp > 0.10
+  Found 10507 atoms meeting this requirement.
+Running Bregman k-means with K=5 for 1 iters
+iter 0: Lscore 3.508e+07
+  555.06 2603.26 1047.27  920.97 5343.56
+Bregman k-means DONE. Delivered 5 non-empty clusters
+     19   20   21   22   23
+   5343 2603 1047 920. 555.
+ Running 5 refinement iterations (--b_nRefineSteps)
+ target prob redistributed by policy uniform (--b_method_xPi)
+ pi[ktarget] before 0.1333  after 0.0027.
+ pi[new comps]: 0.0261 0.0261 0.0261 0.0261 0.0261
+     19   20   21   22   23
+   4540 3177 926. 932. 894.
+   4031 3613 807. 897. 1121
+   3679 3866 728. 881. 1316
+   3475 3960 680. 876. 1479
+   3475 3960 1556 m 21 1479
+   3475 5439 1556      m 20
+   3463 5420 1588          
+Proposal build phase DONE. Created 3 candidate clusters.
+
+Eval     targetUID 3 at lap 1.000 lapCeil 1 | ACCEPT change_loss -2.759e-03 Knew    3
+   gainL -2.759e-03
+    curL  1.818e+00
+   propL  1.815e+00
+   gain_  Lalloc -1.736e-03
+   gain_   Ldata  4.423e-03
+   gain_Lentropy  7.166e-05
+   Accepted. Jump up to loss  1.815e+00 
+    Mass transfered to new comps: 10472.02
+    Remaining mass at targetUID 3: 0.00
+
+STATUS uid     3  lap   2.000 lapCeil     2 batchPos   0/1 batchID   0  N_b     0.000 N_ttl     0.000 BUSY MERGE PROPOSAL
+STATUS uid     3  lap   3.000 lapCeil     3 batchPos   0/1 batchID   0  N_b  3943.780 N_ttl  3943.780 BUSY MERGE PROPOSAL
+STATUS uid     3  lap   4.000 lapCeil     4 batchPos   0/1 batchID   0  N_b  3326.948 N_ttl  3326.948 BUSY MERGE PROPOSAL
+STATUS uid     3  lap   5.000 lapCeil     5 batchPos   0/1 batchID   0  N_b  2994.621 N_ttl  2994.621 BUSY MERGE PROPOSAL
+STATUS uid     3  lap   6.000 lapCeil     6 batchPos   0/1 batchID   0  N_b  2840.398 N_ttl  2840.398 BUSY MERGE PROPOSAL
+STATUS uid     3  lap   7.000 lapCeil     7 batchPos   0/1 batchID   0  N_b  2742.764 N_ttl  2742.764 BUSY MERGE PROPOSAL
+STATUS uid     3  lap   8.000 lapCeil     8 batchPos   0/1 batchID   0  N_b  2672.061 N_ttl  2672.061 BUSY MERGE PROPOSAL
+STATUS uid     3  lap   9.000 lapCeil     9 batchPos   0/1 batchID   0  N_b  2619.078 N_ttl  2619.078 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  10.000 lapCeil    10 batchPos   0/1 batchID   0  N_b  2578.827 N_ttl  2578.827 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  11.000 lapCeil    11 batchPos   0/1 batchID   0  N_b  2547.797 N_ttl  2547.797 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  12.000 lapCeil    12 batchPos   0/1 batchID   0  N_b  2523.201 N_ttl  2523.201 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  13.000 lapCeil    13 batchPos   0/1 batchID   0  N_b  2503.392 N_ttl  2503.392 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  14.000 lapCeil    14 batchPos   0/1 batchID   0  N_b  2487.231 N_ttl  2487.231 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  15.000 lapCeil    15 batchPos   0/1 batchID   0  N_b  2473.861 N_ttl  2473.861 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  16.000 lapCeil    16 batchPos   0/1 batchID   0  N_b  2462.657 N_ttl  2462.657 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  17.000 lapCeil    17 batchPos   0/1 batchID   0  N_b  2453.023 N_ttl  2453.023 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  18.000 lapCeil    18 batchPos   0/1 batchID   0  N_b  2444.385 N_ttl  2444.385 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  19.000 lapCeil    19 batchPos   0/1 batchID   0  N_b  2436.548 N_ttl  2436.548 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  20.000 lapCeil    20 batchPos   0/1 batchID   0  N_b  2429.480 N_ttl  2429.480 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  21.000 lapCeil    21 batchPos   0/1 batchID   0  N_b  2423.531 N_ttl  2423.531 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  22.000 lapCeil    22 batchPos   0/1 batchID   0  N_b  2418.906 N_ttl  2418.906 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  23.000 lapCeil    23 batchPos   0/1 batchID   0  N_b  2415.637 N_ttl  2415.637 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  24.000 lapCeil    24 batchPos   0/1 batchID   0  N_b  2413.670 N_ttl  2413.670 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  25.000 lapCeil    25 batchPos   0/1 batchID   0  N_b  2412.907 N_ttl  2412.907 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  26.000 lapCeil    26 batchPos   0/1 batchID   0  N_b  2413.252 N_ttl  2413.252 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  27.000 lapCeil    27 batchPos   0/1 batchID   0  N_b  2414.628 N_ttl  2414.628 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  28.000 lapCeil    28 batchPos   0/1 batchID   0  N_b  2416.977 N_ttl  2416.977 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  29.000 lapCeil    29 batchPos   0/1 batchID   0  N_b  2420.320 N_ttl  2420.320 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  30.000 lapCeil    30 batchPos   0/1 batchID   0  N_b  2424.723 N_ttl  2424.723 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  31.000 lapCeil    31 batchPos   0/1 batchID   0  N_b  2429.755 N_ttl  2429.755 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  32.000 lapCeil    32 batchPos   0/1 batchID   0  N_b  2434.742 N_ttl  2434.742 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  33.000 lapCeil    33 batchPos   0/1 batchID   0  N_b  2439.422 N_ttl  2439.422 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  34.000 lapCeil    34 batchPos   0/1 batchID   0  N_b  2443.724 N_ttl  2443.724 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  35.000 lapCeil    35 batchPos   0/1 batchID   0  N_b  2447.645 N_ttl  2447.645 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  36.000 lapCeil    36 batchPos   0/1 batchID   0  N_b  2451.206 N_ttl  2451.206 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  37.000 lapCeil    37 batchPos   0/1 batchID   0  N_b  2454.433 N_ttl  2454.433 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  38.000 lapCeil    38 batchPos   0/1 batchID   0  N_b  2457.357 N_ttl  2457.357 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  39.000 lapCeil    39 batchPos   0/1 batchID   0  N_b  2460.006 N_ttl  2460.006 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  40.000 lapCeil    40 batchPos   0/1 batchID   0  N_b  2462.404 N_ttl  2462.404 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  41.000 lapCeil    41 batchPos   0/1 batchID   0  N_b  2464.577 N_ttl  2464.577 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  42.000 lapCeil    42 batchPos   0/1 batchID   0  N_b  2466.544 N_ttl  2466.544 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  43.000 lapCeil    43 batchPos   0/1 batchID   0  N_b  2468.324 N_ttl  2468.324 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  44.000 lapCeil    44 batchPos   0/1 batchID   0  N_b  2469.932 N_ttl  2469.932 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  45.000 lapCeil    45 batchPos   0/1 batchID   0  N_b  2471.382 N_ttl  2471.382 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  46.000 lapCeil    46 batchPos   0/1 batchID   0  N_b  2472.689 N_ttl  2472.689 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  47.000 lapCeil    47 batchPos   0/1 batchID   0  N_b  2473.868 N_ttl  2473.868 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  48.000 lapCeil    48 batchPos   0/1 batchID   0  N_b  2474.932 N_ttl  2474.932 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  49.000 lapCeil    49 batchPos   0/1 batchID   0  N_b  2475.898 N_ttl  2475.898 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  50.000 lapCeil    50 batchPos   0/1 batchID   0  N_b  2476.778 N_ttl  2476.778 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  51.000 lapCeil    51 batchPos   0/1 batchID   0  N_b  2477.584 N_ttl  2477.584 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  52.000 lapCeil    52 batchPos   0/1 batchID   0  N_b  2478.329 N_ttl  2478.329 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  53.000 lapCeil    53 batchPos   0/1 batchID   0  N_b  2479.021 N_ttl  2479.021 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  54.000 lapCeil    54 batchPos   0/1 batchID   0  N_b  2479.668 N_ttl  2479.668 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  55.000 lapCeil    55 batchPos   0/1 batchID   0  N_b  2480.275 N_ttl  2480.275 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  56.000 lapCeil    56 batchPos   0/1 batchID   0  N_b  2480.847 N_ttl  2480.847 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  57.000 lapCeil    57 batchPos   0/1 batchID   0  N_b  2481.388 N_ttl  2481.388 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  58.000 lapCeil    58 batchPos   0/1 batchID   0  N_b  2481.899 N_ttl  2481.899 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  59.000 lapCeil    59 batchPos   0/1 batchID   0  N_b  2482.381 N_ttl  2482.381 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  60.000 lapCeil    60 batchPos   0/1 batchID   0  N_b  2482.837 N_ttl  2482.837 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  61.000 lapCeil    61 batchPos   0/1 batchID   0  N_b  2483.268 N_ttl  2483.268 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  62.000 lapCeil    62 batchPos   0/1 batchID   0  N_b  2483.674 N_ttl  2483.674 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  63.000 lapCeil    63 batchPos   0/1 batchID   0  N_b  2484.059 N_ttl  2484.059 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  64.000 lapCeil    64 batchPos   0/1 batchID   0  N_b  2484.424 N_ttl  2484.424 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  65.000 lapCeil    65 batchPos   0/1 batchID   0  N_b  2484.772 N_ttl  2484.772 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  66.000 lapCeil    66 batchPos   0/1 batchID   0  N_b  2485.105 N_ttl  2485.105 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  67.000 lapCeil    67 batchPos   0/1 batchID   0  N_b  2485.425 N_ttl  2485.425 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  68.000 lapCeil    68 batchPos   0/1 batchID   0  N_b  2485.733 N_ttl  2485.733 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  69.000 lapCeil    69 batchPos   0/1 batchID   0  N_b  2486.032 N_ttl  2486.032 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  70.000 lapCeil    70 batchPos   0/1 batchID   0  N_b  2486.322 N_ttl  2486.322 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  71.000 lapCeil    71 batchPos   0/1 batchID   0  N_b  2486.604 N_ttl  2486.604 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  72.000 lapCeil    72 batchPos   0/1 batchID   0  N_b  2486.878 N_ttl  2486.878 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  73.000 lapCeil    73 batchPos   0/1 batchID   0  N_b  2487.145 N_ttl  2487.145 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  74.000 lapCeil    74 batchPos   0/1 batchID   0  N_b  2487.404 N_ttl  2487.404 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  75.000 lapCeil    75 batchPos   0/1 batchID   0  N_b  2487.656 N_ttl  2487.656 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  76.000 lapCeil    76 batchPos   0/1 batchID   0  N_b  2487.901 N_ttl  2487.901 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  77.000 lapCeil    77 batchPos   0/1 batchID   0  N_b  2488.138 N_ttl  2488.138 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  78.000 lapCeil    78 batchPos   0/1 batchID   0  N_b  2488.367 N_ttl  2488.367 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  79.000 lapCeil    79 batchPos   0/1 batchID   0  N_b  2488.586 N_ttl  2488.586 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  80.000 lapCeil    80 batchPos   0/1 batchID   0  N_b  2488.797 N_ttl  2488.797 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  81.000 lapCeil    81 batchPos   0/1 batchID   0  N_b  2488.999 N_ttl  2488.999 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  82.000 lapCeil    82 batchPos   0/1 batchID   0  N_b  2489.190 N_ttl  2489.190 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  83.000 lapCeil    83 batchPos   0/1 batchID   0  N_b  2489.373 N_ttl  2489.373 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  84.000 lapCeil    84 batchPos   0/1 batchID   0  N_b  2489.545 N_ttl  2489.545 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  85.000 lapCeil    85 batchPos   0/1 batchID   0  N_b  2489.708 N_ttl  2489.708 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  86.000 lapCeil    86 batchPos   0/1 batchID   0  N_b  2489.861 N_ttl  2489.861 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  87.000 lapCeil    87 batchPos   0/1 batchID   0  N_b  2490.004 N_ttl  2490.004 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  88.000 lapCeil    88 batchPos   0/1 batchID   0  N_b  2490.139 N_ttl  2490.139 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  89.000 lapCeil    89 batchPos   0/1 batchID   0  N_b  2490.265 N_ttl  2490.265 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  90.000 lapCeil    90 batchPos   0/1 batchID   0  N_b  2490.383 N_ttl  2490.383 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  91.000 lapCeil    91 batchPos   0/1 batchID   0  N_b  2490.493 N_ttl  2490.493 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  92.000 lapCeil    92 batchPos   0/1 batchID   0  N_b  2490.596 N_ttl  2490.596 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  93.000 lapCeil    93 batchPos   0/1 batchID   0  N_b  2490.692 N_ttl  2490.692 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  94.000 lapCeil    94 batchPos   0/1 batchID   0  N_b  2490.781 N_ttl  2490.781 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  95.000 lapCeil    95 batchPos   0/1 batchID   0  N_b  2490.864 N_ttl  2490.864 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  96.000 lapCeil    96 batchPos   0/1 batchID   0  N_b  2490.942 N_ttl  2490.942 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  97.000 lapCeil    97 batchPos   0/1 batchID   0  N_b  2491.014 N_ttl  2491.014 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  98.000 lapCeil    98 batchPos   0/1 batchID   0  N_b  2491.081 N_ttl  2491.081 BUSY MERGE PROPOSAL
+STATUS uid     3  lap  99.000 lapCeil    99 batchPos   0/1 batchID   0  N_b  2491.144 N_ttl  2491.144 BUSY MERGE PROPOSAL

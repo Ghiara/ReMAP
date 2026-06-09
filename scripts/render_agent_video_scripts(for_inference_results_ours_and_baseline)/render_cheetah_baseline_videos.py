@@ -47,14 +47,14 @@ for extra_path in EXTRA_PATHS:
     if str(extra_path) not in sys.path:
         sys.path.insert(0, str(extra_path))
 
-from rlkit.envs import ENVS
-from rlkit.envs.wrappers import NormalizedBoxEnv
-from rlkit.torch.networks import MlpEncoder, RecurrentEncoder
-from rlkit.torch.rl2.rl2_agent import RL2Agent
-from rlkit.torch.rl2.networks import LSTMPolicy
-from rlkit.torch.sac.agent import PEARLAgent
-from rlkit.torch.sac.policies import TanhGaussianPolicy
-from tigr.agent_module import Agent as TigrAgent
+from third_party.rlkit.envs import ENVS
+from third_party.rlkit.envs.wrappers import NormalizedBoxEnv
+from third_party.rlkit.torch.networks import MlpEncoder, RecurrentEncoder
+from third_party.rlkit.torch.rl2.rl2_agent import RL2Agent
+from third_party.rlkit.torch.rl2.networks import LSTMPolicy
+from third_party.rlkit.torch.sac.agent import PEARLAgent
+from third_party.rlkit.torch.sac.policies import TanhGaussianPolicy
+from third_party.tigr.agent_module import Agent as TigrAgent
 
 
 DEVICE = torch.device("cpu")
@@ -391,8 +391,8 @@ def build_melts_env_agent(exp_dir: Path):
         shared_dim = int((encoder_input_dim / time_steps) * net_complex)
 
     if variant["inference_option"] == "dpmm":
-        from tigr.task_inference.dpmm_bnp import BNPModel
-        from tigr.task_inference.dpmm_inference import DecoupledEncoder
+        from third_party.tigr.task_inference.dpmm_bnp import BNPModel
+        from third_party.tigr.task_inference.dpmm_inference import DecoupledEncoder
 
         dp = variant.get("dpmm_params", {})
         bnp_model = BNPModel(
@@ -406,7 +406,7 @@ def build_melts_env_agent(exp_dir: Path):
             merge_kwargs=dp.get("merge_kwargs", {}),
         )
     else:
-        from tigr.task_inference.true_gmm_inference import DecoupledEncoder
+        from third_party.tigr.task_inference.true_gmm_inference import DecoupledEncoder
 
         bnp_model = None
 

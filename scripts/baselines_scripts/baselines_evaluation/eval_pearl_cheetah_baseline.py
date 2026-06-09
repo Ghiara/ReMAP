@@ -37,14 +37,14 @@ import torch
 project_root = Path(__file__).parent.absolute()
 sys.path.insert(0, str(project_root))
 
-from rlkit.envs import ENVS
-from rlkit.envs.wrappers import NormalizedBoxEnv
-from rlkit.torch.sac.policies import TanhGaussianPolicy
-from rlkit.torch.networks import FlattenMlp, MlpEncoder, RecurrentEncoder
-from rlkit.torch.sac.agent import PEARLAgent
-from rlkit.samplers.util import rollout
+from third_party.rlkit.envs import ENVS
+from third_party.rlkit.envs.wrappers import NormalizedBoxEnv
+from third_party.rlkit.torch.sac.policies import TanhGaussianPolicy
+from third_party.rlkit.torch.networks import FlattenMlp, MlpEncoder, RecurrentEncoder
+from third_party.rlkit.torch.sac.agent import PEARLAgent
+from third_party.rlkit.samplers.util import rollout
 from configs.pearl_default import default_config
-import rlkit.torch.pytorch_util as ptu
+import third_party.rlkit.torch.pytorch_util as ptu
 
 
 # Task type names for readable output

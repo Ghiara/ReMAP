@@ -24,11 +24,11 @@ import matplotlib.image as mplimg
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 sys.path.insert(0, 'submodules/SAC')
-from sac_envs.walker_multi  import WalkerMulti
-from sac_envs.hopper_multi  import HopperMulti
-from sac_envs.ant_multi_old     import AntMulti
+from third_party.SAC.sac_envs.walker_multi  import WalkerMulti
+from third_party.SAC.sac_envs.hopper_multi  import HopperMulti
+from third_party.SAC.sac_envs.ant_multi     import AntMulti
 sys.path.insert(0, 'submodules/meta_rand_envs')
-from meta_rand_envs.half_cheetah_multi_env import HalfCheetahMixtureEnv
+from third_party.meta_rand_envs.meta_rand_envs.half_cheetah_multi_env import HalfCheetahMixtureEnv
 
 OUTPUT_BASE = 'agent_task_frames'
 

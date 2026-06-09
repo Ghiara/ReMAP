@@ -7,14 +7,14 @@ import numpy as np
 import json
 import torch
 
-from rlkit.envs import ENVS
-from rlkit.envs.wrappers import NormalizedBoxEnv
-from rlkit.torch.networks import FlattenMlp
-from rlkit.torch.rl2.networks import LSTMQFunction
-from rlkit.torch.rl2.rl2_agent import RL2Agent
-from rlkit.torch.rl2.rl2_sac import RL2SoftActorCritic
-from rlkit.launchers.launcher_util import setup_logger
-import rlkit.torch.pytorch_util as ptu
+from third_party.rlkit.envs import ENVS
+from third_party.rlkit.envs.wrappers import NormalizedBoxEnv
+from third_party.rlkit.torch.networks import FlattenMlp
+from third_party.rlkit.torch.rl2.networks import LSTMQFunction
+from third_party.rlkit.torch.rl2.rl2_agent import RL2Agent
+from third_party.rlkit.torch.rl2.rl2_sac import RL2SoftActorCritic
+from third_party.rlkit.launchers.launcher_util import setup_logger
+import third_party.rlkit.torch.pytorch_util as ptu
 
 
 # Keys consumed by RL2SoftActorCritic (not forwarded to MetaRLAlgorithm)

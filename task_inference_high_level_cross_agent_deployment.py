@@ -3,21 +3,21 @@
 # from tigr.task_inference.dpmm_inference import DecoupledEncoder
 # from configs.toy_config import toy_config
 import numpy as np
-from rlkit.envs import ENVS
-from tigr.task_inference.dpmm_bnp import BNPModel
+from third_party.rlkit.envs import ENVS
+from third_party.tigr.task_inference.dpmm_bnp import BNPModel
 import torch
 import os
-from rlkit.torch.sac.policies import TanhGaussianPolicy
-from sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
-from model import PolicyNetwork as TransferFunction
-import rlkit.torch.pytorch_util as ptu
+from third_party.rlkit.torch.sac.policies import TanhGaussianPolicy
+from third_party.SAC.sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
+from third_party.SAC.model import PolicyNetwork as TransferFunction
+import third_party.rlkit.torch.pytorch_util as ptu
 from collections import OrderedDict
 import cv2
 from typing import List, Any, Dict, Callable
 import json
 import imageio
-import rlkit.torch.pytorch_util as ptu
-from tigr.task_inference.prediction_networks import DecoderMDP, ExtendedDecoderMDP
+import third_party.rlkit.torch.pytorch_util as ptu
+from third_party.tigr.task_inference.prediction_networks import DecoderMDP, ExtendedDecoderMDP
 import matplotlib.pyplot as plt
 import random
 from collections import namedtuple
@@ -25,19 +25,19 @@ import torch.nn as nn
 import torch.optim as optim
 from pathlib import Path
 
-from sac_envs.walker import WalkerGoal
-from sac_envs.hopper import HopperGoal
-from sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
-from sac_envs.hopper_multi import HopperMulti
-from sac_envs.walker_multi import WalkerMulti
-from sac_envs.ant_multi import AntMulti
-from sac_envs.walker_multi import WalkerMulti
+from third_party.SAC.sac_envs.walker import WalkerGoal
+from third_party.SAC.sac_envs.hopper import HopperGoal
+from third_party.SAC.sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
+from third_party.SAC.sac_envs.hopper_multi import HopperMulti
+from third_party.SAC.sac_envs.walker_multi import WalkerMulti
+from third_party.SAC.sac_envs.ant_multi import AntMulti
+from third_party.SAC.sac_envs.walker_multi import WalkerMulti
 
-from agent import SAC
-from model import ValueNetwork, QvalueNetwork, PolicyNetwork
+from third_party.SAC.agent import SAC
+from third_party.SAC.model import ValueNetwork, QvalueNetwork, PolicyNetwork
 
 from mrl_analysis.plots.plot_settings import *
-from vis_utils.vis_logging import log_all, _frames_to_gif
+from scripts.inspect_training_results_scripts.vis_logging import log_all, _frames_to_gif
 import pandas as pd
 
 ### this train_striding_predictor.py is used to evaluate the low level policy(cheetah velocity tracking) perfomance in the subgoal tracking
@@ -186,11 +186,11 @@ def get_encoder(path, shared_dim, encoder_input_dim):
     ti_option = variant.get('inference_option', 'dpmm')
 
     if ti_option in ['dpmm', 'single_gaussian']:
-        from tigr.task_inference.dpmm_inference import DecoupledEncoder
+        from third_party.tigr.task_inference.dpmm_inference import DecoupledEncoder
     elif ti_option == 'true_gmm':
-        from tigr.task_inference.true_gmm_inference import DecoupledEncoder
+        from third_party.tigr.task_inference.true_gmm_inference import DecoupledEncoder
     elif ti_option == 'stick_break':
-        from tigr.task_inference.stick_break_inference import DecoupledEncoder
+        from third_party.tigr.task_inference.stick_break_inference import DecoupledEncoder
     else:
         raise ValueError(f'Unknown inference_option in variant.json: {ti_option}')
 
@@ -348,12 +348,11 @@ def save_plot(loss_history, name:str, path=f'{os.getcwd()}/plots'):
 
 
 # === 🧩 工具函数：保存一个 tensorboard step ===
-def _write_tensorboard_step(save_root, step_idx, latents, true_ids, pred_ids, specs=None, component_ids=None):
+def _write_tensorboard_step(save_root, step_idx, latents, true_ids, pred_ids, specs=None):
     """
     把一批样本写成 tensorboard 兼容格式：
     <root>/<00001>/default/{metadata.tsv, tensors.tsv}
     metadata 每行: "<true_id> [<spec>] -> <pred_id>"
-    components.tsv 每行: "<component_id>"（与 tensors.tsv 行对齐）
     """
     import csv, os, numpy as np
     step_dir = os.path.join(save_root, f"{step_idx:05d}", "default")
@@ -364,18 +363,11 @@ def _write_tensorboard_step(save_root, step_idx, latents, true_ids, pred_ids, sp
 
     if specs is None:
         specs = [0.0] * len(true_ids)
-    if component_ids is None:
-        component_ids = [-1] * len(true_ids)
 
     with open(os.path.join(step_dir, "metadata.tsv"), "w", newline="") as f:
         writer = csv.writer(f, delimiter="\t")
         for t, s, p in zip(true_ids, specs, pred_ids):
             writer.writerow([f"{int(t)} [{float(s):.3f}] -> {int(p)}"])
-
-    with open(os.path.join(step_dir, "components.tsv"), "w", newline="") as f:
-        writer = csv.writer(f, delimiter="\t")
-        for c in component_ids:
-            writer.writerow([f"{int(c)}"])
 
 
 
@@ -390,7 +382,6 @@ def _balanced_task_for_episode(env, range_dict, episode, rng=None):
     """
     if rng is None:
         rng = np.random
-    t = env.config['tasks']  # 例如 {'goal_front':0, 'goal_back':1, 'forward_vel':2, 'backward_vel':3}
 
     order = ['goal_front', 'goal_back', 'forward_vel', 'backward_vel']
     base_name = order[episode % 4]
@@ -454,12 +445,9 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
 
 
     # === 🧩 新增：t-SNE latent 导出设置 ===
-    EXPORT_ROOT     = os.path.join(save_video_path, "tensorboard_transfer")          # mu only
-    EXPORT_ROOT_DEC = os.path.join(save_video_path, "tensorboard_transfer_dec_input")  # obs + mu (decoder task-head input)
+    EXPORT_ROOT = os.path.join(save_video_path, "tensorboard_transfer")
     EXPORT_SAMPLES_PER_STEP = 1200  # 每导出一次保存多少个样本点，可自行调大
-    export_latents,     export_true, export_pred = [], [], []  # mu-only track
-    export_components = []                                      # DPMM component id per sample
-    export_latents_dec = []                                    # decoder-task-input track (obs + mu)
+    export_latents, export_true, export_pred = [], [], []
     export_step_idx = 1
 
 
@@ -502,7 +490,7 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             complex_action = [],
             simple_action = [],
             action = [])
-            video = True
+            video = False
         
         #these save the x position and velocity at each timestep in the rollout, and will be used for plotting the pos/vel trajectory
         x_pos_curr, x_vel_curr = [],[]
@@ -555,26 +543,34 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             #task_cfg(example):{'base_task': 'forward_vel', 'specification': 0.5}
             task_cfg = _balanced_task_for_episode(env, range_dict, episode)
 
-        # 让complex环境按我们指定的 base_task + spec 设置任务
-        task = env.sample_task(task=task_cfg, test=True)
-
-        # ✅ 强制覆盖 env.base_task 以确保任务四类轮换,get the base_task from the task config
+        # 让complex环境按我们指定的 base_task + spec/target_value 设置任务
         base_name = task_cfg['base_task']
-        
-        env.base_task = env.config['tasks'][base_name]
+        true_task_idx = env.config['tasks'][base_name]
 
-        true_task_idx = env.base_task
-        true_spec = float(task_cfg['specification'])
+        if 'target_value' in task_cfg:
+            target_value = float(task_cfg['target_value'])
+            task = np.zeros(max(env.config['tasks'].values()) + 1, dtype=np.float32)
+            task[true_task_idx] = target_value
+            env.base_task = true_task_idx
+            env.update_task(task)
+            true_spec = target_value
+            true_goal_value = target_value
+        else:
+            task = env.sample_task(task=task_cfg, test=True)
 
-        # === TODO: 新增 ===
-        # 真正的目标值：位置任务为目标位置，速度任务为目标速度
-        true_goal_value = float(task[true_task_idx])
+            # ✅ 强制覆盖 env.base_task 以确保任务四类轮换,get the base_task from the task config
+            env.base_task = true_task_idx
+            true_spec = float(task_cfg['specification'])
+
+            # 真正的目标值：位置任务为目标位置，速度任务为目标速度
+            true_goal_value = float(task[true_task_idx])
+
         print(f"[EP {episode}] true_task_idx={true_task_idx}, true_goal_value={true_goal_value:.3f}")
 
 
         # 这行用来导出 metadata 里的 [spec]（一集内保持常数即可）
         # not change in episode, will be saved later in the "spec_of_episode" field of episode_logs
-        spec_for_logging = float(task_cfg['specification'])
+        spec_for_logging = true_spec
 
         # empty loss for the decoder training in the current episode, but now not used beacause the decoder is not trained
         _loss  = []
@@ -597,13 +593,6 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             #input the context to the encoder to get the latent variable
             #mu: task latent variable(very important for task inference!!!)
             mu, log_var = encoder(encoder_input)
-            component_id = -1
-            if hasattr(encoder, "bnp_model") and getattr(encoder.bnp_model, "model", None):
-                try:
-                    _, comp_arr = encoder.bnp_model.cluster_assignments(mu.detach())
-                    component_id = int(np.asarray(comp_arr).reshape(-1)[0])
-                except Exception:
-                    component_id = -1
 
             # === 🧩 记录 latent (μ) 与任务标签 ===
             export_latents.append(mu.detach().cpu().numpy().squeeze())
@@ -616,22 +605,14 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             except NameError:
                 export_specs = []
             export_specs.append(spec_for_logging)   
-            export_components.append(component_id)
 
-#get the real observation from the complex env
+            #get the real observation from the complex env
             obs_before_sim = env._get_obs()
             # map the complex observation to simple observation, not in toy env
             #simple_obs_before: as input to the simple agent to get the simple action
             #simple_obs_before: as input to the decoder to get the task prediction
             #simple_obs_before: [pos_x, vel_x]
             simple_obs_before = general_obs_map(env)
-
-            # === decoder task-input embedding (obs + mu, exact input to task_decoder head) ===
-            _dec_feat = np.concatenate([
-                simple_obs_before.flatten(),
-                mu.detach().cpu().numpy().squeeze()
-            ])
-            export_latents_dec.append(_dec_feat)
 
             # Save latent vars
             #simple_obs_before: [pos_x, vel_x]  mu:[mu_1, mu_2, ..., mu_d]
@@ -729,14 +710,9 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             if len(export_latents) >= EXPORT_SAMPLES_PER_STEP:
                 _write_tensorboard_step(
                     EXPORT_ROOT, export_step_idx,
-                    export_latents, export_true, export_pred, export_specs, export_components
+                    export_latents, export_true, export_pred, export_specs
                 )
-                _write_tensorboard_step(
-                    EXPORT_ROOT_DEC, export_step_idx,
-                    export_latents_dec, export_true, export_pred, export_specs, export_components
-                )
-                export_latents,     export_true, export_pred, export_specs, export_components = [], [], [], [], []
-                export_latents_dec  = []
+                export_latents, export_true, export_pred, export_specs = [], [], [], []
                 export_step_idx += 1
 
             # === FINETUNE decoder数据收集（仅在 train_stride 模式下）===
@@ -1259,12 +1235,9 @@ def rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor, tran
             # === 🧩 写出最后未满批次的数据 ===
             if len(export_latents) > 0:
                 _write_tensorboard_step(EXPORT_ROOT, export_step_idx,
-                                        export_latents, export_true, export_pred, export_specs, export_components)
-                _write_tensorboard_step(EXPORT_ROOT_DEC, export_step_idx,
-                                        export_latents_dec, export_true, export_pred, export_specs, export_components)
+                                        export_latents, export_true, export_pred, export_specs)
                 print(f"[INFO] Saved final latent batch to step {export_step_idx}")
-            print(f"[INFO] mu-only embeddings        -> {EXPORT_ROOT}")
-            print(f"[INFO] decoder-input embeddings  -> {EXPORT_ROOT_DEC}")
+            print(f"[INFO] Latent embeddings exported under {EXPORT_ROOT}")
         # ✅ 检查采样均衡性（插在 for episode 的结尾）
         if (episode + 1) % 4 == 0 or episode == num_trajectory - 1:
             from collections import Counter
@@ -1430,8 +1403,9 @@ if __name__ == "__main__":
     elif env_config['env'] == 'walker_multi':
         env = WalkerMulti(env_config)
         seed_env_compat(env, SEED)
-    elif env_config['env'] == 'ant_multi':
-        env = AntMulti()
+    elif env_config['env'] in ['ant_multi', 'ant_multi_new']:
+        ant_env_cls = complex_agent.get('environment', AntMulti)
+        env = ant_env_cls(env_config)
         seed_env_compat(env, SEED)
     env.render_mode = 'rgb_array'
 
@@ -1533,21 +1507,49 @@ if __name__ == "__main__":
     After the striding predictor is trained, plot the results with symmetric goals
     '''
     # taskid: order = ['goal_front:0', 'goal_back:1', 'forward_vel:2', 'backward_vel:3']
+    # Old normalized-spec showcase tasks (kept here for quick rollback)
+    # tasks = [
+    #     {'base_task':'goal_back', 'specification':0.9},#1
+    #     {'base_task':'goal_back', 'specification':0.5},
+    #     {'base_task':'goal_back', 'specification':0.3},
+    #     {'base_task':'goal_front', 'specification':0.3},#0
+    #     {'base_task':'goal_front', 'specification':0.5},
+    #     {'base_task':'goal_front', 'specification':0.9},
+    #     {'base_task':'backward_vel', 'specification':0.9},#3
+    #     {'base_task':'backward_vel', 'specification':0.5},
+    #     {'base_task':'backward_vel', 'specification':0.3},
+    #     {'base_task':'forward_vel', 'specification':0.3},#2
+    #     {'base_task':'forward_vel', 'specification':0.5},
+    #     {'base_task':'forward_vel', 'specification':0.9},
+    #             ]
+    # Old normalized-spec showcase tasks (kept here for quick rollback)
+    # tasks = [
+    #     {'base_task':'goal_back', 'specification':0.9},#1
+    #     {'base_task':'goal_back', 'specification':0.5},
+    #     {'base_task':'goal_back', 'specification':0.3},
+    #     {'base_task':'goal_front', 'specification':0.3},#0
+    #     {'base_task':'goal_front', 'specification':0.5},
+    #     {'base_task':'goal_front', 'specification':0.9},
+    #     {'base_task':'backward_vel', 'specification':0.9},#3
+    #     {'base_task':'backward_vel', 'specification':0.5},
+    #     {'base_task':'backward_vel', 'specification':0.3},
+    #     {'base_task':'forward_vel', 'specification':0.3},#2
+    #     {'base_task':'forward_vel', 'specification':0.5},
+    #     {'base_task':'forward_vel', 'specification':0.9},
+    #             ]
     tasks = [
-        {'base_task':'goal_back', 'specification':0.9},#1
-        {'base_task':'goal_back', 'specification':0.5},
-        {'base_task':'goal_back', 'specification':0.3},
-        {'base_task':'goal_front', 'specification':0.3},#0
-        {'base_task':'goal_front', 'specification':0.5},
-        {'base_task':'goal_front', 'specification':0.9},
-        {'base_task':'backward_vel', 'specification':0.9},#3
-        {'base_task':'backward_vel', 'specification':0.5},
-        {'base_task':'backward_vel', 'specification':0.3},
-        # {'base_task':'backward_vel', 'specification':1.0},
-        # {'base_task':'forward_vel', 'specification':1.0},
-        {'base_task':'forward_vel', 'specification':0.3},#2
-        {'base_task':'forward_vel', 'specification':0.5},
-        {'base_task':'forward_vel', 'specification':0.9},
+        {'base_task': 'goal_back', 'target_value': -9.02},
+        {'base_task': 'goal_back', 'target_value': -5.10},
+        {'base_task': 'goal_back', 'target_value': -3.14},
+        {'base_task': 'goal_front', 'target_value': 3.14},
+        {'base_task': 'goal_front', 'target_value': 5.10},
+        {'base_task': 'goal_front', 'target_value': 9.02},
+        {'base_task': 'backward_vel', 'target_value': -2.35},
+        {'base_task': 'backward_vel', 'target_value': -1.75},
+        {'base_task': 'backward_vel', 'target_value': -1.45},
+        {'base_task': 'forward_vel', 'target_value': 1.45},
+        {'base_task': 'forward_vel', 'target_value': 1.75},
+        {'base_task': 'forward_vel', 'target_value': 2.35},
                 ]
     rollout(env, encoder, decoder, optimizer, simple_agent, step_predictor,
                                     transfer_function, memory, variant, obs_dim, action_dim, 

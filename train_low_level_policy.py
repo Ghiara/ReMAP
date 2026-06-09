@@ -1,13 +1,13 @@
 import os
 print(">>> DISPLAY =", os.environ.get("DISPLAY"))
-from agent import SAC
+from third_party.SAC.agent import SAC
 import json
 from torch.utils.tensorboard import SummaryWriter
 import numpy as np
-from sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
-from sac_envs.hopper_multi import HopperMulti
-from sac_envs.walker_multi import WalkerMulti
-from sac_envs.ant_multi_old import AntMulti
+from third_party.SAC.sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
+from third_party.SAC.sac_envs.hopper_multi import HopperMulti
+from third_party.SAC.sac_envs.walker_multi import WalkerMulti
+from third_party.SAC.sac_envs.ant_multi import AntMulti
 import torch
 import cv2
 from typing import List, Any, Dict, Callable
@@ -22,7 +22,7 @@ import argparse
 Choose the experiment to run here
 '''
 # from experiments_configs.half_cheetah_multi_env import config
-from experiments_configs.ant_multi_task import config
+from third_party.SAC.experiments_configs.ant_multi import config
 
 
 import matplotlib.pyplot as plt
@@ -33,7 +33,14 @@ from datetime import datetime
 import pytz
 
 from mrl_analysis.utility.data_smoothing import smooth_plot, smooth_fill_between
-from vis_utils.vis_logging import log_all, _frames_to_gif
+from scripts.inspect_training_results_scripts.vis_logging import log_all, _frames_to_gif
+
+
+
+
+#我这个脚本中的依赖的包是第三方SAC文件夹中的agent.py、sac_envs文件夹中的half_cheetah_multi.py、hopper_multi.py、walker_multi.py、ant_multi.py，
+# 以及experiments_configs文件夹中的half_cheetah_multi_env.py、hopper_multi.py、walker_multi.py、ant_multi.py。
+# 还使用了torch、numpy、json、os、argparse、tqdm、matplotlib.pyplot和pandas等库。
 
 saved_dict = False
 record_video_every = 20000
@@ -264,13 +271,13 @@ def train(env, agent, epochs, experiment_name, save_after_episodes, policy_updat
 def load_config(env_name):
     if env_name == "cheetah":
         # from experiments_configs.half_cheetah_multi_env import config
-        from experiments_configs.half_cheetah_multi_env import config
+        from third_party.SAC.experiments_configs.half_cheetah_multi import config
     elif env_name == "hopper":
-        from experiments_configs.hopper_multi import config
+        from third_party.SAC.experiments_configs.hopper_multi import config
     elif env_name == "walker2d":
-        from experiments_configs.walker_multi import config
+        from third_party.SAC.experiments_configs.walker_multi import config
     elif env_name == "ant":
-        from experiments_configs.ant_multi_task import config
+        from third_party.SAC.experiments_configs.ant_multi import config
     else:
         raise ValueError(f"Unsupported environment: {env_name}")
     return config

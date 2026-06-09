@@ -29,7 +29,7 @@ import matplotlib.pyplot as plt
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-from rlkit.envs.toy1d_multi import Toy1dMultiTaskkWrappedEnv
+from third_party.rlkit.envs.toy1d_multi import Toy1dMultiTaskkWrappedEnv
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 OUT_DIR  = os.path.join('agent_task_frames', 'toy1d', 'goal_forward_frames')

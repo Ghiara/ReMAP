@@ -7,33 +7,38 @@ import json
 import torch
 import copy
 
-from rlkit.envs import ENVS
-from rlkit.envs.wrappers import NormalizedBoxEnv
-from rlkit.torch.sac.policies import TanhGaussianPolicy
-from rlkit.torch.networks import Mlp, FlattenMlp
-from rlkit.launchers.launcher_util import setup_logger
-import rlkit.torch.pytorch_util as ptu
+from third_party.rlkit.envs import ENVS
+from third_party.rlkit.envs.wrappers import NormalizedBoxEnv
+from third_party.rlkit.torch.sac.policies import TanhGaussianPolicy
+from third_party.rlkit.torch.networks import Mlp, FlattenMlp
+from third_party.rlkit.launchers.launcher_util import setup_logger
+import third_party.rlkit.torch.pytorch_util as ptu
 from configs.default import default_config
 from configs.toy_config import toy_config
 from configs.toy2d_config import toy2d_config
 
-from tigr.task_inference.prediction_networks import DecoderMDP, ExtendedDecoderMDP
-from tigr.sac import PolicyTrainer
-from tigr.stacked_replay_buffer import StackedReplayBuffer
-from tigr.rollout_worker import RolloutCoordinator
-from tigr.agent_module import Agent
+from third_party.tigr.task_inference.prediction_networks import DecoderMDP, ExtendedDecoderMDP
+from third_party.tigr.sac import PolicyTrainer
+from third_party.tigr.stacked_replay_buffer import StackedReplayBuffer
+from third_party.tigr.rollout_worker import RolloutCoordinator
+from third_party.tigr.agent_module import Agent
 # from tigr.agent_module import Agent, ScriptedPolicyAgent
-from tigr.training_algorithm import TrainingAlgorithm
+from third_party.tigr.training_algorithm import TrainingAlgorithm
 # from tigr.task_inference.true_gmm_inference import DecoupledEncoder
 # from tigr.trainer.true_gmm_trainer import AugmentedTrainer
-from tigr.task_inference.dpmm_bnp import BNPModel
+from third_party.tigr.task_inference.dpmm_bnp import BNPModel
 # from tigr.task_inference.dpmm_inference import DecoupledEncoder
 # from tigr.trainer.dpmm_trainer import AugmentedTrainer
 # from tigr.task_inference.stick_break_inference import DecoupledEncoder
 # from tigr.trainer.stick_break_trainer import AugmentedTrainer
 
 from torch.utils.tensorboard import SummaryWriter
-import vis_utils.tb_logging as TB
+import scripts.inspect_training_results_scripts.tb_logging as TB
+
+
+
+#这个训练脚本主要依赖这个rlkit和对应的tigr库，主要是为了训练高层次的策略（high-level policy），即训练一个encoder-decoder结构来进行任务推断和重建，
+# 同时训练一个基于SAC的策略网络来进行控制。这个脚本支持多种任务推断方法，包括DP-MM、单高斯、真实GMM和stick-breaking等，可以通过命令行参数进行选择。
 
 task_given = True
 
@@ -127,8 +132,8 @@ def experiment(variant):
     ti_option = variant.get('inference_option', 'dpmm')
 
     if ti_option == 'dpmm':
-        from tigr.task_inference.dpmm_inference import DecoupledEncoder
-        from tigr.trainer.dpmm_trainer import AugmentedTrainer
+        from third_party.tigr.task_inference.dpmm_inference import DecoupledEncoder
+        from third_party.tigr.trainer.dpmm_trainer import AugmentedTrainer
 
         bnp_model = BNPModel(
             save_dir=variant['dpmm_params']['save_dir'],
@@ -144,8 +149,8 @@ def experiment(variant):
     elif ti_option == 'single_gaussian':
         # 注意：这里仍然使用 dpmm_inference + dpmm_trainer，
         # 但 bnp_model.model 永远保持 None，从而退化为 KL(q||N(0,I)) 的单高斯baseline
-        from tigr.task_inference.dpmm_inference import DecoupledEncoder
-        from tigr.trainer.dpmm_trainer import AugmentedTrainer
+        from third_party.tigr.task_inference.dpmm_inference import DecoupledEncoder
+        from third_party.tigr.trainer.dpmm_trainer import AugmentedTrainer
 
         bnp_model = BNPModel(
             save_dir=variant['dpmm_params']['save_dir'],
@@ -160,13 +165,13 @@ def experiment(variant):
         )
 
     elif ti_option == 'true_gmm':
-        from tigr.task_inference.true_gmm_inference import DecoupledEncoder
-        from tigr.trainer.true_gmm_trainer import AugmentedTrainer
+        from third_party.tigr.task_inference.true_gmm_inference import DecoupledEncoder
+        from third_party.tigr.trainer.true_gmm_trainer import AugmentedTrainer
         bnp_model = None
 
     elif ti_option == 'stick_break':
-        from tigr.task_inference.stick_break_inference import DecoupledEncoder
-        from tigr.trainer.stick_break_trainer import AugmentedTrainer
+        from third_party.tigr.task_inference.stick_break_inference import DecoupledEncoder
+        from third_party.tigr.trainer.stick_break_trainer import AugmentedTrainer
         bnp_model = None
 
     else:

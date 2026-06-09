@@ -8,14 +8,14 @@ import click
 import json
 import torch
 
-from rlkit.envs import ENVS
-from rlkit.envs.wrappers import NormalizedBoxEnv
-from rlkit.torch.sac.policies import TanhGaussianPolicy
-from rlkit.torch.networks import FlattenMlp, MlpEncoder, RecurrentEncoder
-from rlkit.torch.sac.sac import PEARLSoftActorCritic
-from rlkit.torch.sac.agent import PEARLAgent
-from rlkit.launchers.launcher_util import setup_logger
-import rlkit.torch.pytorch_util as ptu
+from third_party.rlkit.envs import ENVS
+from third_party.rlkit.envs.wrappers import NormalizedBoxEnv
+from third_party.rlkit.torch.sac.policies import TanhGaussianPolicy
+from third_party.rlkit.torch.networks import FlattenMlp, MlpEncoder, RecurrentEncoder
+from third_party.rlkit.torch.sac.sac import PEARLSoftActorCritic
+from third_party.rlkit.torch.sac.agent import PEARLAgent
+from third_party.rlkit.launchers.launcher_util import setup_logger
+import third_party.rlkit.torch.pytorch_util as ptu
 from configs.pearl_default import default_config
 
 

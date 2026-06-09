@@ -33,15 +33,15 @@ import matplotlib.pyplot as plt
 project_root = Path(__file__).parent.absolute()
 sys.path.insert(0, str(project_root))
 
-import rlkit.torch.pytorch_util as ptu
-from rlkit.envs import ENVS
-from rlkit.envs.wrappers import NormalizedBoxEnv
-from rlkit.torch.sac.policies import TanhGaussianPolicy
-from rlkit.torch.networks import FlattenMlp
+import third_party.rlkit.torch.pytorch_util as ptu
+from third_party.rlkit.envs import ENVS
+from third_party.rlkit.envs.wrappers import NormalizedBoxEnv
+from third_party.rlkit.torch.sac.policies import TanhGaussianPolicy
+from third_party.rlkit.torch.networks import FlattenMlp
 from configs.default import default_config
 from run_toy_training import deep_update_dict, npify_dict
-from tigr.task_inference.prediction_networks import DecoderMDP, ExtendedDecoderMDP
-from tigr.agent_module import Agent
+from third_party.tigr.task_inference.prediction_networks import DecoderMDP, ExtendedDecoderMDP
+from third_party.tigr.agent_module import Agent
 
 # ------------------------------------------------------------------ #
 #  Tracking targets — must match pearl_rl2_tracking/tracking_data.json
@@ -177,12 +177,12 @@ def load_tigr_agent(exp_dir, config_path, inference_option, gpu=0):
 
     # --- Select inference module ---
     if inference_option == 'true_gmm':
-        from tigr.task_inference.true_gmm_inference import DecoupledEncoder
+        from third_party.tigr.task_inference.true_gmm_inference import DecoupledEncoder
         bnp_model = None
 
     elif inference_option == 'dpmm':
-        from tigr.task_inference.dpmm_inference import DecoupledEncoder
-        from tigr.task_inference.dpmm_bnp import BNPModel
+        from third_party.tigr.task_inference.dpmm_inference import DecoupledEncoder
+        from third_party.tigr.task_inference.dpmm_bnp import BNPModel
         dp = variant.get('dpmm_params', {})
         # BNP cluster assignments are not used by the policy at eval time
         # (the assignments are discarded in Agent.get_action). We create a

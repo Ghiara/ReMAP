@@ -23,12 +23,12 @@ import matplotlib.pyplot as plt
 project_root = Path(__file__).parent.absolute()
 sys.path.insert(0, str(project_root))
 
-from rlkit.envs import ENVS
-from rlkit.envs.wrappers import NormalizedBoxEnv
-from rlkit.torch.rl2.rl2_agent import RL2Agent
-from rlkit.samplers.util import rollout
+from third_party.rlkit.envs import ENVS
+from third_party.rlkit.envs.wrappers import NormalizedBoxEnv
+from third_party.rlkit.torch.rl2.rl2_agent import RL2Agent
+from third_party.rlkit.samplers.util import rollout
 from configs.rl2_default import default_config
-import rlkit.torch.pytorch_util as ptu
+import third_party.rlkit.torch.pytorch_util as ptu
 
 TASK_NAMES = {
     0: 'velocity_forward', 1: 'velocity_backward',

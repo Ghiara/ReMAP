@@ -1,9 +1,9 @@
 # default experiment settings
 # all experiments should modify these settings only as needed
-from sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
-from sac_envs.hopper_multi import HopperMulti
-from sac_envs.walker_multi import WalkerMulti
-from sac_envs.ant_multi_old import AntMulti
+from third_party.SAC.sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
+from third_party.SAC.sac_envs.hopper_multi import HopperMulti
+from third_party.SAC.sac_envs.walker_multi import WalkerMulti
+from third_party.SAC.sac_envs.ant_multi import AntMulti
 
 transfer_config = dict(
 
@@ -19,33 +19,21 @@ transfer_config = dict(
     
 
     inference_path = dict(
-        name = '2026_05_24_16_23_33_default_dpmm_seed2_regular_loss_true_time_steps48_v1',
-        path = '/root/bayes-tmp/bowang/Inference-reutilization-MRL/output/toy1d-multi-task/2026_05_24_16_23_33_default_dpmm_seed2_regular_loss_true_time_steps48_v1'
+        name = '2026_05_24_16_23_33_default_dpmm_seed2_regular_loss_true_time_steps48_v2',
+        path = '/root/bayes-tmp/bowang/Inference-reutilization-MRL/output/toy1d-multi-task/2026_05_24_16_23_33_default_dpmm_seed2_regular_loss_true_time_steps48_v2'
     ),
 
 
     ### Define the low-level controller and agent to reuse the inference mechanism
 
     complex_agent = dict(
-        environment = WalkerMulti,
+        environment = HalfCheetahMixtureEnv,
         experiments_repo = '/root/bayes-tmp/bowang/Inference-reutilization-MRL/output/low_level_policy/',
-        experiment_name = 'walker_multi_new_config_v0',
-        epoch = 1000,
+        experiment_name = 'cheetah_multitask_new_config_v0_run0',
+        epoch = 300,
     ),
 
 
 
-    # complex_agent = dict(
-    #     experiments_repo = '/home/ubuntu/juan/Meta-RL/experiments_transfer_function/',
-    #     experiment_name = 'walker_full_06_07',
-    #     epoch = 2100,
-    #     environment = WalkerMulti,
-    # )
-    # complex_agent = dict(
-    #     environment = HopperMulti,
-    #     experiments_repo = '/home/ubuntu/juan/Meta-RL/experiments_transfer_function/',
-    #     experiment_name = 'hopper_full_sac0.2_reward1_randomchange',
-    #     epoch = 1400,
-    # )
     
 )   

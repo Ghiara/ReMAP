@@ -6,15 +6,15 @@ import numpy as np
 import click
 import torch
 
-from rlkit.envs import ENVS
-from rlkit.envs.wrappers import NormalizedBoxEnv, CameraWrapper
-from rlkit.torch.sac.policies import TanhGaussianPolicy
-from rlkit.torch.networks import FlattenMlp, MlpEncoder, RecurrentEncoder
-from rlkit.torch.sac.agent import PEARLAgent
+from third_party.rlkit.envs import ENVS
+from third_party.rlkit.envs.wrappers import NormalizedBoxEnv, CameraWrapper
+from third_party.rlkit.torch.sac.policies import TanhGaussianPolicy
+from third_party.rlkit.torch.networks import FlattenMlp, MlpEncoder, RecurrentEncoder
+from third_party.rlkit.torch.sac.agent import PEARLAgent
 from configs.pearl_default import default_config
 from pearl_launch_experiment import deep_update_dict
-from rlkit.torch.sac.policies import MakeDeterministic
-from rlkit.samplers.util import rollout
+from third_party.rlkit.torch.sac.policies import MakeDeterministic
+from third_party.rlkit.samplers.util import rollout
 
 
 def sim_policy(variant, path_to_exp, num_trajs=1, deterministic=True, save_video=False):

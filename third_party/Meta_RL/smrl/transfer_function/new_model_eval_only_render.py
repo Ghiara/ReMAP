@@ -211,13 +211,24 @@ def load_model(encoder, config):
 if __name__ == "__main__":
     import matplotlib
     matplotlib.use('Agg')
+
+
+def _meta_rl_root() -> Path:
+    for parent in Path(__file__).resolve().parents:
+        if parent.name == 'Meta_RL':
+            return parent
+    raise RuntimeError('Could not resolve Meta_RL root from __file__.')
+
+
+META_RL_ROOT = _meta_rl_root()
+
     
     '''
     Deinfe the inference module
     '''
     paths = [
 
-        '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL/data/experiments/toy1d_MaxAction_1_2025-02-05_14-55-41'
+        str(META_RL_ROOT / 'data' / 'experiments' / 'toy1d_MaxAction_1_2025-02-05_14-55-41')
 
 
 

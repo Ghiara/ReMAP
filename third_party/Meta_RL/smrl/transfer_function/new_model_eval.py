@@ -576,13 +576,24 @@ def load_model(encoder, config):
 if __name__ == "__main__":
     import matplotlib
     matplotlib.use('Agg')
+
+
+def _meta_rl_root() -> Path:
+    for parent in Path(__file__).resolve().parents:
+        if parent.name == 'Meta_RL':
+            return parent
+    raise RuntimeError('Could not resolve Meta_RL root from __file__.')
+
+
+META_RL_ROOT = _meta_rl_root()
+
     
     '''
     Deinfe the inference module
     '''
     paths = [
 
-        '/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL/data/experiments_thesis/step1_biggerNN_velocity_-4_4_v2_right_directions/_2025-11-08_23-55-50'
+        str(META_RL_ROOT / 'data' / 'experiments_thesis' / 'step1_biggerNN_velocity_-4_4_v2_right_directions' / '_2025-11-08_23-55-50')
 
 
 

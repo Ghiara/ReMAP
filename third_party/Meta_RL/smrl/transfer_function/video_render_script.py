@@ -1,9 +1,22 @@
+from pathlib import Path
+
 from mrl_analysis.video.video_creator_replay import VideoCreatorReplay, load_replay_data
 from third_party.SAC.sac_envs.ant_multi import AntMulti  # 或者其他环境
 
+
+def _meta_rl_root() -> Path:
+    for parent in Path(__file__).resolve().parents:
+        if parent.name == 'Meta_RL':
+            return parent
+    raise RuntimeError('Could not resolve Meta_RL root from __file__.')
+
+
+META_RL_ROOT = _meta_rl_root()
+
+
 # 1. 加载数据
 trajectories, env_name, config, env_config= load_replay_data(
-    "/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL/smrl/transfer_function/evaluation/experiments_thesis/transfer_ant_test/toy1d_MaxAction_1_2025-02-05_14-55-41/replay_data.pkl"
+    str(META_RL_ROOT / "smrl" / "transfer_function" / "evaluation" / "experiments_thesis" / "transfer_ant_test" / "toy1d_MaxAction_1_2025-02-05_14-55-41" / "replay_data.pkl")
 )
 
 
@@ -33,7 +46,7 @@ video_creator = VideoCreatorReplay(fps=30, width=800, height=600)
 video_creator.create_video_from_trajectories(
     env=env,
     trajectories=trajectories,
-    save_as="/home/ubuntu/yuanmeng/bo/MRL-Inference-Reutilization/submodules/Meta_RL/smrl/transfer_function/evaluation/experiments_thesis/transfer_ant_test/toy1d_MaxAction_1_2025-02-05_14-55-41/replay/ant_replay.mp4",
+    save_as=str(META_RL_ROOT / "smrl" / "transfer_function" / "evaluation" / "experiments_thesis" / "transfer_ant_test" / "toy1d_MaxAction_1_2025-02-05_14-55-41" / "replay" / "ant_replay.mp4"),
     show_info=True,
     overlay_latent=True,
     overlay_goal=True,

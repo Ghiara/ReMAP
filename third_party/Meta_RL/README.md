@@ -86,8 +86,8 @@ git submodule update
 
 Install the submodules:
 ```bash
-pip install -e ./submodules/meta-environments
-pip install -e ./submodules/MRL-analysis-tools
+pip install -e ./meta-environments-main
+pip install -e ./submodules/MRL-analysis-tools-main
 pip install -e ./submodules/rlkit
 pip install -e ./submodules/symmetrizer     
 ```

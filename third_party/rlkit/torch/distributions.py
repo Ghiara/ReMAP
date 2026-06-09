@@ -3,7 +3,7 @@ from torch.autograd import Variable
 
 import third_party.rlkit.torch.pytorch_util as ptu
 try:
-    from third_party.rlkit.torch.distributions import Distribution, Normal
+    from torch.distributions import Distribution, Normal
 except ImportError:
     print("You should use a PyTorch version that has torch.distributions.")
     print("See docker/rlkit/rlkit-env.yml")

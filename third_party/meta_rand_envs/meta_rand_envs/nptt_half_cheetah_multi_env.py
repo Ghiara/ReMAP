@@ -3,6 +3,7 @@ from third_party.meta_rand_envs.meta_rand_envs.base import RandomEnv
 from gym import utils
 import mujoco_py
 import os
+from pathlib import Path
 from gym.spaces import Box
 
 class HalfCheetahMixtureEnv(RandomEnv, utils.EzPickle):
@@ -38,7 +39,7 @@ class HalfCheetahMixtureEnv(RandomEnv, utils.EzPickle):
         self.positive_change_point = self.positive_change_point_basis + np.random.random() * self.change_point_interval
         self.negative_change_point = self.negative_change_point_basis - np.random.random() * self.change_point_interval
 
-        self.model_path = os.path.join(os.getcwd(), 'submodules', 'meta_rand_envs', 'meta_rand_envs', 'half_cheetah.xml')
+        self.model_path = str(Path(__file__).resolve().with_name('half_cheetah.xml'))
         observation_space = Box(low=-np.inf, high=np.inf, shape=(20,), dtype=np.float64)
         RandomEnv.__init__(self, kwargs.get('log_scale_limit', 0), self.model_path, 5, observation_space, hfield_mode=kwargs.get('hfield_mode', 'gentle'), rand_params=[])
         utils.EzPickle.__init__(self)

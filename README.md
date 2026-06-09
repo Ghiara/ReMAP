@@ -109,15 +109,15 @@ If that solves it, you can copy that to the .bashrc file.
 
 Install the submodules:
 ```bash
-pip install -e ./CARE
-pip install -e ./submodules/Meta_RL/submodules/meta-environments-main
-pip install -e ./submodules/meta_rand_envs
-pip install -e ./submodules/Meta_RL/submodules/MRL-analysis-tools-main
-pip install -e ./submodules/rand_param_envs
-pip install -e ./submodules/Meta_RL/submodules/rlkit
-pip install -e ./submodules/SAC
-pip install -e ./submodules/Meta_RL
-pip install -e ./submodules/Meta_RL/submodules/symmetrizer
+pip install -e ./third_party/CARE
+pip install -e ./third_party/Meta_RL/meta-environments-main
+pip install -e ./third_party/meta_rand_envs
+pip install -e ./third_party/Meta_RL/submodules/MRL-analysis-tools-main
+pip install -e ./third_party/rand_param_envs
+pip install -e ./third_party/Meta_RL/submodules/rlkit
+pip install -e ./third_party/SAC
+pip install -e ./third_party/Meta_RL
+pip install -e ./third_party/Meta_RL/submodules/symmetrizer
 ```
 
 ----------------------------------------------------------------------------
@@ -134,7 +134,7 @@ python run_toy_training.py
 This will save the results in the folder output/toy1d-multi-task.
 
 ### 2. Train low-level policy for new agent
-Parallely train the low-level-controller. Important file is train_low_level_policy.py. In that file, import the config from submodules/SAC/env_configs. This defines which experiment to start. Then run the file with 
+Parallely train the low-level-controller. Important file is train_low_level_policy.py. In that file, import the config from third_party/SAC/experiments_configs. This defines which experiment to start. Then run the file with 
 ```bash
 python train_low_level_policy.py
 ```
@@ -172,7 +172,7 @@ Some utility scripts are stored under the vis_utils folder. The training of the 
 ### Alternative: Run only parametric task variations with encoder consisting of GRUs
 In case a simple encoder is to be used, the implementation by Durmann can be used. To do so train the toy agent with the script run_experiment.py. Then the inference reutilization can be tested with the script new_model_eval.py. There you have to choose the low-level policy and the inference mechanism trained on the toy. You can do this by using following command with the updated paths:
 ```bash
-python submodules/Meta_RL/smrl/transfer_function/new_model_eval.py --encoder_path <path_to_encoder_path> --agent_path <path_to_low_level_agent> --epoch <checkpoint_of_low_level_policy_to_use>
+python third_party/Meta_RL/smrl/transfer_function/new_model_eval.py --encoder_path <path_to_encoder_path> --agent_path <path_to_low_level_agent> --epoch <checkpoint_of_low_level_policy_to_use>
 ```
 
 ## Troubleshooting

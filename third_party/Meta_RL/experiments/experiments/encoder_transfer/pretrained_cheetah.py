@@ -1,7 +1,25 @@
 import stable_baselines3
 import torch
+from pathlib import Path
+import os
 from stable_baselines3.common.policies import ActorCriticPolicy
 from stable_baselines3.common.utils import get_schedule_fn
+
+
+
+def _meta_rl_root() -> Path:
+    for parent in Path(__file__).resolve().parents:
+        if parent.name == 'Meta_RL':
+            return parent
+    raise RuntimeError('Could not resolve Meta_RL root from __file__.')
+
+
+DEFAULT_PRETRAINED_POLICY = Path(
+    os.environ.get(
+        'META_RL_PRETRAINED_POLICY',
+        str(_meta_rl_root() / 'submodules' / 'ppo' / 'HalfCheetah-v3_1' / 'policy.pth'),
+    )
+)
 
 class ModelLoader:
     def __init__(self, model_file):
@@ -35,5 +53,5 @@ class ModelLoader:
         return self.model
 
 if __name__ == "__main__":
-    loader = ModelLoader("/home/ubuntu/juan/Meta-RL/submodules/ppo/HalfCheetah-v3_1/policy.pth")
+    loader = ModelLoader(str(DEFAULT_PRETRAINED_POLICY))
     model = loader.get_model()

@@ -10,6 +10,8 @@ Date:
 """
 
 import torch
+from pathlib import Path
+import os
 from torch import nn
 from typing import List, Type
 import numpy as np
@@ -45,6 +47,23 @@ class MakeDeterministic(MetaRLPolicy):
         dist = self.stochastic_policy.forward(*args, **kwargs)
         return dist
 
+
+
+
+def _meta_rl_root() -> Path:
+    for parent in Path(__file__).resolve().parents:
+        if parent.name == 'Meta_RL':
+            return parent
+    raise RuntimeError('Could not resolve Meta_RL root from __file__.')
+
+
+def _resolve_pretrained_policy_path() -> Path:
+    return Path(
+        os.environ.get(
+            'META_RL_PRETRAINED_POLICY',
+            str(_meta_rl_root() / 'submodules' / 'ppo' / 'HalfCheetah-v3_1' / 'policy.pth'),
+        )
+    )
 
 class MetaRLTanhGaussianPolicy(MetaRLPolicy):
     """A simple Meta-RL policy which concatenates
@@ -171,7 +190,8 @@ class PretrainedCheetah(MetaRLPolicy):
     ):
         super().__init__(obs_dim, encoding_dim, action_dim, **kwargs)
 
-        self.pretrained_weights = torch.load("/home/ubuntu/juan/Meta-RL/submodules/ppo/HalfCheetah-v3_1/policy.pth")
+        pretrained_policy_path = _resolve_pretrained_policy_path()
+        self.pretrained_weights = torch.load(pretrained_policy_path)
 
         input_dim = 17  # Input dimension
         hidden_dim = 256  # Hidden dimension

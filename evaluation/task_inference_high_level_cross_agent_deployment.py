@@ -37,7 +37,7 @@ from third_party.SAC.agent import SAC
 from third_party.SAC.model import ValueNetwork, QvalueNetwork, PolicyNetwork
 
 from mrl_analysis.plots.plot_settings import *
-from scripts.inspect_training_results_scripts.vis_logging import log_all, _frames_to_gif
+from scripts.vis_logging import log_all, _frames_to_gif
 import pandas as pd
 
 ### this train_striding_predictor.py is used to evaluate the low level policy(cheetah velocity tracking) perfomance in the subgoal tracking

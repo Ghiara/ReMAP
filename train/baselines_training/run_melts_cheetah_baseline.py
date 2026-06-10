@@ -27,8 +27,23 @@ import json
 import os
 import sys
 from datetime import datetime
+from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
+
+
+def _resolve_project_path(path_value: str) -> str:
+    path = Path(path_value)
+    if path.is_absolute():
+        cwd = Path.cwd().resolve()
+        try:
+            relative_to_cwd = path.resolve().relative_to(cwd)
+        except ValueError:
+            return str(path)
+        return str(PROJECT_ROOT / relative_to_cwd)
+    return str(PROJECT_ROOT / path)
+
 
 from train.run_task_inference_high_level_policy_training import experiment, deep_update_dict
 from configs.default import default_config
@@ -57,6 +72,8 @@ def main():
         help='Number of CPU workers for rollout collection',
     )
     args = parser.parse_args()
+    args.config = _resolve_project_path(args.config)
+    args.output_dir = _resolve_project_path(args.output_dir)
 
     # Start from the project default config
     variant = copy.deepcopy(default_config)
@@ -94,7 +111,7 @@ def main():
             variant['reconstruction_params']['temp_folder'] = unique_temp_dir
 
     os.makedirs(args.output_dir, exist_ok=True)
-    os.makedirs('logs', exist_ok=True)
+    os.makedirs(_resolve_project_path('logs'), exist_ok=True)
     if 'dpmm_params' in variant:
         os.makedirs(variant['dpmm_params']['save_dir'], exist_ok=True)
 

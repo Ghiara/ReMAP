@@ -106,9 +106,4 @@ config = dict(
         random_initialization = 30000,
     ),
 
-    # 可选：加载预训练权重继续训练
-    # pretrained=dict(
-    #     path = '/home/ubuntu/juan/Meta-RL/experiments_transfer_function/walker_back_to_roots_new_arc',
-    #     epoch = 10000,
-    # )
 )

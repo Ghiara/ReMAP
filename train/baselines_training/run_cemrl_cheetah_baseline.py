@@ -19,11 +19,26 @@ import copy
 import json
 import os
 import sys
+from pathlib import Path
 
 # Add project root to path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
 
-from run_toy_training import experiment, deep_update_dict
+
+def _resolve_project_path(path_value: str) -> str:
+    path = Path(path_value)
+    if path.is_absolute():
+        cwd = Path.cwd().resolve()
+        try:
+            relative_to_cwd = path.resolve().relative_to(cwd)
+        except ValueError:
+            return str(path)
+        return str(PROJECT_ROOT / relative_to_cwd)
+    return str(PROJECT_ROOT / path)
+
+
+from train.run_task_inference_high_level_policy_training import experiment, deep_update_dict
 from configs.default import default_config
 
 
@@ -50,6 +65,8 @@ def main():
         help='Number of CPU workers for rollout collection',
     )
     args = parser.parse_args()
+    args.config = _resolve_project_path(args.config)
+    args.output_dir = _resolve_project_path(args.output_dir)
 
     # Start from the project default config
     variant = copy.deepcopy(default_config)
@@ -79,8 +96,8 @@ def main():
     variant['train_or_showcase'] = 'train'
 
     os.makedirs(args.output_dir, exist_ok=True)
-    os.makedirs('logs', exist_ok=True)
-    os.makedirs('melts/temp_cemrl', exist_ok=True)
+    os.makedirs(_resolve_project_path('logs'), exist_ok=True)
+    os.makedirs(_resolve_project_path('melts/temp_cemrl'), exist_ok=True)
 
     print("=" * 70)
     print("CEMRL Training  (true_gmm inference, cheetah-multi-task)")

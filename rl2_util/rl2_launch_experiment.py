@@ -103,7 +103,7 @@ def experiment(variant):
     DEBUG = variant['util_params']['debug']
     os.environ['DEBUG'] = str(int(DEBUG))
 
-    exp_id = 'debug' if DEBUG else None
+    exp_id = 'debug_rl2_baseline' if DEBUG else 'rl2_baseline'
     experiment_log_dir = setup_logger(
         variant['env_name'],
         variant=variant,

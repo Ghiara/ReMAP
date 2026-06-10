@@ -33,8 +33,9 @@ from third_party.tigr.task_inference.dpmm_bnp import BNPModel
 # from tigr.task_inference.stick_break_inference import DecoupledEncoder
 # from tigr.trainer.stick_break_trainer import AugmentedTrainer
 
+#TODO：看下这里tensoboard能不能写的进去
 from torch.utils.tensorboard import SummaryWriter
-import scripts.inspect_training_results_scripts.tb_logging as TB
+import scripts.tb_logging as TB
 
 
 

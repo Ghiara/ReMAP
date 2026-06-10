@@ -17,7 +17,7 @@ from typing import Tuple
 from tqdm import tqdm
 
 # Choose which experiment to run
-from configs.experiments_configs.half_cheetah_multi import config
+from configs.half_cheetah_multi import config
 
 
 import matplotlib.pyplot as plt

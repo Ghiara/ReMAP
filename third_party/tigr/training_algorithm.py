@@ -11,7 +11,7 @@ import third_party.rlkit.torch.pytorch_util as ptu
 
 import cv2
 
-import scripts.inspect_training_results_scripts.tb_logging as TB
+import scripts.tb_logging as TB
 
 
 class TrainingAlgorithm:

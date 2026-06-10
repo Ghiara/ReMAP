@@ -20,7 +20,7 @@ transfer_config = dict(
 
     inference_path = dict(
         name = '2026_05_24_16_23_33_default_dpmm_seed2_regular_loss_true_time_steps48_v2',
-        path = '/root/bayes-tmp/bowang/Inference-reutilization-MRL/output/toy1d-multi-task/2026_05_24_16_23_33_default_dpmm_seed2_regular_loss_true_time_steps48_v2'
+        path = '/root/bayes-tmp/bowang/ReMAP/output/toy1d-multi-task/2026_05_24_16_23_33_default_dpmm_seed2_regular_loss_true_time_steps48_v2'
     ),
 
 
@@ -28,7 +28,7 @@ transfer_config = dict(
 
     complex_agent = dict(
         environment = HalfCheetahMixtureEnv,
-        experiments_repo = '/root/bayes-tmp/bowang/Inference-reutilization-MRL/output/low_level_policy/',
+        experiments_repo = '/root/bayes-tmp/bowang/ReMAP/output/low_level_policy/',
         experiment_name = 'cheetah_multitask_new_config_v0_run0',
         epoch = 300,
     ),

@@ -12,7 +12,7 @@ from tqdm import tqdm
 import third_party.rlkit.torch.pytorch_util as ptu
 from third_party.rlkit.core.eval_util import create_stats_ordered_dict
 
-import scripts.inspect_training_results_scripts.tb_logging as TB
+import scripts.tb_logging as TB
 
 from third_party.tigr import PCGradOptimizer
 

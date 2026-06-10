@@ -54,7 +54,7 @@ config = dict(
     env = 'hopper_multi',
 
     # 本次实验名（输出目录名）
-    experiment_name = 'hopper_multi_new_config_v3_run2',
+    experiment_name = 'hopper_multi_new_config_v3_cleanup_test',
 
     # task 向量维度上限（通常等于 max(tasks.values()) + 1）
     task_dim = 5,
@@ -125,9 +125,5 @@ config = dict(
         random_initialization = 35000,
     ),
 
-    # 可选：加载预训练模型继续训练
-    # pretrained=dict(
-    #     path = '/home/ubuntu/juan/Meta-RL/experiments_transfer_function/hopper_multi_back_to_roots_change_task',
-    #     epoch = 5400,
-    # )
+
 )

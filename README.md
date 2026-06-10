@@ -1,219 +1,290 @@
-# Meta-Reinforcement-Learning Through Task Inference Reutilization
-Meta-Reinforcement Learning with an encoder module which infers tasks from contexts. Idea is to train the task inference module on a simple agent (toy) depicted below and transfer it to more complex agents from the mujoco environment. The method has been tested on the agents shown below.
-| ![Image 1](images/toy.png) | ![Image 2](images/cheetah.png) | ![Image 3](images/walker.png) | ![Image 4](images/hopper.png) |
-|:-----------------------------:|:-----------------------------:|:-----------------------------:|:-----------------------------:|
-| **Toy**                   | **Cheetah**                   | **Walker**                   | **Hopper**                   |
+# ReMAP: Inference Reutilization for Meta-Reinforcement Learning
 
-This project implements the algorithm decribed in [this thesis](Master_Thesis_Juan_final.pdf) in which an inference-based Meta Reinforcement Learning algorithm was trained in the toy environment and then reused in a more complex agent. In order to transfer the knowledge trained on the simple agent, a hierarchical policy structure is implemented. The tasks for which this method has been tested are reaching a position, running at a velocity and standing at an angle. The Meta Reinforcement Learning algorithm used in described in [9] ([melts](https://github.com/Ghiara/MELTS)).
+This repository contains the current implementation of our ReMAP pipeline for meta-reinforcement learning with inference reutilization. The codebase is organized around three main pieces:
 
-This project is related to previous work, including work by Kate Rakelly et al. [1], David Lerch [2], Lukas Knak [3], Philipp Widmann [4], Jonas Jürß [5], **Durmann** [6], **Bing et al.** [9]
+1. low-level policy training on the target agent,
+2. high-level policy and task inference module training,
+3. evaluation against both ReMAP and several meta-RL baselines.
 
-For more information about the theoretical background, please refer to my Master's thesis and to the references.
-
-----------------------------------------------------------------------------
+The repository also includes all major third-party dependencies used by the project under `third_party/`, so the README below focuses on the code structure that is actually present in this repo today.
 
 ## Installation
-### Cloning
-Go to the GitHub repository website and select 'Code' to get an HTTPS or SSH link to the repository.
-Clone the repository to your device, e.g.
+
+### 1. Clone the repository
+
+Clone the repository first and enter the project root:
+
 ```bash
-git clone https://github.com/juandelos/MRL-Inference-Reutilization.git
-```
-Enter the root directory of this project on your device. The root directory contains this README-file.
-
-### Environment
-
-We recommend to manage the python environment with **conda** and suggest [Miniconda](https://docs.conda.io/en/latest/miniconda.html) as a light-weight installation.
-
-> You may also use different environment tools such as python's *venv*. Please refer
-to *requirements.txt* in this case. In the following, we will proceed with conda.
-
-Install the environment using the ``conda`` command:
-```bash
-conda env create --file updated_environment.yml
-```
-If that doesn't do the job, try:
-```bash
-conda env create --file environment.yml
-```
-This might take some time because it needs to download and install all required packages.
-
-Activate the new environment by running (Make sure that no other environment was active before.):
-```bash
-conda activate inference-reutilization
+git clone https://github.com/Ghiara/ReMAP.git
+cd ReMAP
 ```
 
-In case you need to update an existing environment, you can run
+If you are working from a fork or a renamed local directory, just make sure you end up in the repository root, where `README.md`, `environment.yml`, `train/`, and `third_party/` are located.
+
+### 2. Create the Conda environment
+
+We recommend using Conda, and the current environment definition for this project is [`environment.yml`](environment.yml).
+
+Create the environment with:
+
 ```bash
-conda env update --file updated_environment.yml
+conda env create -f environment.yml
+conda activate ReMAP
 ```
 
-### Initialize submodules
+The environment name defined in the file is `ReMAP`.
+
+
+
+### 3. Install local third-party packages
+
+After activating `ReMAP`, install the local packages used by this repository:
+
 ```bash
-git submodule init
-git submodule update
+pip install -e ./third_party/CARE
+pip install -e ./third_party/Meta_RL
+pip install -e ./third_party/Meta_RL/meta-environments-main
+pip install -e ./third_party/Meta_RL/submodules/MRL-analysis-tools-main
+pip install -e ./third_party/Meta_RL/submodules/rlkit
+pip install -e ./third_party/Meta_RL/submodules/symmetrizer
+pip install -e ./third_party/SAC
+pip install -e ./third_party/meta_rand_envs
+pip install -e ./third_party/rand_param_envs
 ```
 
-### Install Cuda and Pytorch
-```batch
+### 4. CUDA and PyTorch
+
+If your machine does not already have CUDA configured, you may need:
+
+```bash
 sudo apt install nvidia-cuda-toolkit
-```
-Check the cuda version
-```batch
 nvcc --version
 ```
-Install pytorch:
-```batch
+
+If PyTorch needs to be installed or repaired manually, one working setup used in this project is:
+
+```bash
 conda install pytorch torchvision torchaudio cudatoolkit=11.8 -c pytorch
 pip install torch==2.1.0 torchaudio==2.1.0 torchvision==0.16.0
 ```
-This is a workaround for cuda version 10.1 which seems to work. For version 11.1 and further, it should be easier.
-If you get the following error:
+
+
+## MuJoCo Setup
+
+Several training and evaluation scripts in this repository depend on MuJoCo-based environments.
+
+### 1. Download MuJoCo
+
+Download the MuJoCo 2.1.0 Linux package from:
+
+`https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz`
+
+### 2. Extract MuJoCo to the expected location
+
+This project expects the MuJoCo files under:
+
 ```bash
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-ImportError: cannot import name 'S' from 'sympy' (unknown location)
-```
-This can be solved by:
-```bash
-pip uninstall sympy
-pip install sympy
+/root/.mujoco/mujoco210
 ```
 
-### MuJoCo
+A typical setup looks like this:
 
-For running MuJoCo environments, you will need the MuJoCo library binaries which you can download from [here](https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz). You should extract them in the directory */root/.mujoco/mujoco210*. Additionally, you need to set the variable *LD_LIBRARY_PATH* to contain the path to the binaries:
+```bash
+mkdir -p /root/.mujoco
+tar -xzf mujoco210-linux-x86_64.tar.gz -C /root/.mujoco
+```
+
+After extraction, the binaries should be located at:
+
+```bash
+/root/.mujoco/mujoco210/bin
+```
+
+### 3. Export MuJoCo library paths
+
+Before running training or evaluation, make sure these paths are available:
 
 ```bash
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/.mujoco/mujoco210/bin
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia
 ```
-If you don't want to set it every time you open a new terminal, write the export commands in the ~/.bashrc file.
 
-Please read the [documentation](https://github.com/openai) *carefully* (It contains valuable hints on troubleshooting).
+If you do not want to set them every time, add the same lines to `~/.bashrc`.
 
-The python bindings for MuJoCo can be installed with
 
-```bash
-pip install mujoco-py
+
+## Project Structure
+
+The most important tracked folders in this repository are:
+
+```text
+.
+|-- configs/
+|-- evaluation/
+|-- pearl_util/
+|-- rl2_util/
+|-- scripts/
+|-- third_party/
+|-- train/
+|-- environment.yml
 ```
 
-If running a script that requires mujoco gives you a problem that mentions X11, try runnning this.
+### `configs/`
+
+Configuration files for training and evaluation.
+
+- `toy_config.py`, `toy2d_config.py`: configuration for the simple environment used in task inference learning.
+- `transfer_config.py`: transfer-related configuration.
+- `half_cheetah_multi.py`, `hopper_multi.py`, `walker_multi.py`, `ant_multi.py`: low-level policy environment configs.
+- `*_config.json`: baseline configs for CEMRL, MELTS, PEARL, and RL2.
+- `default.py`, `pearl_default.py`, `rl2_default.py`: default config templates used by the different pipelines.
+
+### `train/`
+
+Main training entrypoints for this project.
+
+- `train/train_low_level_policy.py`: trains the low-level policy for the target agent.
+- `train/run_task_inference_high_level_policy_training.py`: trains the high-level policy together with the task inference module.
+- `train/baselines_training/`: baseline training scripts for CEMRL, MELTS, PEARL, and RL2.
+
+In other words, `train/` contains:
+
+- low-level policy training,
+- high-level policy and task inference module training,
+- baseline training.
+
+### `evaluation/`
+
+Evaluation and deployment scripts.
+
+- `evaluation/task_inference_high_level_cross_agent_deployment.py`: ReMAP deployment / cross-agent evaluation script.
+- `evaluation/baselines_evaluation/`: evaluation scripts for the baselines and their tracking performance.
+
+This folder therefore contains:
+
+- baseline evaluation scripts,
+- ReMAP deployment and evaluation scripts.
+
+### `third_party/`
+
+Vendored external dependencies used by this repository.
+
+- `third_party/SAC`: low-level SAC implementation and task-conditioned MuJoCo environments used for low-level control.
+- `third_party/tigr`: task inference and high-level training components used by the ReMAP pipeline.
+- `third_party/rlkit`: RL infrastructure used by the meta-RL and baseline pipelines.
+- `third_party/CARE`: BNP / clustering-related dependency used by inference components.
+- `third_party/Meta_RL`: upstream meta-RL codebase and submodules used for related components and utilities.
+- `third_party/meta_rand_envs`, `third_party/rand_param_envs`: environment packages for meta-RL experiments.
+
+### `scripts/`
+
+Utility scripts for analysis, plotting, logging, and batch execution.
+
+- plotting and diagnostic helpers such as `plot_from_csv.py`, `plot_latent.py`, and `diagnostic_decoder_prediction_confusion_matrix.py`,
+- logging helpers such as `tb_logging.py` and `vis_logging.py`,
+- shell helpers in `scripts/bash_training_scripts/` for launching repeated experiments and multi-seed runs.
+
+### `pearl_util/` and `rl2_util/`
+
+Utilities used by the PEARL and RL2 baselines respectively.
+
+## Training
+
+### 1. Train the low-level policy
+
+The low-level controller is trained through:
+
 ```bash
-export CC=/usr/bin/gcc
-export CXX=/usr/bin/g++
-```
-If that solves it, you can copy that to the .bashrc file.
-
-### Submodules
-
-Install the submodules:
-```bash
-pip install -e ./third_party/CARE
-pip install -e ./third_party/Meta_RL/meta-environments-main
-pip install -e ./third_party/meta_rand_envs
-pip install -e ./third_party/Meta_RL/submodules/MRL-analysis-tools-main
-pip install -e ./third_party/rand_param_envs
-pip install -e ./third_party/Meta_RL/submodules/rlkit
-pip install -e ./third_party/SAC
-pip install -e ./third_party/Meta_RL
-pip install -e ./third_party/Meta_RL/submodules/symmetrizer
-```
-
-----------------------------------------------------------------------------
-
-## Run code
-
-There are three parts to the method. The important scripts are stored under the train_reutilization folder.
-
-### 1. Train the toy
-Update the config under configs/toy_config.py if necessary. Start the training with
-```bash
-python run_toy_training.py
-```
-This will save the results in the folder output/toy1d-multi-task.
-
-### 2. Train low-level policy for new agent
-Parallely train the low-level-controller. Important file is train_low_level_policy.py. In that file, import the config from third_party/SAC/experiments_configs. This defines which experiment to start. Then run the file with 
-```bash
-python train_low_level_policy.py
-```
-The results will be saved in the folder output/low_level_policy. This script will load a config under the folder experiments_configs. The default is the cheetah config. If you want to choose a different one use the flag --env.
-```bash
-python train_low_level_policy.py --env hopper
-python train_low_level_policy.py --env walker2d
-```
-The environments loaded can be used to train parametric and non-parametric tasks. This has to be adjusted in the respective configs.
-
-### 3. To transfer the knowledge there are two possibilities
-#### 3.1 Reuse the policy from the toy as the high-level policy
-Update the config under configs/transfer_config.py with the results obtained from training the toy and the lower level policy.
-If more than one task should be learned, the striding predictor should be learned. First update the inference path with the path from the toy training and the complex_agent_config with the output from the low-level policy training. (Idea: learn the striding predictor with the low-level controller)
-
-```bash
-python train_striding_predictor.py
-```
-
-#### 3.2 Relearn the high-level policy
-The other option is to learn the high-level policy from scratch. Also here, the inference path and the complex_agent_config have to be updated. Then run the training.
-
-```bash
-python train_high_level_policy.py
-```
-
-### 4. Visualize results
-Some utility scripts are stored under the vis_utils folder. The training of the algorithms save the weights of the models, trajectories of the agents, as well as a progress.csv with the loss/rewards histories. Some files for visualizing those are:
-
-- **plot_from_csv.py**: Plots the reward/loss history form the progress.csv
-- **gif_from_video**: turns video into gif to visualize in VSCode
-- **plot_latent.py**: Plots tsne from the toy training
-- **test_tasks**: Loads models from retraining high_policy and plots trajetories.
-
-### Alternative: Run only parametric task variations with encoder consisting of GRUs
-In case a simple encoder is to be used, the implementation by Durmann can be used. To do so train the toy agent with the script run_experiment.py. Then the inference reutilization can be tested with the script new_model_eval.py. There you have to choose the low-level policy and the inference mechanism trained on the toy. You can do this by using following command with the updated paths:
-```bash
-python third_party/Meta_RL/smrl/transfer_function/new_model_eval.py --encoder_path <path_to_encoder_path> --agent_path <path_to_low_level_agent> --epoch <checkpoint_of_low_level_policy_to_use>
+python train/train_low_level_policy.py --env cheetah
 ```
 
-## Troubleshooting
+Available environment choices in the current script are:
 
-1. In case you get the error: RuntimeError: Failed to initialize OpenGL
-   
-   Solve with following command:
-   ```bash
-   unset LD_PRELOAD
-   ```
-2. For error: Could not load the Qt platform plugin "xcb"... check the follwoing [link](https://stackoverflow.com/questions/71088095/opencv-could-not-load-the-qt-platform-plugin-xcb-in-even-though-it-was-fou).
+```bash
+python train/train_low_level_policy.py --env hopper
+python train/train_low_level_policy.py --env walker2d
+python train/train_low_level_policy.py --env ant
+```
 
-## **NOTE**
+The corresponding environment-specific configs are loaded from `configs/half_cheetah_multi.py`, `configs/hopper_multi.py`, `configs/walker_multi.py`, and `configs/ant_multi.py`.
 
-The results shown in final_results for the agents walker and hopper might differ if rerun. The reason is that these agent were trained with a different dt and skip_frames as in the source code from the mujoco installation. To replicate the experiments, the source code must be change to mimic the dt and skip_frames of the cheetah.
-----------------------------------------------------------------------------
+Outputs are written under `output/low_level_policy/`.
 
-## References
+### 2. Train the task inference module and high-level policy
 
-[1] Rakelly, K. et al. (2019) ‘Efficient Off-Policy Meta-Reinforcement Learning via Probabilistic Context Variables’, Proceedings of the 36th International Conference on Machine Learning, ICML 2019, 9-15 June 2019, Long Beach, California, USA: PMLR, pp. 5331–5340. Available at:
-http://proceedings.mlr.press/v97/rakelly19a.html.
+The main ReMAP training entrypoint is:
 
-[2] Lerch, D. (2020) Meta-Reinforcement Learning in Non-Stationary and Dynamic Environments. Master's thesis. Technical University of Munich.
+```bash
+python train/run_task_inference_high_level_policy_training.py
+```
 
-[3] Knak, L. (2021) Task Inference Based Meta-Reinforcement Learning for Robotics Environments. Master's thesis. Technical University of Munich.
+By default, this script uses the internal toy/high-level configuration defined in `configs/toy_config.py`. You can modify that file directly for your experiment.
 
-[4] Widmann, P. (2022) Task Inference for Meta-Reinforcement Learning in Broad and Non-Parametric Environments. Master's thesis. Technical University of Munich.
+The script also exposes useful CLI options:
 
-[5] Jürß, J. (2022) Exploiting Symmetries in Context-Based Meta-Reinforcement Learning. Bachelor's thesis. Technical University of Munich.
+```bash
+python train/run_task_inference_high_level_policy_training.py --name exp1 --ti_option dpmm
+```
 
-[6] RLKIT:  https://github.com/rail-berkeley/rlkit
+Common `ti_option` values in the current implementation include:
 
-[7] Symmetrizer:  https://github.com/ElisevanderPol/symmetrizer/
+- `dpmm`
+- `single_gaussian`
+- `true_gmm`
+- `stick_break`
 
-[8] Durmann, J. (2023) Meta-Reinforcement Learning. Master's thesis. Technical University of Munich.
+Outputs are written to the log directory defined in the corresponding config.
 
-[9] Bing et al. (2024) Context-Based Meta-Reinforcement Learning With Bayesian Nonparametric Models
+### 3. Train baselines
 
+Baseline training scripts are under `train/baselines_training/`.
 
+Examples:
 
-<!--This part is for links only and won't be displayed in Markdown previews-->
-[RLKIT]: <https://github.com/rail-berkeley/rlkit> "RLKIT on GitHub"
+```bash
+python train/baselines_training/run_cemrl_cheetah_baseline.py
+python train/baselines_training/run_melts_cheetah_baseline.py
+python train/baselines_training/run_pearl_cheetah_baseline.py
+python train/baselines_training/run_rl2_cheetah_baseline.py
+```
 
-[Symmetrizer]: <https://github.com/ElisevanderPol/symmetrizer/> "Symmetrizer on GitHub"
+These scripts use the JSON configs in `configs/`.
+
+## Evaluation
+
+### ReMAP deployment / evaluation
+
+For ReMAP deployment and cross-agent evaluation:
+
+```bash
+python evaluation/task_inference_high_level_cross_agent_deployment.py
+```
+
+### Baseline evaluation
+
+Baseline evaluation scripts are under `evaluation/baselines_evaluation/`.
+
+Examples:
+
+```bash
+python evaluation/baselines_evaluation/eval_pearl_tracking.py --exp-dir <path_to_experiment_dir>
+python evaluation/baselines_evaluation/eval_rl2_tracking.py --exp-dir <path_to_experiment_dir>
+python evaluation/baselines_evaluation/eval_cemrl_melts_tracking.py --cemrl-dir <path> --melts-dir <path>
+python evaluation/baselines_evaluation/baseline_tarcking_evalaution.py
+```
+
+These scripts are mainly used to compare target tracking behavior and adaptation quality between ReMAP and the baselines.
+
+## Outputs
+
+Experiment artifacts are typically written to:
+
+- `output/`: checkpoints, progress logs, videos, and run directories,
+- `final_results/`: collected result summaries and tracking evaluation artifacts,
+- `logs/`: auxiliary logs.
+
+## Notes
+
+- Some old script names from earlier versions of the project are no longer the main entrypoints. This README only documents the scripts that are currently present in the tracked repository.
+- If a run fails at import time, first verify that the editable installs from `third_party/` were completed in the active `ReMAP` environment.
+- For MuJoCo or rendering issues, check your CUDA, OpenGL, and `LD_LIBRARY_PATH` setup first.

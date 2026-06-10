@@ -17,8 +17,21 @@ import sys
 from pathlib import Path
 
 # Add project root to path
-project_root = Path(__file__).parent.absolute()
-sys.path.insert(0, str(project_root))
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
+
+
+def _resolve_project_path(path_value: str) -> str:
+    path = Path(path_value)
+    if path.is_absolute():
+        cwd = Path.cwd().resolve()
+        try:
+            relative_to_cwd = path.resolve().relative_to(cwd)
+        except ValueError:
+            return str(path)
+        return str(PROJECT_ROOT / relative_to_cwd)
+    return str(PROJECT_ROOT / path)
+
 
 from rl2_util.rl2_launch_experiment import experiment, deep_update_dict
 from configs.rl2_default import default_config
@@ -60,7 +73,7 @@ rl2_default_config = {
         'inner_lr': 1e-4,  # RL2 specific
     },
     'util_params': {
-        'base_log_dir': 'output',
+        'base_log_dir': 'output/rl2_baseline',
         'use_gpu': True,
         'gpu_id': 0,
         'debug': False,
@@ -93,11 +106,13 @@ def main():
     parser.add_argument(
         '--output-dir',
         type=str,
-        default='output',
+        default='output/rl2_baseline',
         help='Base output directory for logs'
     )
     
     args = parser.parse_args()
+    args.config = _resolve_project_path(args.config)
+    args.output_dir = _resolve_project_path(args.output_dir)
     
     # Load config
     variant = rl2_default_config.copy()
@@ -115,7 +130,7 @@ def main():
     
     # Create output directories
     os.makedirs(args.output_dir, exist_ok=True)
-    os.makedirs('logs', exist_ok=True)
+    os.makedirs(_resolve_project_path('logs'), exist_ok=True)
     
     # Run experiment
     print("\nStarting RL2 training...")

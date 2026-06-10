@@ -14,7 +14,7 @@ from third_party.tigr import stacked_replay_buffer
 from third_party.tigr.task_inference import base_inference as task_inference
 from third_party.tigr.task_inference import prediction_networks
 
-import scripts.inspect_training_results_scripts.tb_logging as TB
+import scripts.tb_logging as TB
 
 
 def weighting_fun(loss_array, c=1., m=1.):

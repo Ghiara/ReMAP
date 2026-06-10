@@ -23,7 +23,7 @@ config = dict(
     max_rot_vel = [2.0 * pi, 4.0 * pi],
 
     env = 'half_cheetah_multi',
-    experiment_name = 'cheetah_multitask_new_config_v0_run2',
+    experiment_name = 'cheetah_multitask_new_config_v0_cleanup_test',
     task_dim = 5,
 
     hidden_layers_actor = [300, 300, 300, 300],
@@ -71,6 +71,4 @@ config = dict(
 
     random_restart_after = 1,
 
-    # pretrained = dict(path='/home/ubuntu/juan/Meta-RL/experiments_transfer_function/new_cheetah_training/half_cheetah_21_06',
-    #                   file_name='epoch_1700')
 )

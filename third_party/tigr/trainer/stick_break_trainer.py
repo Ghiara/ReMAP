@@ -12,7 +12,7 @@ from third_party.tigr import PCGradOptimizer
 
 from third_party.tigr.trainer.base_trainer import AugmentedTrainer as BaseTrainer
 
-import scripts.inspect_training_results_scripts.tb_logging as TB
+import scripts.tb_logging as TB
 
 
 class AugmentedTrainer(BaseTrainer):

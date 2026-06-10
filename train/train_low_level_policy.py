@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 print(">>> DISPLAY =", os.environ.get("DISPLAY"))
 from third_party.SAC.agent import SAC
 import json
@@ -8,6 +9,7 @@ from third_party.SAC.sac_envs.half_cheetah_multi import HalfCheetahMixtureEnv
 from third_party.SAC.sac_envs.hopper_multi import HopperMulti
 from third_party.SAC.sac_envs.walker_multi import WalkerMulti
 from third_party.SAC.sac_envs.ant_multi import AntMulti
+from scripts.vis_logging import log_all, _frames_to_gif
 import torch
 import cv2
 from typing import List, Any, Dict, Callable
@@ -24,15 +26,10 @@ Choose the experiment to run here
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
 import os
 from datetime import datetime
 import pytz
 
-
-#TODO:check where is the mrl_analysis package and import the smoothing functions from there. For now, I have copied the smoothing functions to this folder and imported them from there.
-from mrl_analysis.utility.data_smoothing import smooth_plot, smooth_fill_between
-from scripts.inspect_training_results_scripts.vis_logging import log_all, _frames_to_gif
 
 
 
@@ -43,9 +40,29 @@ from scripts.inspect_training_results_scripts.vis_logging import log_all, _frame
 
 saved_dict = False
 record_video_every = 20000
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
-def train(env, agent, epochs, experiment_name, save_after_episodes, policy_update_steps, batch_size=config['batch_size'], path=os.path.join(os.getcwd(), 'output/low_level_policy')):
+def _resolve_project_path(path_value):
+    path = Path(path_value)
+    if path.is_absolute():
+        cwd = Path.cwd().resolve()
+        try:
+            relative_to_cwd = path.resolve().relative_to(cwd)
+        except ValueError:
+            return str(path)
+        return str(PROJECT_ROOT / relative_to_cwd)
+    return str(PROJECT_ROOT / path)
+
+
+def train(env, agent, epochs, experiment_name, save_after_episodes, policy_update_steps, batch_size=None, path=None):
+
+    if batch_size is None:
+        batch_size = config['batch_size']
+    if path is None:
+        path = _resolve_project_path('output/low_level_policy')
+    else:
+        path = _resolve_project_path(path)
 
     # For logging
     value_loss_history, q_loss_history, policy_loss_history, rew_history = [], [], [], []
@@ -270,13 +287,13 @@ def train(env, agent, epochs, experiment_name, save_after_episodes, policy_updat
 def load_config(env_name):
     if env_name == "cheetah":
         # from experiments_configs.half_cheetah_multi_env import config
-        from configs.experiments_configs.half_cheetah_multi import config
+        from configs.half_cheetah_multi import config
     elif env_name == "hopper":
-        from configs.experiments_configs.hopper_multi import config
+        from configs.hopper_multi import config
     elif env_name == "walker2d":
-        from configs.experiments_configs.walker_multi import config
+        from configs.walker_multi import config
     elif env_name == "ant":
-        from configs.experiments_configs.ant_multi import config
+        from configs.ant_multi import config
     else:
         raise ValueError(f"Unsupported environment: {env_name}")
     return config

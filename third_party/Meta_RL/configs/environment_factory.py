@@ -2,13 +2,29 @@ from typing import Tuple
 import numpy as np
 
 from meta_envs.toy_goal import Toy1D, Toy1dContinuous, Toy2D
-from meta_envs.toy_goal.toy_1d import Toy1dVelocity
+try:
+    from meta_envs.toy_goal.toy_1d import Toy1dVelocity
+except ImportError:
+    Toy1dVelocity = None
 
 from meta_envs.wrappers import NoisyEnv, DomainRandomizer
-from meta_envs.mujoco.cheetah import HalfCheetahGoal, HalfCheetahVel
-from meta_envs.mujoco.ant import AntGoal, AntVel
+try:
+    from meta_envs.mujoco.cheetah import HalfCheetahGoal, HalfCheetahVel
+    from meta_envs.mujoco.ant import AntGoal, AntVel
+except ImportError:
+    HalfCheetahGoal = None
+    HalfCheetahVel = None
+    AntGoal = None
+    AntVel = None
 from meta_envs.toy_goal.toy_goal_legacy import ToyGoalEnv
 
+
+def _require_optional_dependency(dependency, name: str) -> None:
+    if dependency is None:
+        raise ImportError(
+            f"{name} is unavailable in the installed meta_envs package. "
+            "Install the matching optional dependency/version before using this environment."
+        )
 
 
 
@@ -30,6 +46,7 @@ def toy1d() -> Tuple[Toy1D, Toy1D]:
 
 
 def toy1d_vel() -> Tuple[Toy1dVelocity, Toy1dVelocity]:
+    _require_optional_dependency(Toy1dVelocity, "Toy1dVelocity")
     env_args = []
     env_kwargs = {
         "n_train_tasks": 100,
@@ -205,6 +222,7 @@ def toy2d_L2() -> Tuple[Toy2D, Toy2D]:
     return expl_env, eval_env
 
 def cheetah_vel() -> Tuple[HalfCheetahVel, HalfCheetahVel]:
+    _require_optional_dependency(HalfCheetahVel, "HalfCheetahVel")
     env_args = []
     env_kwargs = {
         "n_train_tasks": 100,
@@ -217,6 +235,7 @@ def cheetah_vel() -> Tuple[HalfCheetahVel, HalfCheetahVel]:
     return expl_env, eval_env
 
 def cheetah_goal() -> Tuple[HalfCheetahGoal, HalfCheetahGoal]:
+    _require_optional_dependency(HalfCheetahGoal, "HalfCheetahGoal")
     env_args = []
     env_kwargs = {
         "n_train_tasks": 100,
@@ -229,6 +248,7 @@ def cheetah_goal() -> Tuple[HalfCheetahGoal, HalfCheetahGoal]:
     return expl_env, eval_env
 
 def cheetah_goal_onesided() -> Tuple[HalfCheetahGoal, HalfCheetahGoal]:
+    _require_optional_dependency(HalfCheetahGoal, "HalfCheetahGoal")
     env_args = []
     env_kwargs = {
         "n_train_tasks": 100,

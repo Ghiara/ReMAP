@@ -11,10 +11,16 @@ Date:
 """
 
 import os
+import sys
+from pathlib import Path
+
 import torch
-import ray
 from datetime import datetime
 import pytz
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from third_party.Meta_RL.smrl.experiment.experiment_setup import setup_experiment
 from third_party.Meta_RL.configs.base_configuration import config
@@ -34,6 +40,7 @@ print(f"GPU available: {'Yes' if torch.cuda.is_available() else 'No'}")
 # Multithreading
 os.environ["MULTITHREADING"] = "False"   # Set to "False" to not use multithreading
 if os.environ["MULTITHREADING"] == "True":
+    import ray
     ray.init(num_cpus=12)
 
 

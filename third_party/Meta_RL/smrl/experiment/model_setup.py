@@ -15,7 +15,7 @@ import torch
 from typing import Dict, Any
 from pathlib import Path
 
-from third_party.Meta_RL.smrl.policies.meta_policy import MakeDeterministic
+from smrl.policies.meta_policy import MakeDeterministic
 
 
 def init_networks(config: Dict[str, Any]) -> Dict[str, torch.nn.Module]:

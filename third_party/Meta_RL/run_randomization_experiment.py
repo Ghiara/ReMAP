@@ -16,17 +16,17 @@ import ray
 from datetime import datetime
 import pytz
 
-from third_party.Meta_RL.smrl.experiment.experiment_setup import setup_experiment
-from third_party.Meta_RL.configs.base_configuration import config
-from third_party.Meta_RL.configs.environment_factory import toy1d_rand, toy1d_domain_rand
+from smrl.experiment.experiment_setup import setup_experiment
+from configs.base_configuration import config
+from configs.environment_factory import toy1d_rand, toy1d_domain_rand
 import torch
-from third_party.Meta_RL.smrl.vae.encoder_networks import GRUEncoder, MlpEncoder
-from third_party.Meta_RL.smrl.vae.decoder_networks import MlpDecoder, SeparateMlpDecoder
-from third_party.Meta_RL.smrl.vae.mdpvae import NeuralProcess, MdpVAE, InfoMaxMdpVAE
-from third_party.Meta_RL.smrl.policies.meta_policy import MetaRLTanhGaussianPolicy
-from third_party.Meta_RL.smrl.policies.meta_value_function import MlpValueFunction
-from third_party.Meta_RL.smrl.policies.exploration import RandomPolicy, RandomMemoryPolicy
-from third_party.Meta_RL.smrl.data_management.replay_buffers import ContextReplayBuffer, TrajectoryReplayBuffer, MultiTaskReplayBuffer
+from smrl.vae.encoder_networks import GRUEncoder, MlpEncoder
+from smrl.vae.decoder_networks import MlpDecoder, SeparateMlpDecoder
+from smrl.vae.mdpvae import NeuralProcess, MdpVAE, InfoMaxMdpVAE
+from smrl.policies.meta_policy import MetaRLTanhGaussianPolicy
+from smrl.policies.meta_value_function import MlpValueFunction
+from smrl.policies.exploration import RandomPolicy, RandomMemoryPolicy
+from smrl.data_management.replay_buffers import ContextReplayBuffer, TrajectoryReplayBuffer, MultiTaskReplayBuffer
 from collections import OrderedDict
 
 config = OrderedDict(

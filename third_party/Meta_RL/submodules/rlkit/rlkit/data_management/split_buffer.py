@@ -1,6 +1,6 @@
 import random
 
-from third_party.rlkit.data_management.replay_buffer import ReplayBuffer
+from rlkit.data_management.replay_buffer import ReplayBuffer
 
 
 class SplitReplayBuffer(ReplayBuffer):

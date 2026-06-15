@@ -1,8 +1,8 @@
 import torch
 
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.groups import MatrixRepresentation
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.nn.modules import BasisLinear
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.ops import *
+from symmetrizer.groups import MatrixRepresentation
+from symmetrizer.nn.modules import BasisLinear
+from symmetrizer.ops import *
 
 
 class BasisCartpoleNetworkWrapper(torch.nn.Module):

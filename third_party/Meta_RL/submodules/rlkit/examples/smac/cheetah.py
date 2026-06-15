@@ -1,7 +1,7 @@
-from third_party.rlkit.launchers.launcher_util import run_experiment
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.smac.launcher import smac_experiment
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.smac.base_config import DEFAULT_CONFIG
-import third_party.Meta_RL.submodules.rlkit.rlkit.util.hyperparameter as hyp
+from rlkit.launchers.launcher_util import run_experiment
+from rlkit.torch.smac.launcher import smac_experiment
+from rlkit.torch.smac.base_config import DEFAULT_CONFIG
+import rlkit.util.hyperparameter as hyp
 
 
 # @click.command()

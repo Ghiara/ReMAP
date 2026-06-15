@@ -2,15 +2,15 @@ from collections import OrderedDict
 import copy
 import numpy as np
 
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 import torch.optim as optim
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn as nn
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.distributions import kl_divergence
+from torch import nn as nn
+from torch.distributions import kl_divergence
 
-import third_party.rlkit.torch.pytorch_util as ptu
+import rlkit.torch.pytorch_util as ptu
 
-from third_party.rlkit.core.eval_util import create_stats_ordered_dict
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import TorchTrainer
+from rlkit.core.eval_util import create_stats_ordered_dict
+from rlkit.torch.torch_rl_algorithm import TorchTrainer
 from itertools import chain
 
 

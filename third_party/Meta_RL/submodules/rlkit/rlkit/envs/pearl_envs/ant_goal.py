@@ -1,6 +1,6 @@
 import numpy as np
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.ant_multitask_base import MultitaskAntEnv
+from rlkit.envs.pearl_envs.ant_multitask_base import MultitaskAntEnv
 
 
 # Copy task structure from https://github.com/jonasrothfuss/ProMP/blob/master/meta_policy_search/envs/mujoco_envs/ant_rand_goal.py

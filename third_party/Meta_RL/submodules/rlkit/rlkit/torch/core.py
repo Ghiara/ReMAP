@@ -1,10 +1,10 @@
 import abc
 
 import numpy as np
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn as nn
+import torch
+from torch import nn as nn
 
-from third_party.rlkit.torch import pytorch_util as ptu
+from rlkit.torch import pytorch_util as ptu
 
 
 class PyTorchModule(nn.Module, metaclass=abc.ABCMeta):

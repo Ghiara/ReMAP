@@ -20,7 +20,7 @@ from torch.distributions.distribution import Distribution
 import numpy as np
 from typing import List, Tuple, Union, Dict
 
-from third_party.rlkit.torch.core import torch_ify, np_ify
+from rlkit.torch.core import torch_ify, np_ify
 
 from .basevae import Encoder, Decoder, VAE
 from ..utility.distributions import DiagonalMultivariateNormal

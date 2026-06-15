@@ -4,10 +4,10 @@ import gym
 import torch
 import torch.nn.functional as F
 
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.ops import *
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.nn.cartpole_networks import BasisCartpoleNetworkWrapper, \
+from symmetrizer.ops import *
+from symmetrizer.nn.cartpole_networks import BasisCartpoleNetworkWrapper, \
     BasisCartpoleLayer, SingleBasisCartpoleLayer
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.groups.ops import closed_group
+from symmetrizer.groups.ops import closed_group
 
 
 

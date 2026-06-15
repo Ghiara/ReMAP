@@ -16,11 +16,11 @@ import copy
 from typing import List, Dict, Callable
 from tqdm import tqdm
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector.path_collector import MdpPathCollector as MdpPathCollector_
+from rlkit.samplers.data_collector.path_collector import MdpPathCollector as MdpPathCollector_
 
-from third_party.Meta_RL.smrl.policies.base import Policy
-from third_party.Meta_RL.smrl.utility.ops import unnest_dictionary
-import third_party.Meta_RL.smrl.utility.console_strings as console_strings
+from smrl.policies.base import Policy
+from smrl.utility.ops import unnest_dictionary
+import smrl.utility.console_strings as console_strings
 
 
 class MdpPathCollector(MdpPathCollector_):

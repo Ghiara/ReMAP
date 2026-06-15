@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.testing.testing_utils import are_np_arrays_equal, \
+from rlkit.testing.testing_utils import are_np_arrays_equal, \
     are_np_array_iterables_equal
 
 

@@ -1,7 +1,10 @@
+from sys import modules
 import torch
 from torch import nn
 from torch.nn import functional as F
 from torch.distributions import Normal
+
+modules.setdefault('model', modules[__name__])
 
 
 def init_weight(layer, initializer="he normal"):
@@ -59,7 +62,7 @@ class ValueNetwork(nn.Module):
         return self.value(x)
     
     def load_model(self, path):
-        network = torch.load(path)
+        network = torch.load(path, map_location='cpu')
         return network
 
 
@@ -114,7 +117,7 @@ class QvalueNetwork(nn.Module):
         return self.q_value(x)
     
     def load_model(self, path):
-        network = torch.load(path)
+        network = torch.load(path, map_location='cpu')
         return network
 
 
@@ -215,5 +218,5 @@ class PolicyNetwork(nn.Module):
         return self.sample_or_likelihood(states, tasks, max_action=deterministic)[0]
     
     def load_model(self, path):
-        network = torch.load(path)
+        network = torch.load(path, map_location='cpu')
         return network

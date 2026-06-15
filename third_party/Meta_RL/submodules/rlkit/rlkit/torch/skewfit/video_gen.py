@@ -2,7 +2,7 @@ import os
 import os.path as osp
 
 import uuid
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.vae_wrapper import VAEWrappedEnv
+from rlkit.envs.vae_wrapper import VAEWrappedEnv
 
 filename = str(uuid.uuid4())
 

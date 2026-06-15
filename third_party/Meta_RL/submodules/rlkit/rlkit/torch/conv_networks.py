@@ -1,7 +1,7 @@
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn as nn
+import torch
+from torch import nn as nn
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.pythonplusplus import identity
+from rlkit.pythonplusplus import identity
 
 import numpy as np
 

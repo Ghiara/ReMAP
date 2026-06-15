@@ -13,7 +13,7 @@ import torch
 # from torch.distributions import Distribution
 from collections import OrderedDict
 
-from third_party.rlkit.torch.distributions import Distribution
+from rlkit.torch.distributions import Distribution
 from torch.distributions import Normal
 from torch.distributions import constraints
 

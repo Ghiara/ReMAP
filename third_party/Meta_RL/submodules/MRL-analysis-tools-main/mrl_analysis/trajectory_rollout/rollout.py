@@ -17,8 +17,8 @@ import numpy as np
 import torch
 import copy
 import random
-from third_party.Meta_RL.smrl.utility.console_strings import print_to_terminal
-from third_party.Meta_RL.main_config import SAVE_REWARD_PLOTS_EVALUATION
+from smrl.utility.console_strings import print_to_terminal
+from main_config import SAVE_REWARD_PLOTS_EVALUATION
 
 
 from typing import Callable, List, Tuple

@@ -16,10 +16,10 @@ import ray
 from datetime import datetime
 import pytz
 
-from third_party.Meta_RL.smrl.experiment.experiment_setup import setup_experiment
-from third_party.Meta_RL.configs.base_configuration import config
-from third_party.Meta_RL.configs.environment_factory import toy1d_rand
-from third_party.Meta_RL.experiments.experiments.encoder_transfer.toy1d_to_toy1d import huge_config
+from smrl.experiment.experiment_setup import setup_experiment
+from configs.base_configuration import config
+from configs.environment_factory import toy1d_rand
+from experiments.experiments.encoder_transfer.toy1d_to_toy1d import huge_config
 
 
 # Environment

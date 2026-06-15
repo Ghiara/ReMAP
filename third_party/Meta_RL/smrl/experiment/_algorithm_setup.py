@@ -13,16 +13,16 @@ import os
 import torch
 from typing import Dict, Any
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.logging import logger
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.rlkit.launchers.launcher_util import setup_logger
+from rlkit.core.logging import logger
+import rlkit.torch.pytorch_util as ptu
+from rlkit.launchers.launcher_util import setup_logger
 
-from third_party.Meta_RL.smrl.environments.meta_env import MetaEnv
-from third_party.Meta_RL.smrl.algorithms.meta_rl_algorithm import MetaRlAlgorithm
-from third_party.Meta_RL.smrl.data_management.path_collector import MdpPathCollector, MultithreadedPathCollector
-from third_party.Meta_RL.smrl.data_management.rollout_functions import rollout_with_encoder
-from third_party.Meta_RL.smrl.trainers.vae import MdpVAETrainer
-from third_party.Meta_RL.smrl.trainers.meta_sac import MetaSACTrainer
+from smrl.environments.meta_env import MetaEnv
+from smrl.algorithms.meta_rl_algorithm import MetaRlAlgorithm
+from smrl.data_management.path_collector import MdpPathCollector, MultithreadedPathCollector
+from smrl.data_management.rollout_functions import rollout_with_encoder
+from smrl.trainers.vae import MdpVAETrainer
+from smrl.trainers.meta_sac import MetaSACTrainer
 
 
 def setup_algorithm(

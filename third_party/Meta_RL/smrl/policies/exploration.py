@@ -15,9 +15,9 @@ import numpy as np
 from numpy import float32
 from typing import List, Dict, Type, Union, Tuple
 
-from third_party.rlkit.torch.distributions import Distribution, MultivariateDiagonalNormal, TanhNormal
+from rlkit.torch.distributions import Distribution, MultivariateDiagonalNormal, TanhNormal
 
-from third_party.Meta_RL.smrl.vae.encoder_networks.util import pad_sequence_length
+from smrl.vae.encoder_networks.util import pad_sequence_length
 
 from .base import StandardPolicy, ContextPolicy, ContextQFunction
 

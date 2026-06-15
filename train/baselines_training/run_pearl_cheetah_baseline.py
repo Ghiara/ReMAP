@@ -9,7 +9,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from pearl_util.pearl_launch_experiment import experiment
+from ReMAP.utils.pearl_util.pearl_launch_experiment import experiment
 from configs.pearl_default import default_config
 
 

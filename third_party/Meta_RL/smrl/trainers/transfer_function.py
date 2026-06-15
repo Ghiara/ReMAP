@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-from third_party.rlkit.torch.distributions import TanhNormal
+from rlkit.torch.distributions import TanhNormal
 
 def init_weight(layer, initializer="he normal"):
     if initializer == "xavier uniform":

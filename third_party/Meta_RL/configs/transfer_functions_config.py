@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from third_party.Meta_RL.smrl.trainers.transfer_function import TransferFunction
+from smrl.trainers.transfer_function import TransferFunction
 
 transfer_config = OrderedDict(
     obs_dim = 20,

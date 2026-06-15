@@ -6,8 +6,8 @@ from typing import Dict, List, Union, Any, Tuple
 from tqdm import tqdm
 import copy
 
-from third_party.Meta_RL.main_config import HARDCODED
-from third_party.Meta_RL.smrl.policies.meta_policy import PretrainedCheetah
+from main_config import HARDCODED
+from smrl.policies.meta_policy import PretrainedCheetah
 
 from .path_collector import MdpPathCollector, MultithreadedPathCollector
 from .rollout import rollout_with_encoder

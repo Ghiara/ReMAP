@@ -1,4 +1,4 @@
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.ant import AntEnv
+from rlkit.envs.pearl_envs.ant import AntEnv
 
 
 class MultitaskAntEnv(AntEnv):

@@ -4,7 +4,7 @@ import numpy as np
 
 from .base import MultiTaskEnv, Task
 import random
-from third_party.Meta_RL.smrl.utility.console_strings import print_to_terminal
+from smrl.utility.console_strings import print_to_terminal
 
 class DomainRandomizer(object):
     """A wrapper for domain randomization to help with transfer to 

@@ -1,9 +1,9 @@
 import numpy as np
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.rlkit.core.eval_util import create_stats_ordered_dict
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.dqn.dqn import DQNTrainer
+import rlkit.torch.pytorch_util as ptu
+from rlkit.core.eval_util import create_stats_ordered_dict
+from rlkit.torch.dqn.dqn import DQNTrainer
 
 
 class DoubleDQNTrainer(DQNTrainer):

@@ -1,8 +1,8 @@
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
-import third_party.rlkit.torch.pytorch_util as ptu
+import torch
+import rlkit.torch.pytorch_util as ptu
 import numpy as np
 
-from third_party.rlkit.data_management.normalizer import Normalizer, FixedNormalizer
+from rlkit.data_management.normalizer import Normalizer, FixedNormalizer
 
 
 class TorchNormalizer(Normalizer):

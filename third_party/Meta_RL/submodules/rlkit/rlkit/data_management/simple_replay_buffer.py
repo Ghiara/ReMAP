@@ -3,7 +3,7 @@ from collections import OrderedDict
 import numpy as np
 import warnings
 
-from third_party.rlkit.data_management.replay_buffer import ReplayBuffer
+from rlkit.data_management.replay_buffer import ReplayBuffer
 
 
 class SimpleReplayBuffer(ReplayBuffer):

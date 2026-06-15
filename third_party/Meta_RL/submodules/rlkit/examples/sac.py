@@ -1,14 +1,14 @@
 from gym.envs.mujoco import HalfCheetahEnv
 
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.rlkit.data_management.env_replay_buffer import EnvReplayBuffer
-from third_party.rlkit.envs.wrappers import NormalizedBoxEnv
-from third_party.rlkit.launchers.launcher_util import setup_logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector import MdpPathCollector
-from third_party.rlkit.torch.sac.policies import TanhGaussianPolicy, MakeDeterministic
-from third_party.rlkit.torch.sac.sac import SACTrainer
-from third_party.rlkit.torch.networks import ConcatMlp
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
+import rlkit.torch.pytorch_util as ptu
+from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
+from rlkit.envs.wrappers import NormalizedBoxEnv
+from rlkit.launchers.launcher_util import setup_logger
+from rlkit.samplers.data_collector import MdpPathCollector
+from rlkit.torch.sac.policies import TanhGaussianPolicy, MakeDeterministic
+from rlkit.torch.sac.sac import SACTrainer
+from rlkit.torch.networks import ConcatMlp
+from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
 
 
 def experiment(variant):

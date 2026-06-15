@@ -1,4 +1,4 @@
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs import (
+from rlkit.envs.pearl_envs import (
     AntDirEnv,
     HalfCheetahVelEnv,
 )

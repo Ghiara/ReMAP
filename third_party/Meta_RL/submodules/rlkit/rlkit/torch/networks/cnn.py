@@ -1,14 +1,14 @@
 import numpy as np
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn as nn
+import torch
+from torch import nn as nn
 
-from third_party.rlkit.policies.base import Policy
-from third_party.Meta_RL.submodules.rlkit.rlkit.pythonplusplus import identity
-from third_party.rlkit.torch.core import PyTorchModule, eval_np
-from third_party.rlkit.torch.data_management.normalizer import TorchFixedNormalizer
+from rlkit.policies.base import Policy
+from rlkit.pythonplusplus import identity
+from rlkit.torch.core import PyTorchModule, eval_np
+from rlkit.torch.data_management.normalizer import TorchFixedNormalizer
 
 
-from third_party.rlkit.torch.pytorch_util import activation_from_string
+from rlkit.torch.pytorch_util import activation_from_string
 
 
 class CNN(PyTorchModule):

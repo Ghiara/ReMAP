@@ -1,7 +1,7 @@
 import numpy as np
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.smac.agent import MakeSMACAgentDeterministic
-import third_party.rlkit.torch.pytorch_util as ptu
+from rlkit.torch.smac.agent import MakeSMACAgentDeterministic
+import rlkit.torch.pytorch_util as ptu
 
 
 class SMACInPlacePathSampler(object):

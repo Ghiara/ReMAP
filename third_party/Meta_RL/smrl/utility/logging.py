@@ -15,8 +15,8 @@ import os
 import json
 from typing import Dict, Any
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.logging import Logger
-from third_party.rlkit.launchers.launcher_util import dict_to_safe_json
+from rlkit.core.logging import Logger
+from rlkit.launchers.launcher_util import dict_to_safe_json
 
 
 def setup_logger(

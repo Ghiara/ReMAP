@@ -1,5 +1,5 @@
 import random
-from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.base import RawExplorationStrategy
+from rlkit.exploration_strategies.base import RawExplorationStrategy
 import numpy as np
 
 

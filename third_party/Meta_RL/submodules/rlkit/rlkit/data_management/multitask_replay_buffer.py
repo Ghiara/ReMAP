@@ -1,7 +1,7 @@
 import numpy as np
 
-from third_party.rlkit.data_management.replay_buffer import ReplayBuffer
-from third_party.rlkit.data_management.simple_replay_buffer import (
+from rlkit.data_management.replay_buffer import ReplayBuffer
+from rlkit.data_management.simple_replay_buffer import (
     SimpleReplayBuffer as RLKitSimpleReplayBuffer
 )
 from gym.spaces import Box, Discrete, Tuple
@@ -182,7 +182,7 @@ def get_dim(space):
     else:
         # import OldBox here so it is not necessary to have rand_param_envs
         # installed if not running the rand_param envs
-        from third_party.rand_param_envs.rand_param_envs.gym.spaces.box import Box as OldBox
+        from rand_param_envs.gym.spaces.box import Box as OldBox
         if isinstance(space, OldBox):
             return space.low.size
         else:

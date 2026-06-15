@@ -14,7 +14,7 @@ import gym
 from typing import List, Any, Dict
 
 from .context_replay_buffer import ContextReplayBuffer
-from third_party.Meta_RL.smrl.utility.console_strings import warning
+from smrl.utility.console_strings import warning
 
 
 class MultiTaskReplayBuffer(ContextReplayBuffer):

@@ -1,4 +1,4 @@
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.rand_param_envs.walker2d_rand_params import Walker2DRandParamsEnv
+from rlkit.envs.pearl_envs.rand_param_envs.walker2d_rand_params import Walker2DRandParamsEnv
 
 
 class WalkerRandParamsWrappedEnv(Walker2DRandParamsEnv):

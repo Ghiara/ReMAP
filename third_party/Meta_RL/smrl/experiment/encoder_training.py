@@ -1,12 +1,12 @@
 from typing import Dict, Any, Tuple
 import torch
 
-from third_party.rlkit.torch import pytorch_util as ptu
+from rlkit.torch import pytorch_util as ptu
 
-from third_party.Meta_RL.smrl.algorithms.encoder_algorithm import MdpVaeAlgorithm
-from third_party.Meta_RL.smrl.vae.mdpvae import MdpEncoder, MdpDecoder, MdpVAE
-from third_party.Meta_RL.smrl.policies.base import Policy
-from third_party.Meta_RL.smrl.utility.logging import setup_logger
+from smrl.algorithms.encoder_algorithm import MdpVaeAlgorithm
+from smrl.vae.mdpvae import MdpEncoder, MdpDecoder, MdpVAE
+from smrl.policies.base import Policy
+from smrl.utility.logging import setup_logger
 
 
 def init_models(config: Dict[str, Any]) -> Tuple[MdpEncoder, MdpDecoder, MdpVAE, Policy]:

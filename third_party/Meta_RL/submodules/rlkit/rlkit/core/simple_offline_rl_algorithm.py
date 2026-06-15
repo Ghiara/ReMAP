@@ -3,10 +3,10 @@ from collections import OrderedDict
 import numpy as np
 
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.timer import timer
-from third_party.rlkit.core import logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.logging import add_prefix
-from third_party.rlkit.torch.core import np_to_pytorch_batch
+from rlkit.core.timer import timer
+from rlkit.core import logger
+from rlkit.core.logging import add_prefix
+from rlkit.torch.core import np_to_pytorch_batch
 
 
 def _get_epoch_timings():

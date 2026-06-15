@@ -1,21 +1,21 @@
 import time
 from multiworld.core.image_env import ImageEnv
-from third_party.rlkit.core import logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.vae_wrapper import temporary_mode
+from rlkit.core import logger
+from rlkit.envs.vae_wrapper import temporary_mode
 
 import cv2
 import numpy as np
 import os.path as osp
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector.vae_env import (
+from rlkit.samplers.data_collector.vae_env import (
     VAEWrappedEnvPathCollector,
 )
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.her.her import HERTrainer
-from third_party.rlkit.torch.sac.policies import MakeDeterministic
-from third_party.rlkit.torch.sac.sac import SACTrainer
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.skewfit.online_vae_algorithm import OnlineVaeAlgorithm
-from third_party.Meta_RL.submodules.rlkit.rlkit.util.io import load_local_or_remote_file
-from third_party.Meta_RL.submodules.rlkit.rlkit.util.video import dump_video
+from rlkit.torch.her.her import HERTrainer
+from rlkit.torch.sac.policies import MakeDeterministic
+from rlkit.torch.sac.sac import SACTrainer
+from rlkit.torch.skewfit.online_vae_algorithm import OnlineVaeAlgorithm
+from rlkit.util.io import load_local_or_remote_file
+from rlkit.util.video import dump_video
 
 
 def skewfit_full_experiment(variant):
@@ -56,7 +56,7 @@ def full_experiment_variant_preprocess(variant):
 
 
 def train_vae_and_update_variant(variant):
-    from third_party.rlkit.core import logger
+    from rlkit.core import logger
     skewfit_variant = variant['skewfit_variant']
     train_vae_variant = variant['train_vae_variant']
     if skewfit_variant.get('vae_path', None) is None:
@@ -91,16 +91,16 @@ def train_vae_and_update_variant(variant):
 
 
 def train_vae(variant, return_data=False):
-    from third_party.Meta_RL.submodules.rlkit.rlkit.util.ml_util import PiecewiseLinearSchedule
-    from third_party.Meta_RL.submodules.rlkit.rlkit.torch.vae.conv_vae import (
+    from rlkit.util.ml_util import PiecewiseLinearSchedule
+    from rlkit.torch.vae.conv_vae import (
         ConvVAE,
     )
-    import third_party.Meta_RL.submodules.rlkit.rlkit.torch.vae.conv_vae as conv_vae
-    from third_party.Meta_RL.submodules.rlkit.rlkit.torch.vae.vae_trainer import ConvVAETrainer
-    from third_party.rlkit.core import logger
-    import third_party.rlkit.torch.pytorch_util as ptu
-    from third_party.Meta_RL.submodules.rlkit.rlkit.pythonplusplus import identity
-    import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+    import rlkit.torch.vae.conv_vae as conv_vae
+    from rlkit.torch.vae.vae_trainer import ConvVAETrainer
+    from rlkit.core import logger
+    import rlkit.torch.pytorch_util as ptu
+    from rlkit.pythonplusplus import identity
+    import torch
     beta = variant["beta"]
     representation_size = variant["representation_size"]
     generate_vae_dataset_fctn = variant.get('generate_vae_data_fctn',
@@ -182,7 +182,7 @@ def generate_vae_dataset(variant):
         'non_presampled_goal_img_is_garbage', None)
     tag = variant.get('tag', '')
     from multiworld.core.image_env import ImageEnv, unormalize_image
-    import third_party.rlkit.torch.pytorch_util as ptu
+    import rlkit.torch.pytorch_util as ptu
     info = {}
     if dataset_path is not None:
         dataset = load_local_or_remote_file(dataset_path)
@@ -239,7 +239,7 @@ def generate_vae_dataset(variant):
                 policy = policy_file['policy']
                 policy.to(ptu.device)
             if random_rollout_data:
-                from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.ou_strategy import OUStrategy
+                from rlkit.exploration_strategies.ou_strategy import OUStrategy
                 policy = OUStrategy(env.action_space)
             dataset = np.zeros((N, imsize * imsize * num_channels),
                                dtype=np.uint8)
@@ -299,8 +299,8 @@ def generate_vae_dataset(variant):
 
 def get_envs(variant):
     from multiworld.core.image_env import ImageEnv
-    from third_party.Meta_RL.submodules.rlkit.rlkit.envs.vae_wrapper import VAEWrappedEnv
-    from third_party.Meta_RL.submodules.rlkit.rlkit.util.io import load_local_or_remote_file
+    from rlkit.envs.vae_wrapper import VAEWrappedEnv
+    from rlkit.util.io import load_local_or_remote_file
 
     render = variant.get('render', False)
     vae_path = variant.get("vae_path", None)
@@ -408,9 +408,9 @@ def get_envs(variant):
 
 
 def get_exploration_strategy(variant, env):
-    from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.epsilon_greedy import EpsilonGreedy
-    from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.gaussian_strategy import GaussianStrategy
-    from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.ou_strategy import OUStrategy
+    from rlkit.exploration_strategies.epsilon_greedy import EpsilonGreedy
+    from rlkit.exploration_strategies.gaussian_strategy import GaussianStrategy
+    from rlkit.exploration_strategies.ou_strategy import OUStrategy
 
     exploration_type = variant['exploration_type']
     exploration_noise = variant.get('exploration_noise', 0.1)
@@ -444,12 +444,12 @@ def skewfit_preprocess_variant(variant):
 
 
 def skewfit_experiment(variant):
-    import third_party.rlkit.torch.pytorch_util as ptu
-    from third_party.Meta_RL.submodules.rlkit.rlkit.data_management.online_vae_replay_buffer import \
+    import rlkit.torch.pytorch_util as ptu
+    from rlkit.data_management.online_vae_replay_buffer import \
         OnlineVaeRelabelingBuffer
-    from third_party.rlkit.torch.networks import ConcatMlp
-    from third_party.rlkit.torch.sac.policies import TanhGaussianPolicy
-    from third_party.Meta_RL.submodules.rlkit.rlkit.torch.vae.vae_trainer import ConvVAETrainer
+    from rlkit.torch.networks import ConcatMlp
+    from rlkit.torch.sac.policies import TanhGaussianPolicy
+    from rlkit.torch.vae.vae_trainer import ConvVAETrainer
 
     skewfit_preprocess_variant(variant)
     env = get_envs(variant)

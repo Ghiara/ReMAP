@@ -1,10 +1,10 @@
 import numpy as np
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 import torchvision.models as models
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn as nn
+from torch import nn as nn
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.pythonplusplus import identity
-from third_party.rlkit.torch.core import PyTorchModule
+from rlkit.pythonplusplus import identity
+from rlkit.torch.core import PyTorchModule
 
 
 class PretrainedCNN(PyTorchModule):

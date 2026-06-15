@@ -1,9 +1,9 @@
 import os
 
-from third_party.Meta_RL.submodules.rlkit.examples.simplegym import sac
+from examples.simplegym import sac
 
-from third_party.rlkit.core import logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.testing import csv_util
+from rlkit.core import logger
+from rlkit.testing import csv_util
 
 def test_sac_online():
     logger.reset()

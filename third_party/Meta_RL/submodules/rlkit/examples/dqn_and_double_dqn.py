@@ -5,17 +5,17 @@ Run DQN on CartPole-v0.
 import gym
 from torch import nn as nn
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.base import \
+from rlkit.exploration_strategies.base import \
     PolicyWrappedWithExplorationStrategy
-from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.epsilon_greedy import EpsilonGreedy
-from third_party.rlkit.policies.argmax import ArgmaxDiscretePolicy
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.dqn.dqn import DQNTrainer
-from third_party.rlkit.torch.networks import Mlp
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.rlkit.data_management.env_replay_buffer import EnvReplayBuffer
-from third_party.rlkit.launchers.launcher_util import setup_logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector import MdpPathCollector
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
+from rlkit.exploration_strategies.epsilon_greedy import EpsilonGreedy
+from rlkit.policies.argmax import ArgmaxDiscretePolicy
+from rlkit.torch.dqn.dqn import DQNTrainer
+from rlkit.torch.networks import Mlp
+import rlkit.torch.pytorch_util as ptu
+from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
+from rlkit.launchers.launcher_util import setup_logger
+from rlkit.samplers.data_collector import MdpPathCollector
+from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
 
 
 def experiment(variant):

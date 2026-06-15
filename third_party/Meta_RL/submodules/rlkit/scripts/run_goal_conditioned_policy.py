@@ -1,10 +1,10 @@
 import argparse
 import torch
 
-from third_party.rlkit.core import logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.rollout_functions import multitask_rollout
-from third_party.rlkit.torch import pytorch_util as ptu
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.vae_wrapper import VAEWrappedEnv
+from rlkit.core import logger
+from rlkit.samplers.rollout_functions import multitask_rollout
+from rlkit.torch import pytorch_util as ptu
+from rlkit.envs.vae_wrapper import VAEWrappedEnv
 
 
 def simulate_policy(args):

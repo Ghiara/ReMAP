@@ -14,9 +14,9 @@ import gym
 from typing import Dict
 from collections import deque
 
-from third_party.rlkit.data_management.env_replay_buffer import EnvReplayBuffer
+from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
 
-from third_party.Meta_RL.smrl.utility.console_strings import warning
+from smrl.utility.console_strings import warning
 
 
 class ContextReplayBuffer(EnvReplayBuffer):

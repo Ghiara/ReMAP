@@ -15,8 +15,8 @@ import gtimer
 from typing import Iterable, Dict, Tuple, Callable
 from collections import OrderedDict
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import TorchTrainer
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.loss import LossFunction
+from rlkit.torch.torch_rl_algorithm import TorchTrainer
+from rlkit.core.loss import LossFunction
 
 from ..vae.mdpvae import MdpVAE
 from ..utility.ops import np_batch_to_tensor_batch

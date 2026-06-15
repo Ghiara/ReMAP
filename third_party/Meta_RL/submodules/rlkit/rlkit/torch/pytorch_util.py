@@ -1,6 +1,6 @@
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 import numpy as np
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn
+from torch import nn
 
 
 def identity(x):

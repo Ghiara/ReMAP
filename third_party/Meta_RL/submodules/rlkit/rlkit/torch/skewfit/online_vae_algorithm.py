@@ -1,14 +1,14 @@
 import gtimer as gt
-from third_party.rlkit.core import logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.data_management.online_vae_replay_buffer import \
+from rlkit.core import logger
+from rlkit.data_management.online_vae_replay_buffer import \
     OnlineVaeRelabelingBuffer
-from third_party.Meta_RL.submodules.rlkit.rlkit.data_management.shared_obs_dict_replay_buffer \
+from rlkit.data_management.shared_obs_dict_replay_buffer \
     import SharedObsDictRelabelingBuffer
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch.vae.vae_schedules as vae_schedules
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import (
+import rlkit.torch.vae.vae_schedules as vae_schedules
+from rlkit.torch.torch_rl_algorithm import (
     TorchBatchRLAlgorithm,
 )
-import third_party.rlkit.torch.pytorch_util as ptu
+import rlkit.torch.pytorch_util as ptu
 from torch.multiprocessing import Process, Pipe
 from threading import Thread
 

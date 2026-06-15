@@ -1,9 +1,9 @@
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 import numpy as np
 import abc
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.distributions import Normal
+from torch.distributions import Normal
 from torch.nn import functional as F
-from third_party.rlkit.torch import pytorch_util as ptu
+from rlkit.torch import pytorch_util as ptu
 
 
 class VAEBase(torch.nn.Module, metaclass=abc.ABCMeta):

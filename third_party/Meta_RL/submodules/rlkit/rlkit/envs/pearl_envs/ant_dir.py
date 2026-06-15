@@ -1,6 +1,6 @@
 import numpy as np
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.ant_multitask_base import MultitaskAntEnv
+from rlkit.envs.pearl_envs.ant_multitask_base import MultitaskAntEnv
 
 
 class AntDirEnv(MultitaskAntEnv):

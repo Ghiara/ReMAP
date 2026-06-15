@@ -1,4 +1,4 @@
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.rand_param_envs.hopper_rand_params import HopperRandParamsEnv
+from rlkit.envs.pearl_envs.rand_param_envs.hopper_rand_params import HopperRandParamsEnv
 
 
 class HopperRandParamsWrappedEnv(HopperRandParamsEnv):

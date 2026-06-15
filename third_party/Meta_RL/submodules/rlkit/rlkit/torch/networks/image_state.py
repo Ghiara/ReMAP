@@ -1,5 +1,5 @@
-from third_party.rlkit.policies.base import Policy
-from third_party.rlkit.torch.core import PyTorchModule, eval_np
+from rlkit.policies.base import Policy
+from rlkit.torch.core import PyTorchModule, eval_np
 
 
 class ImageStatePolicy(PyTorchModule, Policy):

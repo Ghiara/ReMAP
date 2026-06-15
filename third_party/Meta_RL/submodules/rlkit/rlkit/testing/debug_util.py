@@ -1,6 +1,6 @@
 """For tracing programs and comparing outputs"""
 
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 
 i = 0
 

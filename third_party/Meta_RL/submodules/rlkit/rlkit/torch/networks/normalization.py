@@ -1,9 +1,9 @@
 """
 Contain some self-contained modules. Maybe depend on pytorch_util.
 """
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 import torch.nn as nn
-from third_party.rlkit.torch import pytorch_util as ptu
+from rlkit.torch import pytorch_util as ptu
 
 
 class LayerNorm(nn.Module):

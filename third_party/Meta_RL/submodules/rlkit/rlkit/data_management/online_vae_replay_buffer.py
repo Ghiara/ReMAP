@@ -1,13 +1,13 @@
 import numpy as np
 
-import third_party.rlkit.torch.pytorch_util as ptu
+import rlkit.torch.pytorch_util as ptu
 from multiworld.core.image_env import normalize_image
-from third_party.rlkit.core.eval_util import create_stats_ordered_dict
-from third_party.Meta_RL.submodules.rlkit.rlkit.data_management.obs_dict_replay_buffer import flatten_dict
-from third_party.Meta_RL.submodules.rlkit.rlkit.data_management.shared_obs_dict_replay_buffer import \
+from rlkit.core.eval_util import create_stats_ordered_dict
+from rlkit.data_management.obs_dict_replay_buffer import flatten_dict
+from rlkit.data_management.shared_obs_dict_replay_buffer import \
     SharedObsDictRelabelingBuffer
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.vae_wrapper import VAEWrappedEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.vae.vae_trainer import (
+from rlkit.envs.vae_wrapper import VAEWrappedEnv
+from rlkit.torch.vae.vae_trainer import (
     compute_p_x_np_to_np,
     relative_probs_from_log_probs,
 )

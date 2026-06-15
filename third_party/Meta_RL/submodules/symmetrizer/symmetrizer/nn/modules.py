@@ -3,8 +3,8 @@ from torch import nn
 import torch.nn.functional as F
 import numpy as np
 
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.groups.groups import MatrixRepresentation
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.ops.ops import get_basis, get_coeffs, get_invariant_basis, \
+from symmetrizer.groups.groups import MatrixRepresentation
+from symmetrizer.ops.ops import get_basis, get_coeffs, get_invariant_basis, \
     compute_gain
 
 

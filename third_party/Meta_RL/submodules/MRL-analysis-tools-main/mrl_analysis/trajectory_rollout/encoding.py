@@ -8,7 +8,7 @@ from tqdm import tqdm
 from ..utility.interfaces import MdpEncoder, MetaEnv, MetaRLPolicy
 from .rollout import rollout_with_encoder
 from .path_collector import MultithreadedPathCollector, MdpPathCollector
-from third_party.Meta_RL.smrl.utility.console_strings import print_to_terminal
+from smrl.utility.console_strings import print_to_terminal
 
 
 def encodings_from_encoder(

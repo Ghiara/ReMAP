@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.testing.np_test_case import NPTestCase
+from rlkit.testing.np_test_case import NPTestCase
 
 
 class TFTestCase(NPTestCase):

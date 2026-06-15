@@ -2,9 +2,9 @@ from collections import deque, OrderedDict
 
 import numpy as np
 
-from third_party.rlkit.core.eval_util import create_stats_ordered_dict
-from third_party.rlkit.data_management.path_builder import PathBuilder
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector.base import StepCollector
+from rlkit.core.eval_util import create_stats_ordered_dict
+from rlkit.data_management.path_builder import PathBuilder
+from rlkit.samplers.data_collector.base import StepCollector
 
 
 class MdpStepCollector(StepCollector):

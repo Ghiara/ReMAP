@@ -1,5 +1,5 @@
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn
+import torch
+from torch import nn
 
 
 class Clamp(nn.Module):

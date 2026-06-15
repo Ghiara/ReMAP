@@ -1,7 +1,7 @@
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.rlkit.torch.networks import ConcatMlp
+import torch
+from torch import nn
+import rlkit.torch.pytorch_util as ptu
+from rlkit.torch.networks import ConcatMlp
 
 
 class MlpEncoder(ConcatMlp):

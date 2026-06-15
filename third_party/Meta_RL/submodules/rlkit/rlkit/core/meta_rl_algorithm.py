@@ -4,18 +4,18 @@ import time
 
 import gtimer as gt
 import numpy as np
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.distributions import Normal, kl_divergence
+import torch
+from torch.distributions import Normal, kl_divergence
 
-from third_party.rlkit.core import logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.logging import append_log
-from third_party.Meta_RL.submodules.rlkit.rlkit.data_management.meta_learning_replay_buffer import \
+from rlkit.core import logger
+from rlkit.core.logging import append_log
+from rlkit.data_management.meta_learning_replay_buffer import \
     MetaLearningReplayBuffer
-from third_party.Meta_RL.submodules.rlkit.rlkit.data_management.multitask_replay_buffer import MultiTaskReplayBuffer
-from third_party.rlkit.data_management.path_builder import PathBuilder
-from third_party.rlkit.core import eval_util
-from third_party.rlkit.torch import pytorch_util as ptu
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.smac.sampler import SMACInPlacePathSampler
+from rlkit.data_management.multitask_replay_buffer import MultiTaskReplayBuffer
+from rlkit.data_management.path_builder import PathBuilder
+from rlkit.core import eval_util
+from rlkit.torch import pytorch_util as ptu
+from rlkit.torch.smac.sampler import SMACInPlacePathSampler
 import copy
 
 

@@ -15,9 +15,9 @@ from typing import Tuple, Dict, List, Any, Callable
 import numpy as np
 from collections import deque
 
-from third_party.Meta_RL.smrl.environments.state_access_env import StateAccessMetaEnv
-from third_party.Meta_RL.smrl.policies.base import Policy
-from third_party.Meta_RL.smrl.utility.console_strings import warning
+from smrl.environments.state_access_env import StateAccessMetaEnv
+from smrl.policies.base import Policy
+from smrl.utility.console_strings import warning
 
 
 class ContextTargetBuffer():

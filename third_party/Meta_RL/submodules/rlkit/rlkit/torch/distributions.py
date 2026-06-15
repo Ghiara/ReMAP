@@ -1,16 +1,16 @@
 """
 Add custom distributions in addition to th existing ones
 """
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.distributions import Categorical, OneHotCategorical, kl_divergence
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.distributions import Normal as TorchNormal
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.distributions import Beta as TorchBeta
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.distributions import Distribution as TorchDistribution
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.distributions import Bernoulli as TorchBernoulli
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.distributions import Independent as TorchIndependent
+import torch
+from torch.distributions import Categorical, OneHotCategorical, kl_divergence
+from torch.distributions import Normal as TorchNormal
+from torch.distributions import Beta as TorchBeta
+from torch.distributions import Distribution as TorchDistribution
+from torch.distributions import Bernoulli as TorchBernoulli
+from torch.distributions import Independent as TorchIndependent
 from torch.distributions.utils import _sum_rightmost
-from third_party.rlkit.core.eval_util import create_stats_ordered_dict
-import third_party.rlkit.torch.pytorch_util as ptu
+from rlkit.core.eval_util import create_stats_ordered_dict
+import rlkit.torch.pytorch_util as ptu
 import numpy as np
 from collections import OrderedDict
 
@@ -150,7 +150,7 @@ class Beta(Distribution, TorchBeta):
 
 
 class MultivariateDiagonalNormal(TorchDistributionWrapper):
-    from third_party.Meta_RL.submodules.rlkit.rlkit.torch.distributions import constraints
+    from torch.distributions import constraints
     arg_constraints = {'loc': constraints.real, 'scale': constraints.positive}
 
     def __init__(self, loc, scale_diag, reinterpreted_batch_ndims=1):

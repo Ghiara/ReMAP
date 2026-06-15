@@ -36,18 +36,16 @@ class InputOutputDecorator(EncoderDecorator):
     def __init__(
             self, 
             encoder: MdpEncoder,
-            # any function preprocess the 5 tensors of the MDP encoder input
             input_map: Callable[[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor], \
                                 Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]] \
                                 = None,
-            # any function transforms the output distribution pf the encoder
             output_map: Callable[[torch.distributions.Distribution], torch.distributions.Distribution] = None,
             *args, **kwargs) -> None:
         super().__init__(encoder, *args, **kwargs)
 
         self.input_map = input_map
         self.output_map = output_map
-    #forward function for the task inference, infer the latent varibale z from the context
+
     def forward(
             self, 
             observations: torch.Tensor, 

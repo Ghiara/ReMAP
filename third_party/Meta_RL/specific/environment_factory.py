@@ -14,7 +14,7 @@ Date:
 from typing import Tuple
 
 from meta_envs.toy_goal import Toy1D
-from third_party.Meta_RL.smrl.utility.console_strings import print_to_terminal
+from smrl.utility.console_strings import print_to_terminal
 
 
 

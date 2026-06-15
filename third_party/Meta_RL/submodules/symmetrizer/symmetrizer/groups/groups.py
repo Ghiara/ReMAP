@@ -1,5 +1,5 @@
 import numpy as np
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.ops import *
+from symmetrizer.ops import *
 
 class Group:
     """

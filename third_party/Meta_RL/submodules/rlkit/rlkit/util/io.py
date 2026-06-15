@@ -4,7 +4,7 @@ import pickle
 
 import boto3
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.launchers.conf import LOCAL_LOG_DIR, AWS_S3_PATH
+from rlkit.launchers.conf import LOCAL_LOG_DIR, AWS_S3_PATH
 import os
 
 PICKLE = 'pickle'

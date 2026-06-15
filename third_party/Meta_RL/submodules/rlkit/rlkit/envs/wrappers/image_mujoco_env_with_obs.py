@@ -1,7 +1,7 @@
 import numpy as np
 from gym.spaces import Box
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.wrappers.image_mujoco_env import ImageMujocoEnv
+from rlkit.envs.wrappers.image_mujoco_env import ImageMujocoEnv
 
 
 class ImageMujocoWithObsEnv(ImageMujocoEnv):

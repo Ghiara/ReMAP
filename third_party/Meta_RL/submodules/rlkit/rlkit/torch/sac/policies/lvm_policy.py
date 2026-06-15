@@ -1,13 +1,13 @@
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.networks.stochastic.distribution_generator import (
+from rlkit.torch.networks.stochastic.distribution_generator import (
     DistributionGenerator
 )
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.sac.policies.base import (
+from rlkit.torch.sac.policies.base import (
     TorchStochasticPolicy,
     PolicyFromDistributionGenerator,
     MakeDeterministic,
 )
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.lvm.latent_variable_model import LatentVariableModel
+from rlkit.torch.lvm.latent_variable_model import LatentVariableModel
 
 
 class LVMPolicy(LatentVariableModel, TorchStochasticPolicy):

@@ -1,6 +1,6 @@
 import numpy as np
 from gym import utils
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.rand_param_envs.base import RandomEnv
+from rlkit.envs.pearl_envs.rand_param_envs.base import RandomEnv
 
 
 class Walker2DRandParamsEnv(RandomEnv, utils.EzPickle):

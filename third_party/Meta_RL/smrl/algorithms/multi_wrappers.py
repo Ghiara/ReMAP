@@ -17,9 +17,9 @@ import torch
 from typing import List, Dict, Iterable
 from collections import OrderedDict
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.trainer import Trainer
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector import DataCollector
-from third_party.rlkit.data_management.replay_buffer import ReplayBuffer
+from rlkit.core.trainer import Trainer
+from rlkit.samplers.data_collector import DataCollector
+from rlkit.data_management.replay_buffer import ReplayBuffer
 
 
 class MultiTrainerWrapper(Trainer):

@@ -1,11 +1,11 @@
 import numpy as np
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn as nn
+import torch
+from torch import nn as nn
 from torch.nn import functional as F
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.pythonplusplus import identity
-from third_party.rlkit.torch import pytorch_util as ptu
-from third_party.rlkit.torch.core import PyTorchModule
+from rlkit.pythonplusplus import identity
+from rlkit.torch import pytorch_util as ptu
+from rlkit.torch.core import PyTorchModule
 
 
 class FeatPointMlp(PyTorchModule):

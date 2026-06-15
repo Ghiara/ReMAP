@@ -9,8 +9,8 @@ import torch.optim as optim
 from torch import nn as nn
 from tqdm import tqdm
 
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.rlkit.core.eval_util import create_stats_ordered_dict
+import rlkit.torch.pytorch_util as ptu
+from rlkit.core.eval_util import create_stats_ordered_dict
 
 # import vis_utils.tb_logging as TB
 

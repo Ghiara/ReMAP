@@ -11,10 +11,10 @@ Date:
 
 import torch
 
-from third_party.Meta_RL.smrl.vae.mdpvae import MdpEncoder
-from third_party.Meta_RL.smrl.utility.distributions import DiagonalMultivariateNormal
-from third_party.Meta_RL.smrl.vae.encoder_networks.util import batched
-from third_party.rlkit.torch.distributions import Delta
+from smrl.vae.mdpvae import MdpEncoder
+from smrl.utility.distributions import DiagonalMultivariateNormal
+from smrl.vae.encoder_networks.util import batched
+from rlkit.torch.distributions import Delta
 
 
 class Toy1dOracle(MdpEncoder):

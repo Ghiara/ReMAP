@@ -17,7 +17,7 @@ Date:
 import torch
 from typing import Type, Any, Mapping
 
-from third_party.Meta_RL.smrl.utility.console_strings import warning
+from smrl.utility.console_strings import warning
 
 from ..mdpvae import MdpEncoder
 

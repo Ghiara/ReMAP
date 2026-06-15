@@ -5,7 +5,7 @@ import os
 
 from collections import OrderedDict
 
-import third_party.rlkit.torch.pytorch_util as ptu
+import rlkit.torch.pytorch_util as ptu
 
 from PIL import Image
 

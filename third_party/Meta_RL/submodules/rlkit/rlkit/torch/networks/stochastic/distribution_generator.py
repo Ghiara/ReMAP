@@ -1,8 +1,8 @@
 import abc
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn
+from torch import nn
 
-from third_party.rlkit.torch.distributions import (
+from rlkit.torch.distributions import (
     Bernoulli,
     Beta,
     Distribution,
@@ -12,7 +12,7 @@ from third_party.rlkit.torch.distributions import (
     MultivariateDiagonalNormal,
     TanhNormal,
 )
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.networks.basic import MultiInputSequential
+from rlkit.torch.networks.basic import MultiInputSequential
 
 
 class DistributionGenerator(nn.Module, metaclass=abc.ABCMeta):

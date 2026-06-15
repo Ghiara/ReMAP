@@ -1,7 +1,7 @@
 """
 Contain some self-contained modules.
 """
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 import torch.nn as nn
 
 

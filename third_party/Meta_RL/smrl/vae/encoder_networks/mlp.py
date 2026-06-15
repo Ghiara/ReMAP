@@ -18,7 +18,7 @@ import torch
 import numpy as np
 from typing import Union, Tuple, List, Type
 
-from third_party.Meta_RL.smrl.utility.distributions import DiagonalMultivariateNormal
+from smrl.utility.distributions import DiagonalMultivariateNormal
 from ..mdpvae import MdpEncoder
 from .util import batched, pad_sequence_length
 

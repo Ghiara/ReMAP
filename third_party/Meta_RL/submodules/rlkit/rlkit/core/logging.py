@@ -15,9 +15,9 @@ import csv
 import json
 import pickle
 import errno
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 
-from third_party.rlkit.core.tabulate import tabulate
+from rlkit.core.tabulate import tabulate
 from collections import OrderedDict
 
 def add_prefix(log_dict: OrderedDict, prefix: str, divider=''):

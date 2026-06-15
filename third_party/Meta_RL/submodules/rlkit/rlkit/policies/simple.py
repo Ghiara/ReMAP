@@ -1,4 +1,4 @@
-from third_party.rlkit.policies.base import Policy
+from rlkit.policies.base import Policy
 
 
 class RandomPolicy(Policy):

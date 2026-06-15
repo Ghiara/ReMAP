@@ -12,8 +12,8 @@ Date:
 
 from run_toy_training import main
 
-from third_party.Meta_RL.configs.environment_factory import *
-from third_party.Meta_RL.configs.base_configuration import config
+from configs.environment_factory import *
+from configs.base_configuration import config
 
 main(
     toy1d,

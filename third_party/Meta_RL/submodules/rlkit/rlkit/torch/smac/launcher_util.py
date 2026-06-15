@@ -6,13 +6,13 @@ from typing import List, Any
 
 import numpy as np
 
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.rlkit.core import eval_util
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.logging import append_log
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.meta_rl_algorithm import MetaRLAlgorithm
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs import AntDirEnv, HalfCheetahVelEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.util.io import load_local_or_remote_file
-from third_party.rlkit.torch.sac.policies import GaussianPolicy, TanhGaussianPolicy
+import rlkit.torch.pytorch_util as ptu
+from rlkit.core import eval_util
+from rlkit.core.logging import append_log
+from rlkit.core.meta_rl_algorithm import MetaRLAlgorithm
+from rlkit.envs.pearl_envs import AntDirEnv, HalfCheetahVelEnv
+from rlkit.util.io import load_local_or_remote_file
+from rlkit.torch.sac.policies import GaussianPolicy, TanhGaussianPolicy
 
 ENV_PARAMS = {
     'HalfCheetah-v2': {

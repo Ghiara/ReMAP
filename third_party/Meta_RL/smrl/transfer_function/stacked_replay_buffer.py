@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-import third_party.rlkit.torch.pytorch_util as ptu
+import rlkit.torch.pytorch_util as ptu
 from tqdm import tqdm
 import ray
 import copy

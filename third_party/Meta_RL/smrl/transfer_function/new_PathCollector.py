@@ -6,11 +6,11 @@ from typing import Dict, List, Union, Any, Tuple
 from tqdm import tqdm
 import copy
 
-from third_party.Meta_RL.main_config import HARDCODED
-from third_party.Meta_RL.smrl.policies.meta_policy import PretrainedCheetah
+from main_config import HARDCODED
+from smrl.policies.meta_policy import PretrainedCheetah
 
 from mrl_analysis.trajectory_rollout.path_collector import MdpPathCollector, MultithreadedPathCollector
-from third_party.Meta_RL.smrl.transfer_function.new_rollout import rollout_with_encoder
+from .new_rollout import rollout_with_encoder
 from mrl_analysis.trajectory_rollout.encoding import contexts_from_trajectory
 
 class TrajectoryGeneratorWithTransferFunction():
@@ -73,18 +73,14 @@ class TrajectoryGeneratorWithTransferFunction():
             - 'rew_dist': Distribution over encoder-predicted rewards (only if decoder provided)
             - 'std_dist': Distribution over encoder-predicted next states (only if decoder provided)
         """
-        #only use the simple env, encoder, transfer function for rollout
-        #how to bridge the HL to LL, happens in the rollout_with_encoder function
+
         rollout_fn = rollout_with_encoder(self.simple_env, self.encoder, self.transfer_function, context_size=self.encoder.context_size)
-        #choose the type of path collector
         path_collector_type = MdpPathCollector
         if 'MULTITHREADING' in os.environ.keys() and os.environ['MULTITHREADING'] == "True":
             path_collector_type = MultithreadedPathCollector
         path_collector = path_collector_type(self.env, self.policy, rollout_fn)
         
         print("Collecting trajectories...")
-        #rollout in the real env with the HL policy
-        #use the path collector of type multithreadpathcollector to collect trajectories
         trajectories = path_collector.collect_new_paths(max_path_length, n_trajectories)
 
         print("Adding additional information...")
@@ -94,7 +90,7 @@ class TrajectoryGeneratorWithTransferFunction():
             action_dist = self.action_distribution(traj)
             traj['action_dist'] = action_dist
             traj['action_mean'] = ptu.np_ify(action_dist.mean)
-            # traj['action_std'] = np.sqrt(ptu.np_ify(action_dist.variance))
+            traj['action_std'] = np.sqrt(ptu.np_ify(action_dist.variance))
             latent_dist = self.latent_distribution(contexts)
             traj['latent_dist'] = latent_dist
             traj['latent_mean'] = ptu.np_ify(latent_dist.mean)

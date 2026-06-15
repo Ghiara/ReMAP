@@ -1,9 +1,9 @@
-import third_party.Meta_RL.submodules.rlkit.rlkit.util.hyperparameter as hyp
+import rlkit.util.hyperparameter as hyp
 from multiworld.envs.mujoco.cameras import sawyer_init_camera_zoomed_in
-from third_party.rlkit.launchers.launcher_util import run_experiment
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch.vae.vae_schedules as vae_schedules
-from third_party.Meta_RL.submodules.rlkit.rlkit.launchers.skewfit_experiments import skewfit_full_experiment
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.vae.conv_vae import imsize48_default_architecture
+from rlkit.launchers.launcher_util import run_experiment
+import rlkit.torch.vae.vae_schedules as vae_schedules
+from rlkit.launchers.skewfit_experiments import skewfit_full_experiment
+from rlkit.torch.vae.conv_vae import imsize48_default_architecture
 
 
 if __name__ == "__main__":

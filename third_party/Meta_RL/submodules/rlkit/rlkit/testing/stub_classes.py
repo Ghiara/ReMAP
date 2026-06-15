@@ -1,7 +1,7 @@
 import numpy as np
 from gym.spaces import Box, Dict
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.base import RawExplorationStrategy
+from rlkit.exploration_strategies.base import RawExplorationStrategy
 
 class StubEnv(object):
     def __init__(self, obs_dim=1, action_dim=1, **kwargs):

@@ -1,10 +1,10 @@
 import os
 import sys
 
-from third_party.Meta_RL.submodules.rlkit.examples.iql import mujoco_finetune as iql
+from examples.iql import mujoco_finetune as iql
 
-from third_party.rlkit.core import logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.testing import csv_util
+from rlkit.core import logger
+from rlkit.testing import csv_util
 
 def test_iql():
     logger.reset()

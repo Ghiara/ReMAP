@@ -3,7 +3,7 @@ from abc import abstractmethod
 from typing import Union, List, Any
 import gtimer
 
-import third_party.rlkit.torch.pytorch_util as ptu
+import rlkit.torch.pytorch_util as ptu
 
 
 class MovableObject():

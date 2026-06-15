@@ -1,28 +1,28 @@
 import pickle
 
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.rlkit.core import logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.meta_rl_algorithm import MetaRLAlgorithm
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.simple_offline_rl_algorithm import (
+import rlkit.torch.pytorch_util as ptu
+from rlkit.core import logger
+from rlkit.core.meta_rl_algorithm import MetaRLAlgorithm
+from rlkit.core.simple_offline_rl_algorithm import (
     OfflineMetaRLAlgorithm,
 )
-from third_party.rlkit.data_management.env_replay_buffer import EnvReplayBuffer
-from third_party.Meta_RL.submodules.rlkit.rlkit.demos.source.mdp_path_loader import MDPPathLoader
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs import ENVS, register_pearl_envs
-from third_party.rlkit.envs.wrappers import NormalizedBoxEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.util.io import load_local_or_remote_file
-from third_party.rlkit.torch.networks import ConcatMlp
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.smac.agent import SmacAgent
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.smac.diagnostics import get_env_info_sizes
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.smac.networks import MlpEncoder, DummyMlpEncoder, MlpDecoder
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.smac.launcher_util import (
+from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
+from rlkit.demos.source.mdp_path_loader import MDPPathLoader
+from rlkit.envs.pearl_envs import ENVS, register_pearl_envs
+from rlkit.envs.wrappers import NormalizedBoxEnv
+from rlkit.util.io import load_local_or_remote_file
+from rlkit.torch.networks import ConcatMlp
+from rlkit.torch.smac.agent import SmacAgent
+from rlkit.torch.smac.diagnostics import get_env_info_sizes
+from rlkit.torch.smac.networks import MlpEncoder, DummyMlpEncoder, MlpDecoder
+from rlkit.torch.smac.launcher_util import (
     policy_class_from_str,
     load_buffer_onto_algo,
     EvalPearl,
     load_macaw_buffer_onto_algo,
     relabel_offline_data,
 )
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.smac.smac import SmacTrainer
+from rlkit.torch.smac.smac import SmacTrainer
 
 
 def smac_experiment(

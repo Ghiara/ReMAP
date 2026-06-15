@@ -22,12 +22,12 @@ from collections.abc import Iterable
 
 from torch.optim.lr_scheduler import _LRScheduler
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.logging import Logger, logger as default_logger
+from rlkit.core.logging import Logger, logger as default_logger
 
-from third_party.Meta_RL.smrl.vae.mdpvae import MdpEncoder, MdpDecoder, MdpVAE
-from third_party.Meta_RL.smrl.data_management.vae_training_data import ContextTargetBuffer, ContextCollector
-from third_party.Meta_RL.smrl.trainers.vae import MdpVAETrainer
-from third_party.Meta_RL.smrl.utility import console_strings
+from smrl.vae.mdpvae import MdpEncoder, MdpDecoder, MdpVAE
+from smrl.data_management.vae_training_data import ContextTargetBuffer, ContextCollector
+from smrl.trainers.vae import MdpVAETrainer
+from smrl.utility import console_strings
 
 
 

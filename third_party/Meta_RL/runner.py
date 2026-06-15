@@ -27,10 +27,10 @@ from datetime import datetime
 import pytz
 from typing import Dict, Callable, Tuple
 
-from third_party.Meta_RL.smrl.experiment.experiment_setup import setup_experiment
-import third_party.Meta_RL.smrl.utility.console_strings as console_strings
+from smrl.experiment.experiment_setup import setup_experiment
+import smrl.utility.console_strings as console_strings
 
-from third_party.Meta_RL.smrl.environments.meta_env import MetaEnv
+from smrl.environments.meta_env import MetaEnv
 
 
 def main(

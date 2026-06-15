@@ -2,12 +2,12 @@ import abc
 from collections import OrderedDict
 
 from typing import Iterable
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn as nn
+from torch import nn as nn
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.batch_rl_algorithm import BatchRLAlgorithm
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.online_rl_algorithm import OnlineRLAlgorithm
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.trainer import Trainer
-from third_party.rlkit.torch.core import np_to_pytorch_batch
+from rlkit.core.batch_rl_algorithm import BatchRLAlgorithm
+from rlkit.core.online_rl_algorithm import OnlineRLAlgorithm
+from rlkit.core.trainer import Trainer
+from rlkit.torch.core import np_to_pytorch_batch
 
 
 class TorchOnlineRLAlgorithm(OnlineRLAlgorithm):

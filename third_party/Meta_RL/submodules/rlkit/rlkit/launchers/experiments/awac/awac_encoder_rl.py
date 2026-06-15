@@ -10,20 +10,20 @@ from gym.envs.mujoco import (
 from gym.envs.classic_control import PendulumEnv
 import gym
 
-from third_party.rlkit.data_management.env_replay_buffer import EnvReplayBuffer
-from third_party.rlkit.envs.wrappers import NormalizedBoxEnv, StackObservationEnv
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector import MdpPathCollector
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector.step_collector import MdpStepCollector
-from third_party.rlkit.torch.networks import ConcatMlp
-from third_party.rlkit.torch.sac.policies import TanhGaussianPolicy, MakeDeterministic
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.sac.awac_trainer import AWACTrainer
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import (
+from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
+from rlkit.envs.wrappers import NormalizedBoxEnv, StackObservationEnv
+import rlkit.torch.pytorch_util as ptu
+from rlkit.samplers.data_collector import MdpPathCollector
+from rlkit.samplers.data_collector.step_collector import MdpStepCollector
+from rlkit.torch.networks import ConcatMlp
+from rlkit.torch.sac.policies import TanhGaussianPolicy, MakeDeterministic
+from rlkit.torch.sac.awac_trainer import AWACTrainer
+from rlkit.torch.torch_rl_algorithm import (
     TorchBatchRLAlgorithm,
     TorchOnlineRLAlgorithm,
 )
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.demos.source.mdp_path_loader import MDPPathLoader
+from rlkit.demos.source.mdp_path_loader import MDPPathLoader
 from rlkit.visualization.video import save_paths
 
 ENV_PARAMS = {

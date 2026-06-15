@@ -1,12 +1,12 @@
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 import torch.utils.data
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn
+from torch import nn
 from torch.nn import functional as F
-from third_party.Meta_RL.submodules.rlkit.rlkit.pythonplusplus import identity
-from third_party.rlkit.torch import pytorch_util as ptu
+from rlkit.pythonplusplus import identity
+from rlkit.torch import pytorch_util as ptu
 import numpy as np
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.conv_networks import CNN, DCNN
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.vae.vae_base import GaussianLatentVAE
+from rlkit.torch.conv_networks import CNN, DCNN
+from rlkit.torch.vae.vae_base import GaussianLatentVAE
 
 ###### DEFAULT ARCHITECTURES #########
 

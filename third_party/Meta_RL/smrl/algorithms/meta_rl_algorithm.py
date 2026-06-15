@@ -15,15 +15,15 @@ import torch
 import gtimer
 from tqdm import tqdm
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm, TorchTrainer
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector import PathCollector
-from third_party.rlkit.data_management.replay_buffer import ReplayBuffer
+from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm, TorchTrainer
+from rlkit.samplers.data_collector import PathCollector
+from rlkit.data_management.replay_buffer import ReplayBuffer
 
-import third_party.Meta_RL.smrl.utility.console_strings as console_strings
-from third_party.Meta_RL.smrl.utility.console_strings import print_to_terminal
-from third_party.Meta_RL.smrl.utility.device_context_manager import DeviceContext
-from third_party.Meta_RL.smrl.environments.meta_env import MetaEnv
-from third_party.Meta_RL.smrl.data_management.replay_buffers import ContextReplayBuffer
+import smrl.utility.console_strings as console_strings
+from smrl.utility.console_strings import print_to_terminal
+from smrl.utility.device_context_manager import DeviceContext
+from smrl.environments.meta_env import MetaEnv
+from smrl.data_management.replay_buffers import ContextReplayBuffer
 
 from .multi_wrappers import *
 

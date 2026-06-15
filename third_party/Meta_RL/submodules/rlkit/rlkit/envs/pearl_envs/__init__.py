@@ -1,15 +1,15 @@
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.ant_normal import AntNormal
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.ant_dir import AntDirEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.ant_goal import AntGoalEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.half_cheetah_dir import HalfCheetahDirEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.half_cheetah_vel import HalfCheetahVelEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.hopper_rand_params_wrapper import \
+from rlkit.envs.pearl_envs.ant_normal import AntNormal
+from rlkit.envs.pearl_envs.ant_dir import AntDirEnv
+from rlkit.envs.pearl_envs.ant_goal import AntGoalEnv
+from rlkit.envs.pearl_envs.half_cheetah_dir import HalfCheetahDirEnv
+from rlkit.envs.pearl_envs.half_cheetah_vel import HalfCheetahVelEnv
+from rlkit.envs.pearl_envs.hopper_rand_params_wrapper import \
     HopperRandParamsWrappedEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.humanoid_dir import HumanoidDirEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.point_robot import PointEnv, SparsePointEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.rand_param_envs.walker2d_rand_params import \
+from rlkit.envs.pearl_envs.humanoid_dir import HumanoidDirEnv
+from rlkit.envs.pearl_envs.point_robot import PointEnv, SparsePointEnv
+from rlkit.envs.pearl_envs.rand_param_envs.walker2d_rand_params import \
     Walker2DRandParamsEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.pearl_envs.walker_rand_params_wrapper import \
+from rlkit.envs.pearl_envs.walker_rand_params_wrapper import \
     WalkerRandParamsWrappedEnv
 
 ENVS = {}

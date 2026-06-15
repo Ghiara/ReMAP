@@ -1,47 +1,47 @@
 import gym
 # import roboverse
-from third_party.rlkit.data_management.env_replay_buffer import EnvReplayBuffer
-from third_party.Meta_RL.submodules.rlkit.rlkit.data_management.split_buffer import SplitReplayBuffer
-from third_party.rlkit.envs.wrappers import NormalizedBoxEnv, StackObservationEnv, RewardWrapperEnv
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector import MdpPathCollector, ObsDictPathCollector
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector.step_collector import MdpStepCollector
-from third_party.rlkit.torch.networks import ConcatMlp
-from third_party.rlkit.torch.sac.policies import TanhGaussianPolicy, MakeDeterministic
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.sac.awac_trainer import AWACTrainer
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import (
+from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
+from rlkit.data_management.split_buffer import SplitReplayBuffer
+from rlkit.envs.wrappers import NormalizedBoxEnv, StackObservationEnv, RewardWrapperEnv
+import rlkit.torch.pytorch_util as ptu
+from rlkit.samplers.data_collector import MdpPathCollector, ObsDictPathCollector
+from rlkit.samplers.data_collector.step_collector import MdpStepCollector
+from rlkit.torch.networks import ConcatMlp
+from rlkit.torch.sac.policies import TanhGaussianPolicy, MakeDeterministic
+from rlkit.torch.sac.awac_trainer import AWACTrainer
+from rlkit.torch.torch_rl_algorithm import (
     TorchBatchRLAlgorithm,
     TorchOnlineRLAlgorithm,
 )
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.demos.source.hdf5_path_loader import HDF5PathLoader
-from third_party.Meta_RL.submodules.rlkit.rlkit.demos.source.mdp_path_loader import MDPPathLoader
+from rlkit.demos.source.hdf5_path_loader import HDF5PathLoader
+from rlkit.demos.source.mdp_path_loader import MDPPathLoader
 # from rlkit.visualization.video import save_paths, VideoSaveFunction
 
 from multiworld.core.flat_goal_env import FlatGoalEnv
 from multiworld.core.image_env import ImageEnv
 from multiworld.core.gym_to_multi_env import GymToMultiEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.util.hyperparameter import recursive_dictionary_update
+from rlkit.util.hyperparameter import recursive_dictionary_update
 
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 from torch.nn import functional as F
 import numpy as np
 from torchvision.utils import save_image
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.base import \
+from rlkit.exploration_strategies.base import \
     PolicyWrappedWithExplorationStrategy
-from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.gaussian_and_epsilon_strategy import GaussianAndEpsilonStrategy
-from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.ou_strategy import OUStrategy
+from rlkit.exploration_strategies.gaussian_and_epsilon_strategy import GaussianAndEpsilonStrategy
+from rlkit.exploration_strategies.ou_strategy import OUStrategy
 
 import os.path as osp
-from third_party.rlkit.core import logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.util.io import load_local_or_remote_file
+from rlkit.core import logger
+from rlkit.util.io import load_local_or_remote_file
 import pickle
 
 # from rlkit.envs.images import Renderer, InsertImageEnv, EnvRenderer
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.make_env import make
+from rlkit.envs.make_env import make
 
-from third_party.rlkit.torch.networks import LinearTransform
+from rlkit.torch.networks import LinearTransform
 
 import random
 

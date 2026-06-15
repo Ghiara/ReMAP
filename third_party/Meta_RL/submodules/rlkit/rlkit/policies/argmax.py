@@ -2,10 +2,10 @@
 Torch argmax policy
 """
 import numpy as np
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn
+from torch import nn
 
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.rlkit.policies.base import Policy
+import rlkit.torch.pytorch_util as ptu
+from rlkit.policies.base import Policy
 
 
 class ArgmaxDiscretePolicy(nn.Module, Policy):

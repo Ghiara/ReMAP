@@ -5,7 +5,7 @@ import time
 from typing import List, Any, Dict
 import matplotlib.pyplot as plt
 
-from third_party.Meta_RL.smrl.experiment.analysis import load_results
+from smrl.experiment.analysis import load_results
 
 from mrl_analysis.live_visualization.plots import Plot
 from mrl_analysis.utility import interfaces

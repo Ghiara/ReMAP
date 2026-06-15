@@ -5,18 +5,18 @@ import copy
 
 from gym.envs.mujoco import HalfCheetahEnv
 
-from third_party.rlkit.data_management.env_replay_buffer import EnvReplayBuffer
-from third_party.rlkit.envs.wrappers import NormalizedBoxEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.base import (
+from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
+from rlkit.envs.wrappers import NormalizedBoxEnv
+from rlkit.exploration_strategies.base import (
     PolicyWrappedWithExplorationStrategy
 )
-from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.ou_strategy import OUStrategy
-from third_party.rlkit.launchers.launcher_util import setup_logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector import MdpPathCollector
-from third_party.rlkit.torch.networks import ConcatMlp, TanhMlpPolicy
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.ddpg.ddpg import DDPGTrainer
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
+from rlkit.exploration_strategies.ou_strategy import OUStrategy
+from rlkit.launchers.launcher_util import setup_logger
+from rlkit.samplers.data_collector import MdpPathCollector
+from rlkit.torch.networks import ConcatMlp, TanhMlpPolicy
+from rlkit.torch.ddpg.ddpg import DDPGTrainer
+import rlkit.torch.pytorch_util as ptu
+from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
 
 
 def experiment(variant):

@@ -18,9 +18,9 @@ import json
 
 from typing import Dict, List, Tuple
 
-from third_party.Meta_RL.smrl.utility.ops import ensure_importable_entries
+from smrl.utility.ops import ensure_importable_entries
 from .model_setup import init_networks, load_params
-from third_party.Meta_RL.configs.environment_factory import toy1d_domain_rand
+from configs.environment_factory import toy1d_domain_rand
 
 from stable_baselines3 import SAC
 

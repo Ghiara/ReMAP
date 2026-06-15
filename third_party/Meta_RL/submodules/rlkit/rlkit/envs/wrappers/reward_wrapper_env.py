@@ -1,4 +1,4 @@
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.proxy_env import ProxyEnv
+from rlkit.envs.proxy_env import ProxyEnv
 
 
 class RewardWrapperEnv(ProxyEnv):

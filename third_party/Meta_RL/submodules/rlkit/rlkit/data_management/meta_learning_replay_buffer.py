@@ -1,11 +1,11 @@
 import numpy as np
 import random
 
-from third_party.rlkit.data_management.simple_replay_buffer import (
+from rlkit.data_management.simple_replay_buffer import (
     SimpleReplayBuffer as RLKitSimpleReplayBuffer
 )
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.env_utils import get_dim
+from rlkit.envs.env_utils import get_dim
 
 
 class MetaLearningReplayBuffer(object):

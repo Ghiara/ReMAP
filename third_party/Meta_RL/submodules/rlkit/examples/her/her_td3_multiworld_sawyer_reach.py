@@ -8,19 +8,19 @@ Note that one epoch = 5k steps, so 200 epochs = 1 million steps.
 """
 import gym
 
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.Meta_RL.submodules.rlkit.rlkit.data_management.obs_dict_replay_buffer import ObsDictRelabelingBuffer
-from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.base import \
+import rlkit.torch.pytorch_util as ptu
+from rlkit.data_management.obs_dict_replay_buffer import ObsDictRelabelingBuffer
+from rlkit.exploration_strategies.base import \
     PolicyWrappedWithExplorationStrategy
-from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.gaussian_and_epsilon_strategy import (
+from rlkit.exploration_strategies.gaussian_and_epsilon_strategy import (
     GaussianAndEpsilonStrategy
 )
-from third_party.rlkit.launchers.launcher_util import setup_logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector import GoalConditionedPathCollector
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.her.her import HERTrainer
-from third_party.rlkit.torch.networks import ConcatMlp, TanhMlpPolicy
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.td3.td3 import TD3Trainer
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
+from rlkit.launchers.launcher_util import setup_logger
+from rlkit.samplers.data_collector import GoalConditionedPathCollector
+from rlkit.torch.her.her import HERTrainer
+from rlkit.torch.networks import ConcatMlp, TanhMlpPolicy
+from rlkit.torch.td3.td3 import TD3Trainer
+from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
 
 
 def experiment(variant):

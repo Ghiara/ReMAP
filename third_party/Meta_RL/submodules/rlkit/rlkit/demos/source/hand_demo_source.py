@@ -1,9 +1,9 @@
-from third_party.Meta_RL.submodules.rlkit.rlkit.demos.source.demo_source import DemoSource
+from rlkit.demos.source.demo_source import DemoSource
 import pickle
 
-from third_party.rlkit.data_management.path_builder import PathBuilder
+from rlkit.data_management.path_builder import PathBuilder
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.util.io import load_local_or_remote_file
+from rlkit.util.io import load_local_or_remote_file
 
 class HandDemoSource(DemoSource):
     def __init__(self, filename):

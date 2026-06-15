@@ -3,7 +3,7 @@ from gym import Env
 from gym.spaces import Box
 import mujoco_py
 
-from third_party.rlkit.core.serializable import Serializable
+from rlkit.core.serializable import Serializable
 
 
 class ProxyEnv(Serializable, Env):

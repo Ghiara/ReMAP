@@ -1,4 +1,4 @@
-from third_party.rlkit.torch.core import PyTorchModule
+from rlkit.torch.core import PyTorchModule
 
 
 class LinearTransform(PyTorchModule):

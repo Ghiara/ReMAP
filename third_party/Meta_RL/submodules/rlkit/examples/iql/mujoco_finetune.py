@@ -2,13 +2,13 @@
 AWR + SAC from demo experiment
 """
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.demos.source.hdf5_path_loader import HDF5PathLoader
-from third_party.Meta_RL.submodules.rlkit.rlkit.launchers.experiments.awac.finetune_rl import experiment, process_args
+from rlkit.demos.source.hdf5_path_loader import HDF5PathLoader
+from rlkit.launchers.experiments.awac.finetune_rl import experiment, process_args
 
-from third_party.rlkit.launchers.launcher_util import run_experiment
+from rlkit.launchers.launcher_util import run_experiment
 
-from third_party.rlkit.torch.sac.policies import GaussianPolicy
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.sac.iql_trainer import IQLTrainer
+from rlkit.torch.sac.policies import GaussianPolicy
+from rlkit.torch.sac.iql_trainer import IQLTrainer
 
 import random
 

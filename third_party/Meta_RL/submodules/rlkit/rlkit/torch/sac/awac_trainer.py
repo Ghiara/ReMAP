@@ -1,19 +1,19 @@
 import pickle
 from collections import OrderedDict
 import numpy as np
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 import torch.optim as optim
-from third_party.rlkit.torch.sac.policies import MakeDeterministic
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn as nn
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.rlkit.core.eval_util import create_stats_ordered_dict
-from third_party.rlkit.torch.core import np_to_pytorch_batch
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import TorchTrainer
-from third_party.rlkit.core import logger
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.logging import add_prefix
-from third_party.Meta_RL.submodules.rlkit.rlkit.util.ml_util import PiecewiseLinearSchedule, ConstantSchedule
+from rlkit.torch.sac.policies import MakeDeterministic
+from torch import nn as nn
+import rlkit.torch.pytorch_util as ptu
+from rlkit.core.eval_util import create_stats_ordered_dict
+from rlkit.torch.core import np_to_pytorch_batch
+from rlkit.torch.torch_rl_algorithm import TorchTrainer
+from rlkit.core import logger
+from rlkit.core.logging import add_prefix
+from rlkit.util.ml_util import PiecewiseLinearSchedule, ConstantSchedule
 import torch.nn.functional as F
-from third_party.rlkit.torch.networks import LinearTransform
+from rlkit.torch.networks import LinearTransform
 import time
 
 

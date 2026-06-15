@@ -13,7 +13,7 @@ import torch
 import numpy as np
 from typing import Type
 
-from third_party.Meta_RL.smrl.utility.console_strings import warning
+from smrl.utility.console_strings import warning
 
 from ..mdpvae import MdpEncoder
 from ..encoder_networks.util import batched

@@ -1,7 +1,7 @@
 import torch
 
-from third_party.Meta_RL.smrl.vae.mdpvae import MdpEncoder
-from third_party.Meta_RL.smrl.vae.encoder_decorators import PretrainedEncoder
+from smrl.vae.mdpvae import MdpEncoder
+from smrl.vae.encoder_decorators import PretrainedEncoder
 
 class Toy1dForToy1dContinuousDecorator(PretrainedEncoder):
     """DEPRECATED: Use a more general approach of combining pretrained encoder

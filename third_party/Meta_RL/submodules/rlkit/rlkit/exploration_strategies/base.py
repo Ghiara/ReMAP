@@ -1,6 +1,6 @@
 import abc
 
-from third_party.rlkit.policies.base import ExplorationPolicy
+from rlkit.policies.base import ExplorationPolicy
 
 
 class ExplorationStrategy(object, metaclass=abc.ABCMeta):

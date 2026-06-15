@@ -1,4 +1,3 @@
-
 """
 Should be run on a machine connected to a spacemouse
 """
@@ -6,7 +5,7 @@ Should be run on a machine connected to a spacemouse
 from robosuite.devices import SpaceMouse
 import time
 import Pyro4
-from third_party.rlkit.launchers import config
+from rlkit.launchers import config
 
 Pyro4.config.SERIALIZERS_ACCEPTED = set(['pickle','json', 'marshal', 'serpent'])
 Pyro4.config.SERIALIZER='pickle'

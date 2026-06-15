@@ -4,7 +4,7 @@ import numpy as np
 from gym import Env
 from gym.spaces import Box
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.proxy_env import ProxyEnv
+from rlkit.envs.proxy_env import ProxyEnv
 
 
 class HistoryEnv(ProxyEnv, Env):

@@ -1,5 +1,5 @@
-from third_party.Meta_RL.submodules.rlkit.rlkit.envs.vae_wrapper import VAEWrappedEnv
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector import GoalConditionedPathCollector
+from rlkit.envs.vae_wrapper import VAEWrappedEnv
+from rlkit.samplers.data_collector import GoalConditionedPathCollector
 
 
 class VAEWrappedEnvPathCollector(GoalConditionedPathCollector):

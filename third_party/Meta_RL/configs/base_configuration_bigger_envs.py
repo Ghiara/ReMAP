@@ -1,11 +1,11 @@
 import torch
-from third_party.Meta_RL.smrl.vae.encoder_networks import GRUEncoder, MlpEncoder
-from third_party.Meta_RL.smrl.vae.decoder_networks import MlpDecoder, SeparateMlpDecoder
-from third_party.Meta_RL.smrl.vae.mdpvae import NeuralProcess, MdpVAE, InfoMaxMdpVAE
-from third_party.Meta_RL.smrl.policies.meta_policy import MetaRLTanhGaussianPolicy, MetaRLTanhGaussianPolicyWithMaxAction
-from third_party.Meta_RL.smrl.policies.meta_value_function import MlpValueFunction
-from third_party.Meta_RL.smrl.policies.exploration import RandomPolicy, RandomMemoryPolicy, MultiRandomMemoryPolicy
-from third_party.Meta_RL.smrl.data_management.replay_buffers import ContextReplayBuffer, TrajectoryReplayBuffer, MultiTaskReplayBuffer
+from smrl.vae.encoder_networks import GRUEncoder, MlpEncoder
+from smrl.vae.decoder_networks import MlpDecoder, SeparateMlpDecoder
+from smrl.vae.mdpvae import NeuralProcess, MdpVAE, InfoMaxMdpVAE
+from smrl.policies.meta_policy import MetaRLTanhGaussianPolicy, MetaRLTanhGaussianPolicyWithMaxAction
+from smrl.policies.meta_value_function import MlpValueFunction
+from smrl.policies.exploration import RandomPolicy, RandomMemoryPolicy, MultiRandomMemoryPolicy
+from smrl.data_management.replay_buffers import ContextReplayBuffer, TrajectoryReplayBuffer, MultiTaskReplayBuffer
 from collections import OrderedDict
 
 config = OrderedDict(

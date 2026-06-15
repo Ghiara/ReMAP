@@ -1,9 +1,9 @@
 import numpy as np
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 from torch.utils.data import Dataset, Sampler
 
 # TODO: move this to more reasonable place
-from third_party.Meta_RL.submodules.rlkit.rlkit.data_management.obs_dict_replay_buffer import normalize_image
+from rlkit.data_management.obs_dict_replay_buffer import normalize_image
 
 
 class ImageDataset(Dataset):

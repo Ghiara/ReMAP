@@ -2,15 +2,15 @@ from collections import OrderedDict, namedtuple
 from typing import Tuple
 
 import numpy as np
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 import torch.optim as optim
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.loss import LossFunction, LossStatistics
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn as nn
+from rlkit.core.loss import LossFunction, LossStatistics
+from torch import nn as nn
 
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.rlkit.core.eval_util import create_stats_ordered_dict
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import TorchTrainer
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.logging import add_prefix
+import rlkit.torch.pytorch_util as ptu
+from rlkit.core.eval_util import create_stats_ordered_dict
+from rlkit.torch.torch_rl_algorithm import TorchTrainer
+from rlkit.core.logging import add_prefix
 import gtimer as gt
 
 SACLosses = namedtuple(

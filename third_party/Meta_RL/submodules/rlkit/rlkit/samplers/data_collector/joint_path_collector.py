@@ -1,8 +1,8 @@
 from collections import OrderedDict
 from typing import Dict
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.logging import add_prefix
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector import PathCollector
+from rlkit.core.logging import add_prefix
+from rlkit.samplers.data_collector import PathCollector
 
 
 class JointPathCollector(PathCollector):

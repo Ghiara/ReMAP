@@ -1,21 +1,21 @@
 from collections import OrderedDict
 from os import path as osp
 import numpy as np
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import optim
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.distributions import Normal
+import torch
+from torch import optim
+from torch.distributions import Normal
 from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 from multiworld.core.image_env import normalize_image
-from third_party.rlkit.core import logger
-from third_party.rlkit.core.eval_util import create_stats_ordered_dict
-from third_party.rlkit.torch import pytorch_util as ptu
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.data import (
+from rlkit.core import logger
+from rlkit.core.eval_util import create_stats_ordered_dict
+from rlkit.torch import pytorch_util as ptu
+from rlkit.torch.data import (
     ImageDataset,
     InfiniteWeightedRandomSampler,
     InfiniteRandomSampler,
 )
-from third_party.Meta_RL.submodules.rlkit.rlkit.util.ml_util import ConstantSchedule
+from rlkit.util.ml_util import ConstantSchedule
 
 
 def relative_probs_from_log_probs(log_probs):

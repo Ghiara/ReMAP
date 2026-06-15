@@ -2,17 +2,17 @@
 import copy
 
 import numpy as np
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 import torch.nn.functional as F
-from third_party.Meta_RL.submodules.rlkit.rlkit.util.wrapper import Wrapper
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn as nn
+from rlkit.util.wrapper import Wrapper
+from torch import nn as nn
 
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.rlkit.policies.base import Policy
-from third_party.rlkit.torch.distributions import (
+import rlkit.torch.pytorch_util as ptu
+from rlkit.policies.base import Policy
+from rlkit.torch.distributions import (
     Delta,
 )
-from third_party.rlkit.torch.sac.policies import MakeDeterministic
+from rlkit.torch.sac.policies import MakeDeterministic
 
 
 def _product_of_gaussians(mus, sigmas_squared):

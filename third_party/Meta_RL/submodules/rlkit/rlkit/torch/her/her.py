@@ -1,6 +1,6 @@
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import TorchTrainer
+from rlkit.torch.torch_rl_algorithm import TorchTrainer
 
 
 class HERTrainer(TorchTrainer):

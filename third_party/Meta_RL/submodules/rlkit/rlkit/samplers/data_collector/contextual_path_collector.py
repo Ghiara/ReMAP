@@ -1,9 +1,9 @@
 from functools import partial
 
 from rlkit.envs.contextual import ContextualEnv
-from third_party.rlkit.policies.base import Policy
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector import MdpPathCollector
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.rollout_functions import contextual_rollout
+from rlkit.policies.base import Policy
+from rlkit.samplers.data_collector import MdpPathCollector
+from rlkit.samplers.rollout_functions import contextual_rollout
 
 
 class ContextualPathCollector(MdpPathCollector):

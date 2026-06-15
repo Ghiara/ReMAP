@@ -3,10 +3,10 @@ import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.nn.modules import BasisConv2d, GlobalAveragePool, \
+from symmetrizer.nn.modules import BasisConv2d, GlobalAveragePool, \
     BasisLinear, GlobalMaxPool
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.ops import c2g
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.groups import P4, P4Intermediate, P4toOutput, P4toInvariant
+from symmetrizer.ops import c2g
+from symmetrizer.groups import P4, P4Intermediate, P4toOutput, P4toInvariant
 
 
 class BasisGridNetwork(torch.nn.Module):

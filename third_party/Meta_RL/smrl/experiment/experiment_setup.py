@@ -22,16 +22,16 @@ from typing import Dict, Any, Tuple
 from collections import OrderedDict
 import copy
 
-from third_party.Meta_RL.smrl.data_management.replay_buffers import ContextReplayBuffer
-from third_party.Meta_RL.smrl.algorithms.meta_rl_algorithm import MetaRlAlgorithm
-from third_party.Meta_RL.smrl.environments.meta_env import MetaEnv
+from smrl.data_management.replay_buffers import ContextReplayBuffer
+from smrl.algorithms.meta_rl_algorithm import MetaRlAlgorithm
+from smrl.environments.meta_env import MetaEnv
 from ._algorithm_setup import setup_algorithm
 from .model_setup import init_networks, load_params
 
-from third_party.Meta_RL.smrl.utility.ops import ensure_importable_entries, deep_dictionary_update
-from third_party.Meta_RL.smrl.utility.console_strings import print_to_terminal, warning, ok
+from smrl.utility.ops import ensure_importable_entries, deep_dictionary_update
+from smrl.utility.console_strings import print_to_terminal, warning, ok
 
-from third_party.Meta_RL.configs.environment_factory import toy1d_domain_rand
+from configs.environment_factory import toy1d_domain_rand
 
 
 """

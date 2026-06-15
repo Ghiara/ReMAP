@@ -1,19 +1,19 @@
-from third_party.rlkit.envs.wrappers import StackObservationEnv, RewardWrapperEnv
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector.step_collector import MdpStepCollector
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.data_collector.path_collector import GoalConditionedPathCollector
-from third_party.rlkit.torch.networks import ConcatMlp
-from third_party.rlkit.torch.sac.policies import TanhGaussianPolicy, MakeDeterministic
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.sac.awac_trainer import AWACTrainer
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import (
+from rlkit.envs.wrappers import StackObservationEnv, RewardWrapperEnv
+import rlkit.torch.pytorch_util as ptu
+from rlkit.samplers.data_collector.step_collector import MdpStepCollector
+from rlkit.samplers.data_collector.path_collector import GoalConditionedPathCollector
+from rlkit.torch.networks import ConcatMlp
+from rlkit.torch.sac.policies import TanhGaussianPolicy, MakeDeterministic
+from rlkit.torch.sac.awac_trainer import AWACTrainer
+from rlkit.torch.torch_rl_algorithm import (
     TorchBatchRLAlgorithm,
     TorchOnlineRLAlgorithm,
 )
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.demos.source.mdp_path_loader import MDPPathLoader
+from rlkit.demos.source.mdp_path_loader import MDPPathLoader
 from rlkit.visualization.video import save_paths
 
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 from rlkit.visualization.video import save_paths, VideoSaveFunction, RIGVideoSaveFunction
 from rlkit.envs.images import Renderer, InsertImageEnv, EnvRenderer
 from rlkit.launchers.contextual.util import (
@@ -21,23 +21,23 @@ from rlkit.launchers.contextual.util import (
     get_gym_env,
 )
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.base import \
+from rlkit.exploration_strategies.base import \
     PolicyWrappedWithExplorationStrategy
 from rlkit.exploration_strategies.gaussian_and_epislon import GaussianAndEpsilonStrategy
-from third_party.Meta_RL.submodules.rlkit.rlkit.exploration_strategies.ou_strategy import OUStrategy
+from rlkit.exploration_strategies.ou_strategy import OUStrategy
 
 import os.path as osp
-from third_party.rlkit.core import logger
+from rlkit.core import logger
 from rlkit.misc.asset_loader import load_local_or_remote_file
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.data_management.obs_dict_replay_buffer import \
+from rlkit.data_management.obs_dict_replay_buffer import \
         ObsDictRelabelingBuffer
 from rlkit.data_management.wrappers.concat_to_obs_wrapper import \
         ConcatToObsWrapper
 from rlkit.envs.reward_mask_wrapper import DiscreteDistribution, RewardMaskWrapper
 
 from functools import partial
-import third_party.Meta_RL.submodules.rlkit.rlkit.samplers.rollout_functions as rf
+import rlkit.samplers.rollout_functions as rf
 
 from rlkit.envs.contextual import ContextualEnv
 

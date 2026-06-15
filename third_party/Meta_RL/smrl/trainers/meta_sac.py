@@ -20,15 +20,15 @@ import gtimer
 from collections import OrderedDict
 from typing import Tuple, Dict, Any
 
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.rlkit.torch.sac.sac import SACTrainer, SACLosses
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.loss import LossStatistics
-from third_party.rlkit.core.eval_util import create_stats_ordered_dict
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.logging import add_prefix
+import rlkit.torch.pytorch_util as ptu
+from rlkit.torch.sac.sac import SACTrainer, SACLosses
+from rlkit.core.loss import LossStatistics
+from rlkit.core.eval_util import create_stats_ordered_dict
+from rlkit.core.logging import add_prefix
 
-from third_party.Meta_RL.smrl.policies.base import MetaRLPolicy, MetaQFunction
-from third_party.Meta_RL.smrl.vae.mdpvae import MdpEncoder
-from third_party.Meta_RL.smrl.utility.ops import np_batch_to_tensor_batch
+from smrl.policies.base import MetaRLPolicy, MetaQFunction
+from smrl.vae.mdpvae import MdpEncoder
+from smrl.utility.ops import np_batch_to_tensor_batch
 
 class MetaSACTrainer(SACTrainer):
     """A trainer for SAC networks and an MDP-VAE policy.

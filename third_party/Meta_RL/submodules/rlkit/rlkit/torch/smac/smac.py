@@ -2,19 +2,19 @@ from collections import OrderedDict
 from itertools import chain
 
 import numpy as np
-import third_party.Meta_RL.submodules.rlkit.rlkit.torch as torch
+import torch
 import torch.nn.functional as F
 import torch.optim as optim
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn as nn
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.distributions import kl_divergence
+from torch import nn as nn
+from torch.distributions import kl_divergence
 
-import third_party.rlkit.torch.pytorch_util as ptu
-from third_party.Meta_RL.submodules.rlkit.rlkit.core.logging import add_prefix
-from third_party.Meta_RL.submodules.rlkit.rlkit.util import ml_util
-from third_party.rlkit.core.eval_util import create_stats_ordered_dict
-from third_party.rlkit.torch.networks import LinearTransform
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.smac.agent import SmacAgent
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.torch_rl_algorithm import TorchTrainer
+import rlkit.torch.pytorch_util as ptu
+from rlkit.core.logging import add_prefix
+from rlkit.util import ml_util
+from rlkit.core.eval_util import create_stats_ordered_dict
+from rlkit.torch.networks import LinearTransform
+from rlkit.torch.smac.agent import SmacAgent
+from rlkit.torch.torch_rl_algorithm import TorchTrainer
 
 
 class SmacTrainer(TorchTrainer):

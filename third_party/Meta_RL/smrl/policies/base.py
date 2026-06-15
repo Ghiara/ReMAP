@@ -20,10 +20,10 @@ import numpy as np
 from abc import ABC, abstractmethod
 from typing import Tuple, Dict, Union, Any
 
-from third_party.rlkit.torch.distributions import Distribution
-from third_party.rlkit.torch.core import torch_ify, elem_or_tuple_to_numpy
+from rlkit.torch.distributions import Distribution
+from rlkit.torch.core import torch_ify, elem_or_tuple_to_numpy
 
-from third_party.Meta_RL.smrl.utility.ops import np_batch_to_tensor_batch
+from smrl.utility.ops import np_batch_to_tensor_batch
 
 
 class Policy(torch.nn.Module, ABC):

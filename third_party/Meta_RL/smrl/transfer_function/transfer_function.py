@@ -2,10 +2,10 @@ import numpy as np
 import torch
 from torch import nn as nn
 
-from third_party.rlkit.policies.base import ExplorationPolicy, Policy
-from third_party.rlkit.torch.distributions import TanhNormal
-from third_party.rlkit.torch.networks import Mlp
-from third_party.rlkit.torch.core import np_ify
+from rlkit.policies.base import ExplorationPolicy, Policy
+from rlkit.torch.distributions import TanhNormal
+from rlkit.torch.networks import Mlp
+from rlkit.torch.core import np_ify
 
 
 LOG_SIG_MAX = 2

@@ -5,9 +5,9 @@ import gridworld
 import torch
 import torch.nn.functional as F
 
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.nn.grid_networks import BasisGridLayer, BasisGridNetwork
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.ops import g2c, c2g, get_grid_rolls, get_grid_actions
-from third_party.Meta_RL.submodules.symmetrizer.symmetrizer.groups.ops import closed_group
+from symmetrizer.nn.grid_networks import BasisGridLayer, BasisGridNetwork
+from symmetrizer.ops import g2c, c2g, get_grid_rolls, get_grid_actions
+from symmetrizer.groups.ops import closed_group
 
 
 def test_prebuilt_network():

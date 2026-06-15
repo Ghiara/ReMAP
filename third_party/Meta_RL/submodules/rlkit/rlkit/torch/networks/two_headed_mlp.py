@@ -1,10 +1,10 @@
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch import nn as nn
+from torch import nn as nn
 from torch.nn import functional as F
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.pythonplusplus import identity
-from third_party.rlkit.torch import pytorch_util as ptu
-from third_party.rlkit.torch.core import PyTorchModule
-from third_party.rlkit.torch.networks import LayerNorm
+from rlkit.pythonplusplus import identity
+from rlkit.torch import pytorch_util as ptu
+from rlkit.torch.core import PyTorchModule
+from rlkit.torch.networks import LayerNorm
 
 
 class TwoHeadMlp(PyTorchModule):

@@ -8,7 +8,7 @@ import random
 import itertools
 from typing import List
 
-import third_party.Meta_RL.submodules.rlkit.rlkit.pythonplusplus as ppp
+import rlkit.pythonplusplus as ppp
 
 
 class Hyperparameter(metaclass=abc.ABCMeta):

@@ -20,7 +20,7 @@ from enum import Enum
 import json
 import collections.abc
 
-import third_party.rlkit.torch.pytorch_util as ptu
+import rlkit.torch.pytorch_util as ptu
 
 def circular_slicing(lst: Union[List, np.ndarray, torch.Tensor], index_low: int, index_high: int, min_index: int = None, max_index: int = None) -> Union[List, np.ndarray, torch.Tensor]:
     """Allows circular indexing, e.g. 
@@ -218,7 +218,21 @@ def type_from_json_dict(dictionary: Dict[str, str]) -> Union[Type, Callable]:
         module_and_type = dictionary[key]
         type_name = module_and_type.split(".")[-1]
         module_name = module_and_type.removesuffix("." + type_name)
-        module = importlib.import_module(module_name)
+        candidate_modules = [module_name]
+        if module_name.startswith('third_party.Meta_RL.'):
+            candidate_modules.append(module_name.removeprefix('third_party.Meta_RL.'))
+        if module_name.startswith('configs.'):
+            candidate_modules.append('third_party.Meta_RL.' + module_name)
+
+        last_error = None
+        for candidate_module in candidate_modules:
+            try:
+                module = importlib.import_module(candidate_module)
+                break
+            except ModuleNotFoundError as error:
+                last_error = error
+        else:
+            raise last_error
     return getattr(module, type_name)
 
 

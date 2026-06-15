@@ -20,10 +20,10 @@ except ImportError as e:
     print(e)
 
 try:
-    import third_party.Meta_RL.smrl as smrl
+    import smrl
     import mrl_analysis
-    import third_party.rlkit as rlkit
-    import third_party.Meta_RL.submodules.symmetrizer.symmetrizer as symmetrizer
+    import rlkit
+    import symmetrizer
     import meta_envs
     print("Success: All local packages are available!")
 except ImportError as e:

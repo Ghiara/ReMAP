@@ -1,9 +1,9 @@
-from third_party.Meta_RL.submodules.rlkit.rlkit.samplers.rollout_functions import rollout
-from third_party.rlkit.torch.pytorch_util import set_gpu_mode
+from rlkit.samplers.rollout_functions import rollout
+from rlkit.torch.pytorch_util import set_gpu_mode
 import argparse
 import torch
 import uuid
-from third_party.rlkit.core import logger
+from rlkit.core import logger
 
 filename = str(uuid.uuid4())
 

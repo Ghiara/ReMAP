@@ -6,7 +6,7 @@ import cv2
 import os.path as osp
 import random
 
-from third_party.Meta_RL.submodules.rlkit.rlkit.util.io import local_path_from_s3_or_local_path
+from rlkit.util.io import local_path_from_s3_or_local_path
 
 
 def setup_pickup_image_env(image_env, num_presampled_goals):

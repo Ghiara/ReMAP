@@ -1,8 +1,8 @@
-import third_party.Meta_RL.submodules.rlkit.rlkit.util.hyperparameter as hyp
-from third_party.rlkit.launchers.launcher_util import run_experiment
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.smac.base_config import DEFAULT_PEARL_CONFIG
-from third_party.Meta_RL.submodules.rlkit.rlkit.torch.smac.pearl_launcher import pearl_experiment
-from third_party.Meta_RL.submodules.rlkit.rlkit.util.io import load_local_or_remote_file
+import rlkit.util.hyperparameter as hyp
+from rlkit.launchers.launcher_util import run_experiment
+from rlkit.torch.smac.base_config import DEFAULT_PEARL_CONFIG
+from rlkit.torch.smac.pearl_launcher import pearl_experiment
+from rlkit.util.io import load_local_or_remote_file
 
 
 # @click.command()

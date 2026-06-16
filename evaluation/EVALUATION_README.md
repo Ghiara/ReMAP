@@ -9,7 +9,7 @@ bash evaluation/run_evaluation.sh <target> [args...]
 Run the launcher from the `ReMAP` root directory:
 
 ```bash
-cd /root/bayes-tmp/bowang/ReMAP
+cd ..
 ```
 
 The launcher injects `ReMAP` and the bundled Meta_RL submodules into `PYTHONPATH`, so imports such as `third_party.*`, `configs.*`, `train.*`, `meta_envs.*`, `rlkit.*`, and `mrl_analysis.*` resolve consistently across the evaluation entrypoints.
@@ -17,7 +17,7 @@ The launcher injects `ReMAP` and the bundled Meta_RL submodules into `PYTHONPATH
 ## Supported targets
 
 - `baseline-tracking`
-  Runs [baseline_tracking_evalaution.py](/root/bayes-tmp/bowang/ReMAP/evaluation/baseline_tracking_evalaution.py).
+  Runs [baseline_tracking_evalaution.py](evaluation/baseline_tracking_evalaution.py).
   This is the unified tracking evaluation for CEMRL, MELTS, PEARL, and RL2.
   Example:
   ```bash
@@ -38,7 +38,7 @@ The launcher injects `ReMAP` and the bundled Meta_RL submodules into `PYTHONPATH
   - `--out-dir <path>`
 
 - `single-deploy`
-  Runs [single_task_inference_high_level_cross_agent_deployment.py](/root/bayes-tmp/bowang/ReMAP/evaluation/single_task_inference_high_level_cross_agent_deployment.py).
+  Runs [single_task_inference_high_level_cross_agent_deployment.py](evaluation/single_task_inference_high_level_cross_agent_deployment.py).
   This script currently uses its built-in defaults and config references.
   Example:
   ```bash
@@ -46,7 +46,7 @@ The launcher injects `ReMAP` and the bundled Meta_RL submodules into `PYTHONPATH
   ```
 
 - `multi-deploy`
-  Runs [multi_task_inference_high_level_cross_agent_deployment.py](/root/bayes-tmp/bowang/ReMAP/evaluation/multi_task_inference_high_level_cross_agent_deployment.py).
+  Runs [multi_task_inference_high_level_cross_agent_deployment.py](evaluation/multi_task_inference_high_level_cross_agent_deployment.py).
   This script currently uses its built-in defaults and config references.
   Example:
   ```bash

@@ -6,21 +6,21 @@ This folder now includes a one-click launcher:
 bash train/run_training.sh <target> [args...]
 ```
 
-The launcher should be run from the `ReMAP` root directory. After `cd /root/bayes-tmp/bowang/ReMAP`, all commands below can be used directly.
+The launcher should be run from the `ReMAP` root directory. After `cd ..` from this folder, all commands below can be used directly.
 
 The launcher also injects `ReMAP` and the bundled Meta_RL submodules into `PYTHONPATH`, so imports such as `third_party.*`, `configs.*`, `train.*`, `meta_envs.*`, `rlkit.*`, and `mrl_analysis.*` resolve consistently across all training entrypoints.
 
 ## Supported targets
 
 - `low-level`
-  Runs [train_low_level_policy.py](/root/bayes-tmp/bowang/ReMAP/train/train_low_level_policy.py).
+  Runs [train_low_level_policy.py](train/train_low_level_policy.py).
   Example:
   ```bash
   bash train/run_training.sh low-level --env cheetah
   ```
 
 - `high-single`
-  Runs [train_single_task_inference_high_level_policy.py](/root/bayes-tmp/bowang/ReMAP/train/train_single_task_inference_high_level_policy.py).
+  Runs [train_single_task_inference_high_level_policy.py](train/train_single_task_inference_high_level_policy.py).
   This script currently uses its built-in defaults and saves to `output/goal_tracking_toy/<timestamped_run_name>`.
   Example:
   ```bash
@@ -28,7 +28,7 @@ The launcher also injects `ReMAP` and the bundled Meta_RL submodules into `PYTHO
   ```
 
 - `high-multi`
-  Runs [train_multi_task_inference_high_level_policy.py](/root/bayes-tmp/bowang/ReMAP/train/train_multi_task_inference_high_level_policy.py).
+  Runs [train_multi_task_inference_high_level_policy.py](train/train_multi_task_inference_high_level_policy.py).
   Common example:
   ```bash
   bash train/run_training.sh high-multi --gpu 0 --ti_option dpmm --name exp1
@@ -42,28 +42,28 @@ The launcher also injects `ReMAP` and the bundled Meta_RL submodules into `PYTHO
   - `--use_mp`
 
 - `baseline-cemrl`
-  Runs [baselines_training/run_cemrl_cheetah_baseline.py](/root/bayes-tmp/bowang/ReMAP/train/baselines_training/run_cemrl_cheetah_baseline.py).
+  Runs [baselines_training/run_cemrl_cheetah_baseline.py](train/baselines_training/run_cemrl_cheetah_baseline.py).
   Example:
   ```bash
   bash train/run_training.sh baseline-cemrl --gpu 0
   ```
 
 - `baseline-melts`
-  Runs [baselines_training/run_melts_cheetah_baseline.py](/root/bayes-tmp/bowang/ReMAP/train/baselines_training/run_melts_cheetah_baseline.py).
+  Runs [baselines_training/run_melts_cheetah_baseline.py](train/baselines_training/run_melts_cheetah_baseline.py).
   Example:
   ```bash
   bash train/run_training.sh baseline-melts --gpu 0
   ```
 
 - `baseline-pearl`
-  Runs [baselines_training/run_pearl_cheetah_baseline.py](/root/bayes-tmp/bowang/ReMAP/train/baselines_training/run_pearl_cheetah_baseline.py).
+  Runs [baselines_training/run_pearl_cheetah_baseline.py](train/baselines_training/run_pearl_cheetah_baseline.py).
   Example:
   ```bash
   bash train/run_training.sh baseline-pearl --gpu 0
   ```
 
 - `baseline-rl2`
-  Runs [baselines_training/run_rl2_cheetah_baseline.py](/root/bayes-tmp/bowang/ReMAP/train/baselines_training/run_rl2_cheetah_baseline.py).
+  Runs [baselines_training/run_rl2_cheetah_baseline.py](train/baselines_training/run_rl2_cheetah_baseline.py).
   Example:
   ```bash
   bash train/run_training.sh baseline-rl2 --gpu 0

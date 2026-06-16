@@ -88,13 +88,13 @@ DEFAULT_TRANSFER_EPOCH = int(os.environ.get('META_RL_TRANSFER_EPOCH', '300'))
 DEFAULT_EVAL_INPUT = Path(
     os.environ.get(
         'META_RL_EVAL_INPUT',
-        str(META_RL_ROOT / 'data' / 'toy1d_MaxAction_1_2025-02-05_14-55-41'),
+        str(REMAP_ROOT / 'output' / 'toy1d-single-task' / 'toy1d_MaxAction_1_2025-02-05_14-55-41'),
     )
 )
 DEFAULT_EVAL_OUTPUT = Path(
     os.environ.get(
         'META_RL_EVAL_OUTPUT',
-        str(META_RL_ROOT / 'evaluation' / 'experiments_thesis' / 'transfer_full_cheetah_5_test'),
+        str(REMAP_ROOT / 'output' / 'single_task_inference_results'),
     )
 )
 

@@ -45,7 +45,7 @@ def _resolve_project_path(path_value: str) -> str:
     return str(PROJECT_ROOT / path)
 
 
-from train.run_task_inference_high_level_policy_training import experiment, deep_update_dict
+from train.train_multi_task_inference_high_level_policy import experiment, deep_update_dict
 from configs.default import default_config
 
 

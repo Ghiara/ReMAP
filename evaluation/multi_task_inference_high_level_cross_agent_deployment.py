@@ -2,6 +2,24 @@
 #clarify the git commit last 2 times
 # from tigr.task_inference.dpmm_inference import DecoupledEncoder
 # from configs.toy_config import toy_config
+import sys
+from pathlib import Path
+
+REMAP_ROOT = Path(__file__).resolve().parents[1]
+META_RL_ROOT = REMAP_ROOT / 'third_party' / 'Meta_RL'
+BUNDLED_SUBMODULES = [
+    META_RL_ROOT,
+    META_RL_ROOT / 'submodules' / 'rlkit',
+    META_RL_ROOT / 'submodules' / 'meta-environments-main',
+    META_RL_ROOT / 'submodules' / 'MRL-analysis-tools-main',
+    REMAP_ROOT,
+]
+for _path in reversed(BUNDLED_SUBMODULES):
+    _path = str(_path)
+    if _path in sys.path:
+        sys.path.remove(_path)
+    sys.path.insert(0, _path)
+
 import numpy as np
 from third_party.rlkit.envs import ENVS
 from third_party.tigr.task_inference.dpmm_bnp import BNPModel
@@ -1371,7 +1389,14 @@ if __name__ == "__main__":
 
     SEED = 42
     set_global_seed(SEED)
-    from configs.transfer_config import transfer_config as config
+    import importlib.util
+
+    transfer_config_path = REMAP_ROOT / 'configs' / 'transfer_config.py'
+    spec = importlib.util.spec_from_file_location('remap_transfer_config', transfer_config_path)
+    transfer_config_module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(transfer_config_module)
+    config = transfer_config_module.transfer_config
 
     inference_path = config['inference_path']
     complex_agent = config['complex_agent']

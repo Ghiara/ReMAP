@@ -27,10 +27,19 @@ import numpy as np
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 THIS_DIR = Path(__file__).resolve().parent
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-if str(THIS_DIR) not in sys.path:
-    sys.path.insert(0, str(THIS_DIR))
+BUNDLED_PATHS = [
+    REPO_ROOT,
+    REPO_ROOT / "third_party" / "Meta_RL",
+    REPO_ROOT / "third_party" / "Meta_RL" / "submodules" / "rlkit",
+    REPO_ROOT / "third_party" / "Meta_RL" / "submodules" / "meta-environments-main",
+    REPO_ROOT / "third_party" / "Meta_RL" / "submodules" / "MRL-analysis-tools-main",
+    THIS_DIR,
+]
+for bundled_path in reversed(BUNDLED_PATHS):
+    bundled_path = str(bundled_path)
+    if bundled_path in sys.path:
+        sys.path.remove(bundled_path)
+    sys.path.insert(0, bundled_path)
 
 import third_party.rlkit.torch.pytorch_util as ptu
 from configs.pearl_default import default_config as pearl_default_config

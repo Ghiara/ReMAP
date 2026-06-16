@@ -59,8 +59,9 @@ if os.environ["MULTITHREADING"] == "True":
 experiment_name = "toy1d_MaxAction_1"
 config['algorithm_kwargs']['num_epochs'] = 5_000
 current_time = datetime.now(ZoneInfo('Europe/Berlin'))
+timestamped_experiment_name = f"{experiment_name}_{current_time.strftime('%Y-%m-%d_%H-%M-%S')}"
 logger_kwargs = {
-    'log_dir': str(PROJECT_ROOT / "data" / f"{experiment_name}_{current_time.strftime('%Y-%m-%d_%H-%M-%S')}"),
+    'log_dir': str(PROJECT_ROOT / "output" / "toy1d-single-task" / timestamped_experiment_name),
     'snapshot_mode': 'gap_and_last',
     'snapshot_gap': 10,
 }

@@ -33,6 +33,7 @@ experiment_plots/
 temp/
 .temp/
 trajectories_plots/
+melts/
 ### Visual Studio Code ###
 .vscode/
 
@@ -168,3 +169,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+# Keep the project launchers versioned
+!train/run_training.sh
+!evaluation/run_evaluation.sh
+

@@ -8,7 +8,7 @@ from third_party.SAC.sac_envs.walker_multi import WalkerMulti
 from third_party.SAC.sac_envs.hopper_multi import HopperMulti
 from third_party.SAC.sac_envs.ant_multi import AntMulti
 from third_party.SAC.model import PolicyNetwork as TransferFunction
-from evaluation.task_inference_high_level_cross_agent_deployment import get_complex_agent
+from ReMAP.evaluation.multi_task_inference_high_level_cross_agent_deployment import get_complex_agent
 
 # train_striding_predictor_LL_vel_evaluation
 

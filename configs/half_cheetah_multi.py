@@ -23,7 +23,7 @@ config = dict(
     max_rot_vel = [2.0 * pi, 4.0 * pi],
 
     env = 'half_cheetah_multi',
-    experiment_name = 'cheetah_multitask_new_config_v0_cleanup_test',
+    experiment_name = 'cheetah_multitask_new_config_v0_BASH_TEST',
     task_dim = 5,
 
     hidden_layers_actor = [300, 300, 300, 300],

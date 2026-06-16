@@ -33,7 +33,7 @@ def _resolve_project_path(path_value: str) -> str:
     return str(PROJECT_ROOT / path)
 
 
-from rl2_util.rl2_launch_experiment import experiment, deep_update_dict
+from utils.rl2_util.rl2_launch_experiment import experiment, deep_update_dict
 from configs.rl2_default import default_config
 
 

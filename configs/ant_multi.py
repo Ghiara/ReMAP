@@ -3,76 +3,76 @@ import numpy as np
 pi = 3.141592
 
 config = dict(
-    # 总训练轮数（epoch 数）
+    # Total number of training epochs
     epochs=3000,
 
-    # 每条轨迹初始最大步数（会被 curriculum.max_steps 动态覆盖）
-    # 先用更短轨迹让 ant 学会基础稳定控制，再逐步加长时域
+    # Initial maximum number of steps per trajectory (dynamically overridden by curriculum.max_steps)
+    # Start with shorter trajectories so the ant learns basic stable control first, then gradually extend the horizon
     max_traj_len=200,
 
-    # 经验回放池容量（越大越不容易遗忘旧分布，但更占内存）
+    # Replay buffer capacity (larger values reduce forgetting of old distributions, but use more memory)
     memory_size=1e6,
 
-    # 每次从 replay buffer 采样多少条数据做一次更新
+    # Number of samples drawn from the replay buffer for each update
     batch_size_memory=256,
 
-    # 每个 epoch 采样多少条轨迹（环境 rollout 数）
+    # Number of trajectories sampled per epoch (environment rollouts)
     batch_size=20,
 
-    # 每个 epoch 内 actor/critic 的更新步数
+    # Number of actor/critic update steps per epoch
     policy_update_steps=2048,
 
-    # 折扣因子，越接近 1 越重视长期回报
+    # Discount factor; the closer to 1, the more long-term return is emphasized
     gamma=0.99,
 
-    # SAC 温度系数，控制熵正则强度（探索程度）
+    # SAC temperature coefficient controlling entropy regularization strength (degree of exploration)
     alpha=0.2,
 
-    # 学习率（actor/critic 共用）
+    # Learning rate (shared by actor and critic)
     lr=3e-4,
 
-    # 奖励缩放系数（传给 SAC）
+    # Reward scaling factor (passed to SAC)
     reward_scale=1,
 
-    # 位置目标范围 [min, max]（单位米），用于 goal_front / goal_back
+    # Position target range [min, max] (in meters), used for goal_front / goal_back
     max_goal=[1.0, 10.0],
 
-    # 跳跃任务范围（当前四任务训练不主要使用）
+    # Jump task range (not mainly used in the current four-task training)
     max_jump=[1.5, 3.0],
 
-    # 姿态角范围（当前四任务训练不主要使用）
+    # Posture angle range (not mainly used in the current four-task training)
     max_rot=[pi / 6., pi / 2.],
 
-    # 速度目标范围 [min, max]（单位 m/s），用于 forward_vel / backward_vel
+    # Velocity target range [min, max] (in m/s), used for forward_vel / backward_vel
     max_vel=[0.4, 2.5],
 
-    # 角速度范围（当前四任务训练不主要使用）
+    # Angular velocity range (not mainly used in the current four-task training)
     max_rot_vel=[2. * pi, 4. * pi],
 
-    # 环境名（训练脚本据此实例化 AntMulti）
+    # Environment name (used by the training script to instantiate AntMulti)
     env='ant_multi',
 
-    # 实验名（输出目录名）
-    experiment_name='ant_multi_new_config_v4_run2',
+    # Experiment name (output directory name)
+    experiment_name='ant_multi_new_config_v4_BASH_TEST',
 
-    # task 向量维度上限（通常等于 max(tasks.values()) + 1）
+    # Upper bound of the task vector dimension (usually equal to max(tasks.values()) + 1)
     task_dim=4,
 
-    # Actor 网络隐藏层结构
+    # Actor network hidden layer structure
     hidden_layers_actor=[300, 300, 300, 300],
 
-    # Critic 网络隐藏层结构
+    # Critic network hidden layer structure
     hidden_layers_critic=[300, 300, 300, 300],
 
-    # 每隔多少个 epoch 保存一次模型与训练曲线
+    # Save model and training curves every N epochs
     save_after_episodes=10,
 
-    # 日志绘图间隔（由可视化模块使用）
+    # Logging plot interval (used by the visualization module)
     plot_every=10,
 
-    # 任务名到 task 向量索引的映射
-    # goal_front / goal_back: 位置目标跟踪
-    # forward_vel / backward_vel: 速度目标跟踪
+    # Mapping from task names to task-vector indices
+    # goal_front / goal_back: position target tracking
+    # forward_vel / backward_vel: velocity target tracking
     tasks=dict(
         goal_front=0,
         goal_back=1,
@@ -80,14 +80,14 @@ config = dict(
         backward_vel=3,
     ),
 
-    # Ant 稳定低层控制：先让 reset 从正常站立高度开始，减少初始接触爆冲
+    # Stable low-level control for Ant: start resets from a normal standing height to reduce explosive initial contacts
     initial_torso_height=0.72,
     reset_xy_noise=0.03,
     reset_joint_noise=0.03,
     reset_height_noise=0.01,
     reset_velocity_noise=0.03,
 
-    # 四个任务均衡采样，略微增加 backward 任务，避免 goal_back 训练不足
+    # Sample the four tasks in a balanced way, with slightly higher weight on backward tasks to avoid undertraining goal_back
     task_sample_weights=dict(
         goal_front=1.0,
         goal_back=1.25,
@@ -95,50 +95,50 @@ config = dict(
         backward_vel=1.25,
     ),
 
-    # 启用 random_reset 后，初始 x 位置采样范围
+    # Initial x-position sampling range after enabling random_reset
     random_reset_pos_range=[-8.0, 8.0],
 
-    # 启用 random_reset 后，初始 x 速度采样范围
+    # Initial x-velocity sampling range after enabling random_reset
     random_reset_vel_range=[-0.5, 0.5],
 
     curriculum=dict(
-        # 速度任务解锁完整难度的 epoch 阈值
-        # 训练代码中：episode < max_vel 时 velocity task 会降难（目标速度减半）
+        # Epoch threshold for unlocking full difficulty of velocity tasks
+        # In the training code: when episode < max_vel, the velocity task is simplified (target velocity is halved)
         max_vel=150,
 
-        # 轨迹内任务切换课程的阶段边界（epoch）
-        # 超过某个阈值后，会采用对应 changes_per_trajectory
+        # Stage boundaries (in epochs) for the within-trajectory task-switching curriculum
+        # After exceeding a threshold, the corresponding changes_per_trajectory value is used
         change_tasks_after=[200, 450, 800],
 
-        # 每条轨迹内切换任务次数
-        # 0 表示整条轨迹一个任务；值越大，训练更难但切换适应更强
+        # Number of task switches within each trajectory
+        # 0 means one task for the entire trajectory; larger values make training harder but improve switching adaptation
         changes_per_trajectory=[0, 1, 2],
 
-        # 轨迹长度课程阶段边界（epoch）
-        # 训练循环里是 episode > threshold 才切换，所以：
-        # 1-150: 200 步
-        # 151-350: 300 步
-        # 351-700: 500 步
-        # 701+: 700 步
+        # Stage boundaries (in epochs) for the trajectory length curriculum
+        # In the training loop, switching happens only when episode > threshold, so:
+        # 1-150: 200 steps
+        # 151-350: 300 steps
+        # 351-700: 500 steps
+        # 701+: 700 steps
         max_steps_epochs=[150, 400, 800],
 
-        # 各阶段对应 max_traj_len（只增不减）
-        # 先让 ant 在短时域内学会走稳，再慢慢增加长期 credit assignment 难度
+        # max_traj_len for each stage (only increases, never decreases)
+        # First let the ant learn stable locomotion over short horizons, then gradually increase long-horizon credit assignment difficulty
         max_steps=[250, 350, 500],
 
-        # 从该 epoch 开始启用 random_reset
-        # 你当前设得很大，等效于训练期间基本关闭 random_reset
+        # Enable random_reset starting from this epoch
+        # The current value is large, effectively keeping random_reset disabled during most of training
         random_initialization=1200,
     ),
 
-    # 旧逻辑保留项（当前训练主循环基本未使用）
+    # Legacy retained setting (mostly unused in the current training loop)
     random_restart_after=1,
 
-    # 预训练模型入口（None 表示从头训练）
+    # Pretrained model entry point (None means training from scratch)
     use_termination_after=80,
     termination_ramp_epochs=320,
 
-    # 更强地鼓励四足贴地、躯干稳定，不奖励跳高刷进度
+    # More strongly encourage four-foot ground contact and torso stability; do not reward jumping high to game progress
     healthy_reward=0.55,
     termination_penalty=-8.0,
     target_torso_height=0.70,

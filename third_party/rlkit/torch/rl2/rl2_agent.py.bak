@@ -1,0 +1,87 @@
+"""
+RL2 Agent: Uses LSTM-based policy for fast adaptation
+"""
+import torch
+import torch.nn as nn
+from torch.optim import Adam
+import numpy as np
+
+import rlkit.torch.pytorch_util as ptu
+from rlkit.torch.rl2.networks import LSTMPolicy
+
+class RL2Agent(nn.Module):
+    """RL2 agent with LSTM policy for online adaptation"""
+    
+    def __init__(
+        self,
+        obs_dim,
+        action_dim,
+        hidden_size=256,
+        num_layers=1,
+        policy_lr=3e-4,
+        **kwargs
+    ):
+        super().__init__()
+        
+        self.obs_dim = obs_dim
+        self.action_dim = action_dim
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        
+        self.policy = LSTMPolicy(
+            obs_dim=obs_dim,
+            action_dim=action_dim,
+            hidden_size=hidden_size,
+            num_layers=num_layers,
+        )
+        
+        self.policy_optimizer = Adam(self.policy.parameters(), lr=policy_lr)
+        self.policy_lr = policy_lr
+        
+    def get_action(self, obs, hidden_state=None, deterministic=False):
+        """
+        Get action from policy
+        
+        Args:
+            obs: observation
+            hidden_state: LSTM hidden state (h, c)
+            deterministic: if True, use mean; else sample from distribution
+        
+        Returns:
+            action: sampled or mean action
+            info: dict with log_prob, mean, log_std
+            hidden_state: updated hidden state
+        """
+        mean, log_std, hidden_state = self.policy(obs, hidden_state)
+        
+        if deterministic:
+            action = mean
+            log_prob = torch.zeros(1)
+        else:
+            std = torch.exp(log_std)
+            dist = torch.distributions.Normal(mean, std)
+            action = dist.rsample()
+            log_prob = dist.log_prob(action).sum(dim=-1, keepdim=True)
+        
+        info = {
+            'mean': mean,
+            'log_std': log_std,
+            'log_prob': log_prob,
+        }
+        
+        return action, info, hidden_state
+    
+    def update_policy(self, loss):
+        """Update policy with given loss"""
+        self.policy_optimizer.zero_grad()
+        loss.backward()
+        self.policy_optimizer.step()
+    
+    def init_hidden(self, batch_size):
+        """Initialize hidden state"""
+        return self.policy.init_hidden(batch_size)
+    
+    def to(self, device):
+        """Move agent to device"""
+        super().to(device)
+        return self

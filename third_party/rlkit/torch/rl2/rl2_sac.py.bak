@@ -1,0 +1,259 @@
+"""
+RL2 with Soft Actor-Critic (SAC) for meta-reinforcement learning
+"""
+import os
+import pickle
+import torch
+import torch.nn as nn
+from torch.optim import Adam
+import numpy as np
+from collections import defaultdict
+
+from rlkit.core.rl_algorithm import MetaRLAlgorithm
+from rlkit.core.eval_util import create_stats_ordered_dict
+from rlkit.torch.rl2.networks import LSTMPolicy, LSTMQFunction
+import rlkit.torch.pytorch_util as ptu
+
+
+class RL2SoftActorCritic(MetaRLAlgorithm):
+    """Meta-RL algorithm using RL2 approach"""
+    
+    def __init__(
+        self,
+        env,
+        train_tasks,
+        eval_tasks,
+        nets,
+        latent_dim=None,
+        meta_batch=16,
+        num_iterations=500,
+        num_initial_steps=2000,
+        num_tasks_sample=5,
+        num_steps_prior=400,
+        num_steps_posterior=0,
+        num_extra_rl_steps_posterior=400,
+        num_train_steps_per_itr=2000,
+        num_evals=2,
+        num_steps_per_eval=600,
+        batch_size=256,
+        embedding_batch_size=64,
+        embedding_mini_batch_size=64,
+        max_path_length=200,
+        discount=0.99,
+        soft_target_tau=0.005,
+        policy_lr=3e-4,
+        qf_lr=3e-4,
+        vf_lr=3e-4,
+        context_lr=3e-4,
+        reward_scale=5.0,
+        sparse_rewards=False,
+        kl_lambda=0.1,
+        use_information_bottleneck=True,
+        use_next_obs_in_context=False,
+        update_post_train=1,
+        num_exp_traj_eval=1,
+        recurrent=False,
+        dump_eval_paths=False,
+        inner_lr=1e-4,
+        num_inner_steps=5,
+        **kwargs
+    ):
+        super().__init__(
+            env=env,
+            agent=nets[0],
+            train_tasks=train_tasks,
+            eval_tasks=eval_tasks,
+            **kwargs
+        )
+        
+        self.env = env
+        self.train_tasks = train_tasks
+        self.eval_tasks = eval_tasks
+        
+        # RL2-specific parameters
+        self.inner_lr = inner_lr
+        self.num_inner_steps = num_inner_steps
+        
+        # Algorithm parameters
+        self.meta_batch = meta_batch
+        self.num_iterations = num_iterations
+        self.num_initial_steps = num_initial_steps
+        self.num_tasks_sample = num_tasks_sample
+        self.num_steps_prior = num_steps_prior
+        self.num_train_steps_per_itr = num_train_steps_per_itr
+        self.num_evals = num_evals
+        self.num_steps_per_eval = num_steps_per_eval
+        self.batch_size = batch_size
+        self.max_path_length = max_path_length
+        self.discount = discount
+        self.soft_target_tau = soft_target_tau
+        self.reward_scale = reward_scale
+        self.update_post_train = update_post_train
+        self.num_exp_traj_eval = num_exp_traj_eval
+        self.recurrent = recurrent
+        self.dump_eval_paths = dump_eval_paths
+        
+        # Networks
+        self.agent = nets[0]
+        self.qf1 = nets[1]
+        self.qf2 = nets[2]
+        self.vf = nets[3]
+        
+        self.target_vf = nn.Module()
+        self.target_vf.load_state_dict(self.vf.state_dict())
+        
+        self.obs_dim = int(np.prod(env.observation_space.shape))
+        self.action_dim = int(np.prod(env.action_space.shape))
+        
+        # Optimizers
+        self.qf1_optimizer = Adam(self.qf1.parameters(), lr=qf_lr)
+        self.qf2_optimizer = Adam(self.qf2.parameters(), lr=qf_lr)
+        self.vf_optimizer = Adam(self.vf.parameters(), lr=vf_lr)
+        
+        # Logging
+        self.eval_statistics = defaultdict(float)
+        
+    def train(self):
+        """Main training loop"""
+        print("Starting RL2 training...")
+        
+        # Initial data collection
+        print(f"\nCollecting initial {self.num_initial_steps} transitions per task...")
+        self._collect_initial_data()
+        
+        # Main meta-training loop
+        for iteration in range(self.num_iterations):
+            print(f"\n--- Iteration {iteration + 1}/{self.num_iterations} ---")
+            
+            # Sample tasks for this meta-batch
+            sampled_tasks = np.random.choice(
+                self.train_tasks, 
+                size=min(self.num_tasks_sample, len(self.train_tasks)),
+                replace=False
+            )
+            
+            # Collect experience on sampled tasks
+            for task_id in sampled_tasks:
+                self.env.set_task(task_id)
+                self._collect_task_data(task_id)
+            
+            # Meta-update
+            self._meta_update()
+            
+            # Evaluation
+            if (iteration + 1) % max(1, (self.num_iterations // self.num_evals)) == 0:
+                self._evaluate()
+    
+    def _collect_initial_data(self):
+        """Collect initial data before training"""
+        for task_id in self.train_tasks[:min(10, len(self.train_tasks))]:
+            self.env.set_task(task_id)
+            for _ in range(max(1, self.num_initial_steps // len(self.train_tasks[:10]))):
+                self._collect_episode(task_id)
+    
+    def _collect_task_data(self, task_id, num_episodes=1):
+        """Collect episode(s) for a task"""
+        for _ in range(num_episodes):
+            self._collect_episode(task_id)
+    
+    def _collect_episode(self, task_id):
+        """Collect a single episode"""
+        obs = self.env.reset()
+        hidden_state = self.agent.init_hidden(1)
+        
+        for step in range(self.max_path_length):
+            with torch.no_grad():
+                obs_tensor = torch.FloatTensor([obs]).to(ptu.device)
+                action, _, hidden_state = self.agent.get_action(
+                    obs_tensor, 
+                    hidden_state,
+                    deterministic=False
+                )
+                if isinstance(action, torch.Tensor):
+                    action = action.cpu().numpy()
+                if action.ndim > 1:
+                    action = action[0]
+            
+            next_obs, reward, done, _ = self.env.step(action)
+            obs = next_obs
+            
+            if done:
+                break
+    
+    def _meta_update(self):
+        """Perform meta-gradient update"""
+        print("  Meta-update step...")
+        # Placeholder: actual meta-update logic would go here
+        pass
+    
+    def _evaluate(self):
+        """Evaluate on held-out tasks"""
+        print("\nEvaluating...")
+        eval_rewards = []
+        
+        for task_id in self.eval_tasks[:min(5, len(self.eval_tasks))]:
+            self.env.set_task(task_id)
+            obs = self.env.reset()
+            hidden_state = self.agent.init_hidden(1)
+            
+            total_reward = 0.0
+            for step in range(self.num_steps_per_eval):
+                with torch.no_grad():
+                    obs_tensor = torch.FloatTensor([obs]).to(ptu.device)
+                    action, _, hidden_state = self.agent.get_action(
+                        obs_tensor,
+                        hidden_state,
+                        deterministic=True
+                    )
+                    if isinstance(action, torch.Tensor):
+                        action = action.cpu().numpy()
+                    if action.ndim > 1:
+                        action = action[0]
+                
+                obs, reward, done, _ = self.env.step(action)
+                total_reward += reward
+                
+                if done:
+                    obs = self.env.reset()
+                    hidden_state = self.agent.init_hidden(1)
+            
+            eval_rewards.append(total_reward)
+        
+        avg_reward = np.mean(eval_rewards) if eval_rewards else 0.0
+        print(f"  Avg eval reward: {avg_reward:.2f}")
+        self.eval_statistics['eval_reward'] = avg_reward
+    
+    def get_epoch_paths(self):
+        """Get paths for current epoch (for logging)"""
+        return []
+    
+    def training_mode(self, mode):
+        """Set training mode"""
+        if mode:
+            self.agent.train()
+            self.qf1.train()
+            self.qf2.train()
+            self.vf.train()
+        else:
+            self.agent.eval()
+            self.qf1.eval()
+            self.qf2.eval()
+            self.vf.eval()
+    
+    def _do_training(self):
+        """Perform one training iteration"""
+        # Placeholder for actual training step
+        pass
+    
+    def to(self, device='cuda'):
+        """Move all networks to device"""
+        self.agent.to(device)
+        self.qf1.to(device)
+        self.qf2.to(device)
+        self.vf.to(device)
+        self.target_vf.to(device)
+        return self
+
+
+# Insert abstract methods before the final to() method
+# We'll append them after to() is defined

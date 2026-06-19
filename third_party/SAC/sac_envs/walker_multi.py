@@ -1,0 +1,216 @@
+import gym
+from third_party.SAC.sac_envs.base_envs.walker2d import Walker2dEnv
+from gym.utils.ezpickle import EzPickle
+from typing import List, Tuple
+import numpy as np
+import mujoco_py
+from meta_envs.pygame_rendering import PygameRenderer
+from gym.spaces import Box
+
+class WalkerMulti(Walker2dEnv):
+    # rewrite this to give as input the dictionary
+    def __init__(self, config, healthy_scale = 1, render_mode: str = 'rgb_array', reached_goal_threshold=0.05, *args, **kwargs):
+        super().__init__(render_mode=render_mode, *args, **kwargs)
+        self.observation_space = Box(
+                low=-np.inf, high=np.inf, shape=(20,), dtype=np.float64
+            )
+        self.healthy_scale = healthy_scale
+        self.screen_height = 400
+        self.screen_width = 400
+        self.config = config
+        self.training_episode = 0
+        self.task = self.sample_task()
+        
+        # Think about changing it to normalize by max_task
+        self.reached_goal_threshold = reached_goal_threshold
+
+    def _initialize_camera(self):
+        # set camera parameters for viewing
+        sim = self.sim
+        self.viewer = mujoco_py.MjRenderContextOffscreen(sim)
+        camera = self.viewer.cam
+        camera.type = 1
+        camera.trackbodyid = 0
+        camera.elevation = -20
+        sim.add_render_context(self.viewer)
+
+    def viewer_setup(self):
+        self.viewer.cam.type = 2
+        self.viewer.cam.fixedcamid = 0
+
+    def get_image(self, width=256, height=256, camera_name=None):
+        if self.viewer is None or type(self.viewer) != mujoco_py.MjRenderContextOffscreen:
+            self.viewer = mujoco_py.MjRenderContextOffscreen(self.sim)
+            self.viewer_setup()
+            self._viewers['rgb_array'] = self.viewer
+        return self.sim.render(width, height, camera_name=camera_name)
+
+        # How to make the reward robust (combination of healthy reward, distance_to_goal)
+    def set_training_episode(self, episode: int):
+        self.training_episode = int(episode)
+
+    def _curriculum_scale(self) -> float:
+        milestones = [1, 200, 500, 900, 1400]
+        scales = [0.45, 0.60, 0.75, 0.90, 1.00]
+        idx = 0
+        for i, m in enumerate(milestones):
+            if self.training_episode >= m:
+                idx = i
+        return scales[idx]
+
+    def step(self, action, healthy_scale=None):
+        if healthy_scale is not None:
+            self.healthy_scale = healthy_scale
+        # Task is 5 dimensional -> it can either be jump, go forward/backward, rotation, velocity and flip velocity
+        # this can be just q pos and qvel[0]
+        # change task after some steps
+
+
+        xposbefore = self.get_body_com('torso')[0]
+        distance_before = np.abs(self.task[0] - self.get_body_com('torso')[0])
+        state, reward, terminated, _, info = super().step(action)
+        state = np.append(self.get_body_com("torso")[0], state)
+        distance_after = np.abs(self.task[0] - self.get_body_com('torso')[0])
+        xposafter = self.get_body_com('torso')[0]
+
+        ob = self._get_obs()
+
+        # if task[3]!=0:  # 'velocity'
+        #     reward_run = - np.abs(xvelafter[0] - self.task_specification)
+        #     reward_ctrl = -0.5 * 1e-1 * np.sum(np.square(action))
+        #     reward = reward_ctrl * 1.0 + reward_run / np.abs(self.task_specification)
+        
+        if self.base_task in [self.config.get('tasks',{}).get('goal_front'), self.config.get('tasks',{}).get('goal_back')]:  # goal tracking
+            dist_before = np.abs(xposbefore - self.task[self.base_task])
+            dist_after = np.abs(xposafter - self.task[self.base_task])
+            progress = dist_before - dist_after
+            goal_norm = max(float(self.config['max_goal'][1]), 1.0)
+
+            reward_run = -dist_after / goal_norm + 0.8 * progress / goal_norm
+            if dist_after < 1.0:
+                reward_run += 0.5
+            if dist_after < 0.4:
+                reward_run += 0.7
+
+            reward_ctrl = -1e-3 * np.sum(np.square(action))
+            healthy_reward = 1.0
+            reward = reward_run + reward_ctrl + healthy_reward * self.healthy_scale
+
+        elif self.base_task in [self.config.get('tasks',{}).get('forward_vel'), self.config.get('tasks',{}).get('backward_vel')]:  # velocity tracking
+            healthy_reward = 1.0
+            forward_vel = (xposafter - xposbefore) / self.dt
+            vel_norm = max(float(self.config['max_vel'][1]), 1.0)
+            vel_error = np.abs(forward_vel - self.task[self.base_task])
+
+            reward_run = -vel_error / vel_norm
+            if vel_error < 0.35:
+                reward_run += 0.4
+            if vel_error < 0.20:
+                reward_run += 0.5
+
+            reward_ctrl = -2e-3 * np.sum(np.square(action))
+            reward = reward_run + reward_ctrl + healthy_reward * self.healthy_scale
+            # if np.abs(forward_vel - self.task[3]) < 0.1:
+            #     self.reached_goal += 1
+            #     if self.reached_goal == 20:
+            #         reward+=1
+        else:
+            raise RuntimeError("base task not recognized")
+        
+        return ob, reward, terminated, False, dict(reward_run=reward_run, reward_ctrl=reward_ctrl,
+                                      true_task=self.task)
+
+    # from pearl rlkit
+    def _get_obs(self):
+        return np.concatenate([
+            self.sim.data.qpos.flat[1:],
+            self.sim.data.qvel.flat,
+            self.get_body_com("torso").flat,
+        ]).astype(np.float32).flatten()
+
+
+    def update_task(self, task):
+        self.task = task
+
+    def update_base_task(self, base_task):
+        self.base_task = base_task
+
+    def reset(self):
+        obs = super().reset()
+        # new_obs = np.append(self.get_body_com("torso")[0], obs[0])
+        new_obs = self._get_obs()
+        return new_obs, {}
+    
+    def random_reset(self, x_pos_range=[-10,10], x_vel_range=[-0.1,0.1]):
+        obs = super().reset()
+        # new_obs = np.append(self.get_body_com("torso")[0], obs[0])
+
+        qpos = self.init_qpos + self.np_random.uniform(
+            low=-0.1, high=0.1, size=self.model.nq
+        )
+        qvel = self.init_qvel + self.np_random.standard_normal(self.model.nv) * 0.1
+        qpos[0] = np.random.random() * (x_pos_range[1] - x_pos_range[0]) + x_pos_range[0]
+        qvel[0] = np.random.random() * (x_vel_range[1] - x_vel_range[0]) + x_vel_range[0]
+        self.set_state(qpos, qvel)
+
+        new_obs = self._get_obs()
+        return new_obs, {}
+    
+    
+    def sample_task(self, test=False, task=None):
+        self.task = np.zeros(max(self.config['tasks'].values())+1)
+        # {'velocity_forward': 0, 'velocity_backward': 1, 'goal_forward': 4, 'goal_backward': 5, 
+        # 'flip_forward': 6, 'stand_front': 3, 'stand_back': 2, 'jump': 7, flip_backward = 8,
+        # 'direction_forward': -1, 'direction_backward': -1, 'velocity': -1}
+        task_keys = list(self.config['tasks'].keys())
+        task_weights = np.array([2.0 if k in ('backward_vel', 'goal_front') else 1.0 for k in task_keys])
+        task_weights = task_weights / task_weights.sum()
+        base_task = np.random.choice(task_keys, p=task_weights)
+        self.base_task = self.config.get('tasks',{}).get(base_task)
+        mult = np.random.random()
+        if task:
+            base_task = task['base_task']
+            self.base_task = self.config.get('tasks',{}).get(base_task)
+            mult = task['specification']
+
+        scale = self._curriculum_scale()
+        goal_min, goal_max = self.config['max_goal']
+        vel_min, vel_max = self.config['max_vel']
+        goal_upper = goal_min + (goal_max - goal_min) * scale
+        vel_upper = vel_min + (vel_max - vel_min) * scale
+
+        if base_task == 'goal_front':
+            mag = goal_min + (goal_upper - goal_min) * (mult ** 0.7)
+            self.task[self.base_task] = mag
+            self.norm = max(goal_max, 1.0)
+        elif base_task == 'goal_back':
+            mag = goal_min + (goal_upper - goal_min) * (mult ** 0.7)
+            self.task[self.base_task] = -mag
+            self.norm = max(goal_max, 1.0)
+        elif base_task == 'forward_vel':
+            mag = vel_min + (vel_upper - vel_min) * (mult ** 0.75)
+            self.task[self.base_task] = mag
+            self.norm = max(vel_max, 1.0)
+        elif base_task == 'backward_vel':
+            mag = vel_min + (vel_upper - vel_min) * (mult ** 0.75)
+            self.task[self.base_task] = -mag
+            self.norm = max(vel_max, 1.0)
+        elif base_task == 'stand_front':
+            self.task[self.base_task] = mult * (self.config['max_rot'][1] - self.config['max_rot'][0]) + self.config['max_rot'][0]
+            self.norm = self.task[self.base_task]
+        elif base_task == 'stand_back':
+            self.task[self.base_task] = - (mult * (self.config['max_rot'][1] - self.config['max_rot'][0]) + self.config['max_rot'][0])
+            self.norm = self.task[self.base_task]
+        # elif base_task == 6: # instead of rotation velocity, sample how many flips
+        #     sign = np.random.choice(np.array([1,2]))
+        #     self.task[0] = (-1)**sign*(mult * (self.config['max_rot_vel'][1] - self.config['max_rot_vel'][0]) + self.config['max_rot_vel'][0])
+        #     # flips = np.random.choice(np.array([1,2,3]))
+        #     # self.task[4] = -2*np.pi*flips
+        # elif base_task == 8:
+        #     self.task[0] = -(mult * (self.config['max_rot_vel'][1] - self.config['max_rot_vel'][0]) + self.config['max_rot_vel'][0])
+        elif base_task == 'jump':
+            self.task[self.base_task] = mult * (self.config['max_jump'][1] - self.config['max_jump'][0]) + self.config['max_jump'][0]
+            self.norm = self.task[self.base_task]
+        else: 
+            print('Task not found')
+        return self.task

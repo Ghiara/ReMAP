@@ -1,0 +1,1 @@
+STATUS uid    20  lap   2.000 lapCeil     2 batchPos   0/1 batchID   0  N_b  4785.542 N_ttl  4785.542 BUSY MERGE PROPOSAL

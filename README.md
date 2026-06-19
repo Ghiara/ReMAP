@@ -1,8 +1,5 @@
 # ReMAP
 
-
-
-
 <div align="center">
 
 Official implementation of the paper: **Knowledge Reutilization in Meta-Reinforcement Learning**
